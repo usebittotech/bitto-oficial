@@ -56,7 +56,7 @@ if(startBtn) {
         // 1. CHECK LIMIT (Plano)
         const canUse = await checkUsageLimit(currentUser.uid, 'quiz');
         if (!canUse) {
-            showToast('🔒 Limite mensal de Quizzes atingido (2/2).', 'error');
+            showToast('🔒 Limite mensal de Quizzes atingido (3/3).', 'error');
             return;
         }
 

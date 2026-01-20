@@ -37,7 +37,7 @@ if(generateBtn) {
         // 1. LIMIT CHECK (Plano)
         const canUse = await checkUsageLimit(currentUser.uid, 'review');
         if (!canUse) {
-            showToast('🔒 Limite mensal atingido (2/2).', 'error');
+            showToast('🔒 Limite mensal atingido (3/3).', 'error');
             return;
         }
 

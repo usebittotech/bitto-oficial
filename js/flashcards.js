@@ -98,7 +98,7 @@ if(generateBtn) {
         // 1. VERIFICA LIMITE DO PLANO (userManager.js)
         const canUse = await checkUsageLimit(currentUser.uid, 'flashcards');
         if (!canUse) {
-            showToast('🔒 Limite mensal atingido (2/2). Faça upgrade!', 'error');
+            showToast('🔒 Limite mensal atingido (3/3). Faça upgrade!', 'error');
             return;
         }
 
