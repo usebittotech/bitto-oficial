@@ -73,7 +73,7 @@ export async function checkUsageLimit(userId, tool) {
     // < 3 permite: 0, 1 e 2. O 4º uso bloqueia.
     const currentUsage = userData.usage?.[tool] || 0;
     
-    if (currentUsage < 4) {
+    if (currentUsage < 3) {
         return true;
     } else {
         return false; // Bloqueado
