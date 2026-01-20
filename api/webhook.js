@@ -19,106 +19,96 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
     const data = req.body;
+
+    // --- 🕵️ MODO DETETIVE ATIVADO ---
+    // Isso vai mostrar no log da Vercel TODO o pacote que a Cakto mandou
+    console.log("🔍 PAYLOAD CAKTO:", JSON.stringify(data, null, 2));
+
     const eventName = data.event || ""; 
-    const status = data.state || data.status || "";
+    // Tenta achar o status em vários lugares comuns
+    const status = data.state || data.status || data.current_status || "";
 
-    console.log(`WEBHOOK: Evento [${eventName}] | Status [${status}] | Email [${data.customer?.email}]`);
+    // Tenta achar o email em vários lugares comuns (Fallback)
+    const userEmail = data.customer?.email || data.client?.email || data.payer?.email || data.buyer?.email;
+    const userName = data.customer?.name || data.client?.name || data.payer?.name || "Estudante VIP";
 
-    const userEmail = data.customer?.email;
-    if (!userEmail) return res.status(400).json({ error: "Email não identificado." });
+    console.log(`WEBHOOK PROCESSANDO | Evento: [${eventName}] | Email: [${userEmail}]`);
 
-    // --- CENÁRIO 1: REMOVER ACESSO (Reembolso/Chargeback) ---
-    // Se o cliente pediu dinheiro de volta ou contestou, cortamos o mal pela raiz.
-    if (['refund', 'chargeback', 'purchase_refused'].includes(eventName) || status === 'refunded' || status === 'refused') {
-        console.log(`⛔ REVOGANDO ACESSO de ${userEmail} por ${eventName}`);
-        
-        try {
-            const userRecord = await auth.getUserByEmail(userEmail);
-            await db.collection('users').doc(userRecord.uid).set({
-                plan: 'free',
-                subscriptionEnd: null, // Remove a data de validade
-                lastStatus: eventName
-            }, { merge: true });
-            return res.json({ success: true, action: 'revoked' });
-        } catch (e) {
-            console.log("Usuário não encontrado para revogar ou erro:", e.message);
-            return res.json({ message: "Nada a revogar." });
-        }
+    if (!userEmail) {
+        // Retorna sucesso 200 para a Cakto não ficar tentando de novo, mas avisa no log
+        console.log("❌ ERRO: Email não encontrado no payload.");
+        return res.json({ received: true, error: "Email missing" });
     }
 
-    // --- CENÁRIO 2: LIBERAR/RENOVAR ACESSO ---
+    // --- LÓGICA DE APROVAÇÃO ---
     let isApproved = false;
 
-    // Lista de eventos que dão acesso
-    // Adicionei 'subscription_renewed' (nome padrão provável) e verificação de status 'paid'
-    if (eventName === 'purchase_approved' || eventName === 'subscription_renewed' || status === 'paid' || status === 'approved') {
+    if (eventName === 'purchase_approved' || status === 'paid' || status === 'approved') {
         isApproved = true;
     } 
-    // MODO TESTE (Pix Gerado) - APAGUE ISSO DEPOIS
+    // MODO TESTE PIX
     else if (eventName === 'pix_gerado') {
-        console.log("⚠️ TESTE: Liberando por Pix Gerado");
+        console.log("⚠️ TESTE PIX: Liberando acesso...");
         isApproved = true;
     }
 
     if (!isApproved) {
-        return res.json({ message: `Evento ${eventName} ignorado (não altera acesso).` });
+        return res.json({ message: "Evento ignorado." });
     }
 
     try {
-        // Lógica de Produtos (Mensal vs Trimestral)
-        const productName = data.product?.name?.toLowerCase() || "";
+        // Tenta pegar o nome do produto
+        // Às vezes vem dentro de uma lista 'items' ou 'products'
+        const productName = data.product?.name || data.products?.[0]?.name || "";
+        
         let monthsToAdd = 1;
         let planType = 'monthly';
 
-        if (productName.includes('trimestral')) {
+        if (productName.toLowerCase().includes('trimestral')) {
             monthsToAdd = 3;
             planType = 'quarterly';
         }
 
-        // CÁLCULO INTELIGENTE DE RENOVAÇÃO
-        // Se for renovação, o ideal seria somar tempo à data atual do usuário,
-        // mas para simplificar e evitar erros, somar a partir de "HOJE" funciona bem para garantir acesso.
+        // Cálculos de data
         const now = new Date();
         const endDate = new Date();
         endDate.setMonth(now.getMonth() + monthsToAdd);
 
-        // Busca ou Cria Usuário
+        // Firebase Auth e Firestore
         let userRecord;
         let isNewUser = false;
+
         try {
             userRecord = await auth.getUserByEmail(userEmail);
+            console.log("Usuário encontrado:", userRecord.uid);
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
+                console.log("Criando novo usuário...");
                 userRecord = await auth.createUser({
                     email: userEmail,
                     emailVerified: true,
-                    displayName: data.customer?.name || "Estudante"
+                    displayName: userName
                 });
                 isNewUser = true;
             } else throw error;
         }
 
-        // Grava no Firestore
-        const userRef = db.collection('users').doc(userRecord.uid);
-        const updateData = {
+        await db.collection('users').doc(userRecord.uid).set({
+            name: userName,
             email: userEmail,
             plan: planType,
             subscriptionEnd: admin.firestore.Timestamp.fromDate(endDate),
             lastPaymentId: data.id || `webhook_${Date.now()}`,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        };
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            ...(isNewUser && { 
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                usage: { flashcards: 0, quiz: 0, review: 0 },
+                xp: 0
+            })
+        }, { merge: true });
 
-        if (isNewUser) {
-            updateData.name = data.customer?.name || "Estudante";
-            updateData.usage = { flashcards: 0, quiz: 0, review: 0 };
-            updateData.xp = 0;
-            updateData.createdAt = admin.firestore.FieldValue.serverTimestamp();
-        }
-
-        await userRef.set(updateData, { merge: true });
-
-        console.log(`✅ SUCESSO: ${planType} ativado/renovado até ${endDate.toISOString()}`);
-        return res.status(200).json({ success: true });
+        console.log(`✅ SUCESSO TOTAL: ${userEmail} ativado.`);
+        return res.json({ success: true });
 
     } catch (error) {
         console.error("ERRO CRÍTICO:", error);
