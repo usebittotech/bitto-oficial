@@ -1,5 +1,6 @@
 import admin from 'firebase-admin';
 
+// Inicializa o Firebase apenas se não estiver inicializado
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert({
@@ -20,38 +21,32 @@ export default async function handler(req, res) {
 
     const payload = req.body;
     
-    // --- CORREÇÃO DO PAYLOAD ---
-    // A Cakto envia os dados úteis dentro de um objeto 'data'.
-    // Se existir payload.data, usamos ele. Se não, usamos o payload direto.
+    // Detecção da estrutura de dados da Cakto (payload direto ou dentro de 'data')
     const data = payload.data || payload;
 
     const eventName = payload.event || data.event || ""; 
     const status = data.status || data.state || "";
 
-    // Busca o email dentro do objeto correto
+    // Busca o email em todos os locais possíveis
     const userEmail = data.customer?.email || data.client?.email || data.payer?.email;
     const userName = data.customer?.name || data.client?.name || "Estudante VIP";
 
-    console.log(`WEBHOOK | Evento: [${eventName}] | Email: [${userEmail}]`);
+    console.log(`WEBHOOK | Evento: [${eventName}] | Status: [${status}] | Email: [${userEmail}]`);
 
     if (!userEmail) {
-        console.log("❌ ERRO: Email não encontrado mesmo após correção.");
-        return res.json({ error: "Email missing" });
+        console.log("❌ Ignorado: Email não encontrado no payload.");
+        return res.json({ message: "Email missing" });
     }
 
-    // --- LÓGICA DE APROVAÇÃO ---
+    // --- LÓGICA DE SEGURANÇA ---
     let isApproved = false;
 
-    // 1. Aprovação Real (Produção)
+    // 1. APROVAÇÃO REAL: Apenas se estiver PAGO ou APROVADO
     if (eventName === 'purchase_approved' || status === 'paid' || status === 'approved' || eventName === 'subscription_renewed') {
         isApproved = true;
     } 
-    // 2. MODO TESTE (Pix Gerado) - REMOVER DEPOIS
-    else if (eventName === 'pix_gerado') {
-        console.log("⚠️ TESTE PIX: Liberando acesso...");
-        isApproved = true;
-    }
-    // 3. Cancelamento/Reembolso (Revoga acesso)
+    
+    // 2. REVOGAÇÃO: Se for reembolso ou cancelamento, removemos o acesso
     else if (['refund', 'chargeback', 'purchase_refused'].includes(eventName) || status === 'refunded' || status === 'refused') {
         console.log(`⛔ REVOGANDO ACESSO de ${userEmail}`);
         try {
@@ -63,19 +58,20 @@ export default async function handler(req, res) {
             }, { merge: true });
             return res.json({ success: true, action: 'revoked' });
         } catch (e) {
-            return res.json({ message: "Nada a revogar." });
+            return res.json({ message: "Usuário não encontrado para revogar." });
         }
     }
 
+    // Se não for aprovado (ex: pix_gerado, waiting_payment), o código para aqui.
     if (!isApproved) {
-        return res.json({ message: "Evento ignorado." });
+        console.log(`⏳ Evento [${eventName}] recebido, mas aguardando pagamento.`);
+        return res.json({ message: "Aguardando pagamento." });
     }
 
     try {
-        // Busca o nome do produto para saber se é Trimestral
-        // No seu log, o nome está em data.product.name
+        // --- LÓGICA DE PRODUTO (Mensal vs Trimestral) ---
         const productName = data.product?.name || data.offer?.name || "";
-        console.log(`Produto: ${productName}`);
+        console.log(`💰 Pagamento Confirmado! Produto: ${productName}`);
         
         let monthsToAdd = 1;
         let planType = 'monthly';
@@ -83,7 +79,6 @@ export default async function handler(req, res) {
         if (productName.toLowerCase().includes('trimestral')) {
             monthsToAdd = 3;
             planType = 'quarterly';
-            console.log(">> Plano Trimestral detectado");
         }
 
         const now = new Date();
@@ -96,10 +91,8 @@ export default async function handler(req, res) {
 
         try {
             userRecord = await auth.getUserByEmail(userEmail);
-            console.log("Usuário existente encontrado.");
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
-                console.log("Criando novo usuário...");
                 userRecord = await auth.createUser({
                     email: userEmail,
                     emailVerified: true,
@@ -123,7 +116,7 @@ export default async function handler(req, res) {
             })
         }, { merge: true });
 
-        console.log(`✅ SUCESSO: ${userEmail} ativado até ${endDate.toISOString()}`);
+        console.log(`✅ SUCESSO: ${userEmail} ativado.`);
         return res.json({ success: true });
 
     } catch (error) {
