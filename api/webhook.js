@@ -18,38 +18,53 @@ const auth = admin.auth();
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    const data = req.body;
+    const payload = req.body;
+    
+    // --- CORREÇÃO DO PAYLOAD ---
+    // A Cakto envia os dados úteis dentro de um objeto 'data'.
+    // Se existir payload.data, usamos ele. Se não, usamos o payload direto.
+    const data = payload.data || payload;
 
-    // --- 🕵️ MODO DETETIVE ATIVADO ---
-    // Isso vai mostrar no log da Vercel TODO o pacote que a Cakto mandou
-    console.log("🔍 PAYLOAD CAKTO:", JSON.stringify(data, null, 2));
+    const eventName = payload.event || data.event || ""; 
+    const status = data.status || data.state || "";
 
-    const eventName = data.event || ""; 
-    // Tenta achar o status em vários lugares comuns
-    const status = data.state || data.status || data.current_status || "";
+    // Busca o email dentro do objeto correto
+    const userEmail = data.customer?.email || data.client?.email || data.payer?.email;
+    const userName = data.customer?.name || data.client?.name || "Estudante VIP";
 
-    // Tenta achar o email em vários lugares comuns (Fallback)
-    const userEmail = data.customer?.email || data.client?.email || data.payer?.email || data.buyer?.email;
-    const userName = data.customer?.name || data.client?.name || data.payer?.name || "Estudante VIP";
-
-    console.log(`WEBHOOK PROCESSANDO | Evento: [${eventName}] | Email: [${userEmail}]`);
+    console.log(`WEBHOOK | Evento: [${eventName}] | Email: [${userEmail}]`);
 
     if (!userEmail) {
-        // Retorna sucesso 200 para a Cakto não ficar tentando de novo, mas avisa no log
-        console.log("❌ ERRO: Email não encontrado no payload.");
-        return res.json({ received: true, error: "Email missing" });
+        console.log("❌ ERRO: Email não encontrado mesmo após correção.");
+        return res.json({ error: "Email missing" });
     }
 
     // --- LÓGICA DE APROVAÇÃO ---
     let isApproved = false;
 
-    if (eventName === 'purchase_approved' || status === 'paid' || status === 'approved') {
+    // 1. Aprovação Real (Produção)
+    if (eventName === 'purchase_approved' || status === 'paid' || status === 'approved' || eventName === 'subscription_renewed') {
         isApproved = true;
     } 
-    // MODO TESTE PIX
+    // 2. MODO TESTE (Pix Gerado) - REMOVER DEPOIS
     else if (eventName === 'pix_gerado') {
         console.log("⚠️ TESTE PIX: Liberando acesso...");
         isApproved = true;
+    }
+    // 3. Cancelamento/Reembolso (Revoga acesso)
+    else if (['refund', 'chargeback', 'purchase_refused'].includes(eventName) || status === 'refunded' || status === 'refused') {
+        console.log(`⛔ REVOGANDO ACESSO de ${userEmail}`);
+        try {
+            const userRecord = await auth.getUserByEmail(userEmail);
+            await db.collection('users').doc(userRecord.uid).set({
+                plan: 'free',
+                subscriptionEnd: null,
+                lastStatus: eventName
+            }, { merge: true });
+            return res.json({ success: true, action: 'revoked' });
+        } catch (e) {
+            return res.json({ message: "Nada a revogar." });
+        }
     }
 
     if (!isApproved) {
@@ -57,9 +72,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Tenta pegar o nome do produto
-        // Às vezes vem dentro de uma lista 'items' ou 'products'
-        const productName = data.product?.name || data.products?.[0]?.name || "";
+        // Busca o nome do produto para saber se é Trimestral
+        // No seu log, o nome está em data.product.name
+        const productName = data.product?.name || data.offer?.name || "";
+        console.log(`Produto: ${productName}`);
         
         let monthsToAdd = 1;
         let planType = 'monthly';
@@ -67,20 +83,20 @@ export default async function handler(req, res) {
         if (productName.toLowerCase().includes('trimestral')) {
             monthsToAdd = 3;
             planType = 'quarterly';
+            console.log(">> Plano Trimestral detectado");
         }
 
-        // Cálculos de data
         const now = new Date();
         const endDate = new Date();
         endDate.setMonth(now.getMonth() + monthsToAdd);
 
-        // Firebase Auth e Firestore
+        // --- FIRESTORE & AUTH ---
         let userRecord;
         let isNewUser = false;
 
         try {
             userRecord = await auth.getUserByEmail(userEmail);
-            console.log("Usuário encontrado:", userRecord.uid);
+            console.log("Usuário existente encontrado.");
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
                 console.log("Criando novo usuário...");
@@ -107,7 +123,7 @@ export default async function handler(req, res) {
             })
         }, { merge: true });
 
-        console.log(`✅ SUCESSO TOTAL: ${userEmail} ativado.`);
+        console.log(`✅ SUCESSO: ${userEmail} ativado até ${endDate.toISOString()}`);
         return res.json({ success: true });
 
     } catch (error) {
