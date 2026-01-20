@@ -159,28 +159,187 @@ h1 {
 }
 .video-placeholder video { width: 100%; height: 100%; object-fit: cover; }
 
-/* --- PLANOS --- */
-.pricing-bg { background: linear-gradient(to bottom, #f0f2ff 50%, white 50%); border-radius: 60px 60px 0 0; }
-.price-container { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; }
-.price-card { 
-    background: white; padding: 40px 30px; border-radius: 30px; width: 100%; 
-    max-width: 350px; border: 1px solid var(--border); display: flex; 
-    flex-direction: column; justify-content: space-between; 
+/* =========================================
+   NOVA SEÇÃO DE PLANOS (MODERN SAAS)
+   ========================================= */
+.pricing-section-modern {
+    padding: 100px 8%;
+    background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
 }
-.price-card.featured { border: 2px solid var(--primary); transform: scale(1.05); position: relative; z-index: 2; }
-.featured-tag { 
-    position: absolute; top: -12px; left: 50%; transform: translateX(-50%); 
-    background: var(--primary); color: white; padding: 5px 15px; 
-    border-radius: 20px; font-size: 0.8rem; font-weight: 700; 
+
+.pricing-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 60px;
 }
-.price-value { font-size: 2.5rem; margin: 20px 0; font-family: var(--font-heading); font-weight: 900; }
-.check-list { list-style: none; margin-bottom: 30px; }
-.check-list li { margin-bottom: 10px; display: flex; gap: 10px; }
-.check-list li::before { content: '✓'; color: var(--primary); font-weight: 900; }
+.pricing-header h2 {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-bottom: 15px;
+    color: var(--dark);
+}
+.pricing-header p {
+    color: var(--text-gray);
+    font-size: 1.1rem;
+}
 
-.btn-plan-basic { background: #f1f5f9; color: var(--dark); padding: 1rem; border-radius: 12px; text-align: center; text-decoration: none; font-weight: 700; display: block; }
-.btn-plan-feature { background: var(--accent); color: var(--dark); padding: 1rem; border-radius: 12px; text-align: center; text-decoration: none; font-weight: 800; display: block; }
+.pricing-grid {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    align-items: center; 
+}
 
+/* Card Padrão */
+.plan-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 340px;
+    border: 1px solid rgba(0,0,0,0.08);
+    transition: 0.3s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.plan-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-gray);
+    margin-bottom: 15px;
+    display: block;
+}
+
+.plan-price {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--dark);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+.plan-price span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-gray);
+}
+
+.plan-desc {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    margin-bottom: 30px;
+    line-height: 1.4;
+    min-height: 40px;
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 30px;
+    flex-grow: 1;
+}
+.plan-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: var(--dark);
+}
+.icon-check {
+    color: var(--primary);
+    font-weight: 900;
+    background: rgba(0, 53, 255, 0.1);
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+}
+
+/* Botões */
+.btn-plan {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+.btn-outline {
+    border: 2px solid #e2e8f0;
+    color: var(--dark);
+    background: transparent;
+}
+.btn-outline:hover {
+    border-color: var(--dark);
+    background: var(--dark);
+    color: white;
+}
+
+/* --- CARD DESTAQUE (TRIMESTRAL) --- */
+.plan-card.featured {
+    background: var(--dark); 
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    transform: scale(1.05); 
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    z-index: 2;
+    padding: 50px 35px;
+}
+
+.plan-card.featured .plan-name { color: rgba(255,255,255,0.6); }
+.plan-card.featured .plan-price { color: white; }
+.plan-card.featured .plan-price span { color: rgba(255,255,255,0.5); }
+.plan-card.featured .plan-desc { color: rgba(255,255,255,0.7); }
+.plan-card.featured .plan-features li { color: white; }
+.plan-card.featured .icon-check {
+    background: var(--accent);
+    color: var(--dark);
+}
+
+.btn-primary-neon {
+    background: var(--accent);
+    color: var(--dark);
+    box-shadow: 0 10px 20px rgba(204, 255, 0, 0.2);
+}
+.btn-primary-neon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(204, 255, 0, 0.4);
+}
+
+.badge-popular {
+    position: absolute;
+    top: -15px; left: 50%; transform: translateX(-50%);
+    background: var(--primary);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(0, 53, 255, 0.4);
+}
+
+/* Responsividade Planos */
+@media (max-width: 900px) {
+    .pricing-grid { flex-direction: column; gap: 40px; }
+    .plan-card { width: 100%; max-width: 100%; }
+    .plan-card.featured { transform: scale(1); }
+}
 /* --- FAQ --- */
 .faq-wrapper { max-width: 800px; margin: 0 auto; }
 .faq-item { background: white; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--border); overflow: hidden; }
