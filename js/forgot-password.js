@@ -1,5 +1,5 @@
 import { auth } from './firebase-init.js';
-// Importação direta do CDN para garantir compatibilidade com seu setup atual
+// Importação direta do CDN para garantir compatibilidade
 import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const resetForm = document.getElementById('resetForm');
@@ -12,6 +12,15 @@ const emailInput = document.getElementById('resetEmail');
 
 // Estado inicial
 let currentMode = 'forgot';
+
+// --- ATIVAÇÃO AUTOMÁTICA PELA URL (O SEGREDO ESTÁ AQUI) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'activate') {
+        const activateBtn = document.querySelector('.tab-btn[data-mode="activate"]');
+        if (activateBtn) activateBtn.click();
+    }
+});
 
 // --- CONTROLE DAS ABAS ---
 tabBtns.forEach(btn => {
@@ -28,10 +37,11 @@ tabBtns.forEach(btn => {
 
 function updateUI() {
     if (currentMode === 'activate') {
-        pageTitle.innerText = "Ativar Conta";
+        pageTitle.innerText = "Primeiro Acesso";
         pageSubtitle.innerText = "Defina sua senha para acessar o plano.";
         submitBtn.innerText = "ENVIAR LINK DE ATIVAÇÃO";
         emailInput.placeholder = "E-mail usado na compra";
+        emailInput.focus();
     } else {
         pageTitle.innerText = "Recuperar Senha";
         pageSubtitle.innerText = "Vamos enviar um link para você.";
@@ -40,7 +50,7 @@ function updateUI() {
     }
 }
 
-// --- TEMA (Mantido do seu original) ---
+// --- TEMA ---
 const htmlElement = document.documentElement;
 const sunIcon = document.querySelector('.icon-sun');
 const moonIcon = document.querySelector('.icon-moon');
@@ -87,17 +97,17 @@ resetForm.addEventListener('submit', async (e) => {
         await sendPasswordResetEmail(auth, email);
 
         if (currentMode === 'activate') {
-            showToast("Link enviado! Verifique seu e-mail para ativar.", "success");
+            showToast("Link enviado! Verifique seu e-mail para criar a senha.", "success");
         } else {
             showToast("E-mail de recuperação enviado!", "success");
         }
         
         resetForm.reset();
         
-        // Redireciona após 4s
+        // Redireciona após 5s
         setTimeout(() => {
             window.location.href = 'login.html';
-        }, 4000);
+        }, 5000);
 
     } catch (error) {
         console.error(error);
