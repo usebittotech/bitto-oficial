@@ -4,6 +4,30 @@ import { doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/1
 import { db } from './firebase-init.js';
 import { checkMonthlyReset, calculateLevel } from './xpSystem.js';
 
+// --- FUNÇÃO DE CORREÇÃO PARA MOBILE (ADICIONADA) ---
+async function compressImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 400; // Tamanho otimizado para avatar
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); // Converte para JPEG leve
+            };
+            img.onerror = reject;
+        };
+        reader.onerror = reject;
+    });
+}
+
 // ==========================================
 // 1. ELEMENTOS UI E INICIALIZAÇÃO
 // ==========================================
@@ -12,7 +36,6 @@ const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
 const themeToggle = document.getElementById('themeToggle');
 
-// Histórico da conversa (Contexto da IA)
 let chatHistory = [
     {
         role: "user",
@@ -30,11 +53,9 @@ let chatHistory = [
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         await checkMonthlyReset(user);
-
         const emailInput = document.getElementById('settingsEmailInput');
         if(emailInput) emailInput.value = user.email;
 
-        // Listener em Tempo Real (Firestore)
         onSnapshot(doc(db, "users", user.uid), (docSnapshot) => {
             if (docSnapshot.exists()) {
                 updateInterface(user, docSnapshot.data());
@@ -42,10 +63,7 @@ onAuthStateChanged(auth, async (user) => {
         });
 
         setupSettingsSave(user);
-
     } else {
-        // Redireciona para o login se não estiver autenticado
-        // Ajuste o caminho conforme a estrutura da sua pasta
         window.location.href = '../index.html';
     }
 });
@@ -56,7 +74,6 @@ function updateInterface(user, dbData) {
     const displayName = dbData.displayName || user.displayName || "Estudante";
     const firstName = displayName.split(' ')[0];
 
-    // Atualiza Textos
     document.getElementById('navUserName').innerText = firstName;
     document.getElementById('ddUserName').innerText = displayName;
     document.getElementById('userXP').innerText = currentXP;
@@ -64,20 +81,14 @@ function updateInterface(user, dbData) {
     document.getElementById('ddLevel').innerText = `Nível ${levelData.level}`;
     document.getElementById('mascotLevelText').innerText = `Nível ${levelData.level}`;
 
-    // Card de Estatísticas
     const stats = dbData.stats || {};
     const generatedCount = stats.cardsGeneratedMonth || 0;
     const generatedCountEl = document.getElementById('generatedCount');
-    const generatedDetailsEl = document.getElementById('generatedDetails');
-    
     if(generatedCountEl) {
         generatedCountEl.innerText = `${generatedCount} Cards`;
-        if(generatedCount > 50) generatedCountEl.style.color = "var(--accent-green)";
-        else generatedCountEl.style.color = "var(--primary-blue)";
+        generatedCountEl.style.color = generatedCount > 50 ? "var(--accent-green)" : "var(--primary-blue)";
     }
-    if(generatedDetailsEl) generatedDetailsEl.innerText = "Criados este mês";
 
-    // Barra de XP
     let range = levelData.limit - levelData.min;
     let progress = currentXP - levelData.min;
     let percentage = Math.max(0, Math.min(100, (progress / range) * 100));
@@ -87,15 +98,14 @@ function updateInterface(user, dbData) {
     updateGreeting(firstName);
     updateMascotImage(currentXP);
 
-    // Avatar do Usuário
     const photoURL = dbData.photoURL || user.photoURL;
     if (photoURL) {
         document.querySelectorAll('.avatar-circle, .avatar-placeholder-large').forEach(el => {
             el.innerHTML = `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
         });
         const preview = document.getElementById('settingsAvatarPreview');
-        const placeholder = document.getElementById('settingsAvatarPlaceholder');
         if(preview) { preview.src = photoURL; preview.style.display = 'block'; }
+        const placeholder = document.getElementById('settingsAvatarPlaceholder');
         if(placeholder) placeholder.style.display = 'none';
     }
     
@@ -106,7 +116,6 @@ function updateInterface(user, dbData) {
 function updateMascotImage(xp) {
     const mascotImg = document.getElementById('mascotImage');
     if (!mascotImg) return;
-    
     let imageName = 'bittinho-0';
     if (xp >= 5800) imageName = 'bittinho-5800'; 
     else if (xp >= 4200) imageName = 'bittinho-4200';
@@ -117,7 +126,6 @@ function updateMascotImage(xp) {
     else if (xp >= 500) imageName = 'bittinho-500';
     else if (xp >= 250) imageName = 'bittinho-250';
     else if (xp >= 100) imageName = 'bittinho-100';
-    
     mascotImg.src = `../bittinhos/${imageName}.png`;
 }
 
@@ -125,10 +133,7 @@ function updateGreeting(name) {
     const hour = new Date().getHours();
     const greetingElement = document.getElementById('greetingText');
     if (greetingElement) {
-        let greeting = "Olá";
-        if (hour >= 5 && hour < 12) greeting = "Bom dia";
-        else if (hour >= 12 && hour < 18) greeting = "Boa tarde";
-        else greeting = "Boa noite";
+        let greeting = (hour >= 5 && hour < 12) ? "Bom dia" : (hour >= 12 && hour < 18) ? "Boa tarde" : "Boa noite";
         greetingElement.innerText = `${greeting}, ${name}! 👋`;
     }
 }
@@ -152,23 +157,11 @@ if(hamburgerBtn) hamburgerBtn.addEventListener('click', toggleMobileMenu);
 if(closeMenuBtn) closeMenuBtn.addEventListener('click', toggleMobileMenu);
 if(mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', toggleMobileMenu);
 
-if(mobileConfigBtn) {
-    mobileConfigBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleMobileMenu();
-        openSettings();
-    });
-}
-if(mobileLogoutBtn) {
-    mobileLogoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleMobileMenu();
-        openLogoutModal();
-    });
-}
+if(mobileConfigBtn) mobileConfigBtn.addEventListener('click', (e) => { e.preventDefault(); toggleMobileMenu(); openSettings(); });
+if(mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', (e) => { e.preventDefault(); toggleMobileMenu(); openLogoutModal(); });
 
 // ==========================================
-// 4. CONFIGURAÇÕES E LOGOUT
+// 4. CONFIGURAÇÕES E LOGOUT (CORRIGIDO)
 // ==========================================
 const settingsModal = document.getElementById('settingsModal');
 const navConfigBtn = document.getElementById('navConfigBtn');
@@ -185,18 +178,21 @@ if(ddAccountBtn) ddAccountBtn.addEventListener('click', (e) => { e.preventDefaul
 if(closeSettingsBtn) closeSettingsBtn.addEventListener('click', closeSettings);
 
 if(avatarInput) {
-    avatarInput.addEventListener('change', function(e) {
+    avatarInput.addEventListener('change', async function(e) {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            try {
+                // CORREÇÃO: Comprime a imagem antes de gerar o preview
+                const compressedSrc = await compressImage(file);
                 const preview = document.getElementById('settingsAvatarPreview');
                 const placeholder = document.getElementById('settingsAvatarPlaceholder');
-                preview.src = e.target.result;
+                preview.src = compressedSrc;
                 preview.style.display = 'block';
                 placeholder.style.display = 'none';
+            } catch (err) {
+                console.error("Erro ao processar imagem:", err);
+                showToast("Erro ao carregar imagem no celular.", "error");
             }
-            reader.readAsDataURL(file);
         }
     });
 }
@@ -213,10 +209,13 @@ function setupSettingsSave(user) {
             newBtn.innerText = "Salvando...";
             newBtn.disabled = true;
             try {
-                await updateProfile(user, { displayName: newName });
+                // Atualiza perfil no Auth e prepara objeto Firestore
                 const updateData = { displayName: newName };
                 if (hasNewImage && previewSrc.startsWith('data:image')) updateData.photoURL = previewSrc; 
+                
+                await updateProfile(user, { displayName: newName, photoURL: updateData.photoURL || user.photoURL });
                 await updateDoc(doc(db, "users", user.uid), updateData);
+                
                 showToast("Perfil atualizado!", "success");
                 closeSettings();
             } catch (error) {
@@ -305,100 +304,60 @@ function typeWriter(text, i) {
 document.addEventListener('DOMContentLoaded', () => { typeWriter("Oi! Sou o Bitto. Vamos evoluir juntos?", 0); });
 
 // ==========================================
-// 6. CHATBOT IA (INTEGRAÇÃO OTIMIZADA)
+// 6. CHATBOT IA (TIMER DE 15s MANTIDO)
 // ==========================================
 window.sendChip = (text) => { if(chatInput) { chatInput.value = text; handleSend(); } }
 
 async function handleSend() {
     const text = chatInput.value.trim();
-    if (!text) return;
+    if (!text || sendBtn.disabled) return; 
 
-    // --- 🛡️ BLINDAGEM: TIMER DE 15s (EVITA SPAM) ---
-    if (sendBtn.disabled) return; 
-
-    // 1. Trava Interface
     sendBtn.disabled = true;
     chatInput.disabled = true;
     const originalBtnText = sendBtn.innerText;
     
-    // 2. Inicia Contagem Regressiva
     let timeLeft = 15;
     sendBtn.innerText = `⏳ ${timeLeft}`;
     
     const timer = setInterval(() => {
         timeLeft--;
         sendBtn.innerText = `⏳ ${timeLeft}`;
-        
         if (timeLeft <= 0) {
             clearInterval(timer);
-            // Destrava
             sendBtn.disabled = false;
             chatInput.disabled = false;
             sendBtn.innerText = originalBtnText || "→"; 
             chatInput.focus();
         }
     }, 1000);
-    // ----------------------------------------------
 
-    // Adiciona msg do usuário na tela
     addMessage(text, 'user');
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     chatInput.value = '';
-
-    // Mostra loading
     const loadingId = addLoadingMessage();
 
     try {
-        // Envia apenas as últimas 10 interações para economizar tokens
-        const recentHistory = chatHistory.slice(-10);
-        
-        const botText = await callGeminiChat(recentHistory);
+        const botText = await callGeminiChat(chatHistory.slice(-10));
         removeLoadingMessage(loadingId);
-
         if (botText) {
             addMessage(botText, 'bot');
             chatHistory.push({ role: "model", parts: [{ text: botText }] });
-        } else {
-            addMessage("O Bitto piscou aqui. Tente de novo! 🔌", 'bot');
         }
     } catch (error) {
         removeLoadingMessage(loadingId);
-        console.error(error);
-        addMessage("Muitos estudantes online agora! 🤯 O Bitto precisa de um café. Tente em 30s.", 'bot');
+        addMessage("O Bitto precisa de um café. Tente em 30s.", 'bot');
     }
 }
 
-// ------------------------------------------
-// CHAMADA API (COM FALLBACK NO BACKEND)
-// ------------------------------------------
 async function callGeminiChat(history) {
-    try {
-        const res = await fetch('/api/chat', { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: history })
-        });
-
-        const data = await res.json();
-        
-        // Debug para você acompanhar qual modelo respondeu (opcional)
-        console.log("RESPOSTA API:", data);
-
-        if (!res.ok) {
-            const errorMsg = data.error?.message || JSON.stringify(data);
-            throw new Error(`Erro API (${res.status}): ${errorMsg}`);
-        }
-
-        if (!data.candidates || data.candidates.length === 0) {
-            return "Minha diretriz de segurança bloqueou essa resposta. Tente perguntar de outra forma.";
-        }
-
-        return data.candidates[0].content.parts[0].text;
-
-    } catch (error) {
-        console.error("❌ ERRO NO CHAT:", error);
-        throw error; // Repassa erro para cair no catch do handleSend
-    }
+    const res = await fetch('/api/chat', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: history })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error("Erro na API");
+    return data.candidates[0].content.parts[0].text;
 }
 
 if(sendBtn) sendBtn.addEventListener('click', handleSend);
@@ -408,10 +367,8 @@ function addMessage(text, type) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message message-${type}`;
     const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    
-    // Formata negrito **texto** -> <b>texto</b>
     const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
+    
     let contentHtml = type === 'bot' 
         ? `<div class="header-avatar" style="border:none; background: transparent; flex-shrink:0;"><div class="header-avatar" style="width:32px; height:32px;"><img src="../imagens/bittochat.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div></div><div class="message-bubble">${formattedText}<span class="message-time">${time}</span></div>` 
         : `<div class="message-bubble">${formattedText}<span class="message-time">${time}</span></div>`;
@@ -426,15 +383,7 @@ function addLoadingMessage() {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message message-bot`;
     messageDiv.id = id;
-    messageDiv.innerHTML = `
-        <div class="header-avatar" style="border:none; background: transparent; flex-shrink:0;">
-            <div class="header-avatar" style="width:32px; height:32px;">
-                <img src="../imagens/bittochat.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
-            </div>
-        </div>
-        <div class="message-bubble" style="color: var(--text-muted); font-style: italic;">
-            <span class="cursor">|</span> Digitando...
-        </div>`;
+    messageDiv.innerHTML = `<div class="header-avatar" style="border:none; background: transparent; flex-shrink:0;"><div class="header-avatar" style="width:32px; height:32px;"><img src="../imagens/bittochat.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div></div><div class="message-bubble" style="color: var(--text-muted); font-style: italic;"><span class="cursor">|</span> Digitando...</div>`;
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return id;
