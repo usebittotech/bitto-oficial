@@ -1,230 +1,251 @@
-import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, googleProvider } from './firebase-init.js';
-import { syncUserDatabase } from './userManager.js';
+/* ARQUIVO: css/login.css */
 
-const showRegisterBtn = document.getElementById('showRegister');
-const showLoginBtn = document.getElementById('showLogin');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const formTitle = document.getElementById('formTitle');
-const formSubtitle = document.getElementById('formSubtitle');
-
-// Botões Google
-const googleBtnLogin = document.getElementById('googleBtnLogin');
-const googleBtnRegister = document.getElementById('googleBtnRegister');
-
-// DETECÇÃO AUTOMÁTICA
-window.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'register') {
-        if(showRegisterBtn) showRegisterBtn.click();
-    }
-});
-
-// TEMA
-const themeToggle = document.getElementById('themeToggle');
-const htmlElement = document.documentElement;
-const sunIcon = document.querySelector('.icon-sun');
-const moonIcon = document.querySelector('.icon-moon');
-
-if (localStorage.getItem('bitto_theme') === 'dark') {
-    setTheme('dark');
+:root {
+    --bg-color: #FAFAFA;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --card-bg: #FFFFFF;
+    --border-color: #E0E0E0;
+    --input-bg: #F8F9FA;
+    --primary-blue: #0035FF;
+    --accent-green: #CCFF00;
+    --font-display: 'Unbounded', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --radius-lg: 24px;
+    --shadow-soft: 0 20px 40px rgba(0,0,0,0.06);
+    --right-panel-bg: linear-gradient(135deg, #0035FF 0%, #0020A0 100%);
+    --right-text: #FFFFFF;
 }
 
-function setTheme(theme) {
-    if (theme === 'dark') {
-        htmlElement.setAttribute('data-theme', 'dark');
-        if(sunIcon) sunIcon.style.display = 'none';
-        if(moonIcon) moonIcon.style.display = 'block';
-        localStorage.setItem('bitto_theme', 'dark');
-    } else {
-        htmlElement.setAttribute('data-theme', 'light');
-        if(sunIcon) sunIcon.style.display = 'block';
-        if(moonIcon) moonIcon.style.display = 'none';
-        localStorage.setItem('bitto_theme', 'light');
-    }
+[data-theme="dark"] {
+    --bg-color: #050505;
+    --text-main: #EDEDED;
+    --text-muted: #AAAAAA;
+    --card-bg: #111111;
+    --border-color: #333333;
+    --input-bg: #1A1A1A;
+    --primary-blue: #3366FF;
+    --right-panel-bg: linear-gradient(135deg, #111111 0%, #000000 100%);
 }
 
-if(themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        const current = htmlElement.getAttribute('data-theme');
-        setTheme(current === 'dark' ? 'light' : 'dark');
-    });
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    color: var(--text-main);
+    background-color: var(--bg-color);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden; 
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-// TILT 3D
-const tiltElement = document.querySelector('.tilt-element');
-document.addEventListener('mousemove', (e) => {
-    if(tiltElement && window.innerWidth > 900) { 
-        const rect = tiltElement.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        if (x >= -50 && x <= rect.width + 50 && y >= -50 && y <= rect.height + 50) {
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -5; 
-            const rotateY = ((x - centerX) / centerX) * 5;
-            tiltElement.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-        } else {
-            tiltElement.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-        }
-    }
-});
-
-// TOGGLE SENHA
-const togglePassBtns = document.querySelectorAll('.toggle-pass-btn');
-togglePassBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const input = btn.parentElement.querySelector('input');
-        const eyeOpen = btn.querySelector('.eye-open');
-        const eyeClosed = btn.querySelector('.eye-closed');
-        if (input.type === 'password') {
-            input.type = 'text';
-            eyeOpen.style.display = 'none';
-            eyeClosed.style.display = 'block';
-        } else {
-            input.type = 'password';
-            eyeOpen.style.display = 'block';
-            eyeClosed.style.display = 'none';
-        }
-    });
-});
-
-// LOGIN GOOGLE
-async function handleGoogleLogin() {
-    try {
-        const result = await signInWithPopup(auth, googleProvider);
-        await syncUserDatabase(result.user);
-        showToast("Conectado com Google!", "success");
-        // [CORREÇÃO] Caminho absoluto a partir da raiz
-        setTimeout(() => window.location.href = '/pages/dashboard.html', 1000);
-    } catch (error) {
-        console.error(error);
-        if(error.code === 'auth/unauthorized-domain') showToast("Erro: Domínio não autorizado no Firebase.", "error");
-        else showToast("Erro no Google Login.", "error");
-    }
+/* --- ELEMENTOS GLOBAIS DE NAVEGAÇÃO --- */
+.back-home {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    z-index: 100;
+    transition: all 0.3s;
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: transparent;
 }
-if(googleBtnLogin) googleBtnLogin.addEventListener('click', handleGoogleLogin);
-if(googleBtnRegister) googleBtnRegister.addEventListener('click', handleGoogleLogin);
 
-// LOGIN EMAIL
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const emailInput = document.getElementById('loginEmail');
-    const passInput = document.getElementById('loginPass');
-    const btn = loginForm.querySelector('button[type="submit"]');
-    const originalText = btn.innerHTML;
+.back-home:hover {
+    background: rgba(0, 53, 255, 0.05);
+    transform: translateX(-3px);
+}
 
-    if (!emailInput || !passInput) {
-        showToast("Erro interno: Campos não encontrados.", "error");
-        return;
+.auth-theme-toggle { 
+    position: absolute; 
+    top: 25px; 
+    right: 25px; 
+    z-index: 100; 
+}
+
+/* --- CRT & TILT --- */
+.crt-overlay {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px;
+    pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+[data-theme="dark"] .crt-overlay { display: block; }
+
+/* --- LAYOUT PRINCIPAL --- */
+.auth-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    background-image: radial-gradient(circle at 50% 50%, rgba(0, 53, 255, 0.05) 0%, transparent 70%);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 1000px;
+    z-index: 2;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    overflow: hidden;
+    min-height: 620px;
+    width: 100%;
+}
+
+/* --- COLUNA ESQUERDA --- */
+.auth-left {
+    flex: 1;
+    padding: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.logo-icon {
+    width: 54px; height: 54px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    display: flex; justify-content: center; align-items: center;
+    padding: 6px;
+    margin: 0 auto 1.5rem auto;
+}
+.logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+.auth-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p { text-align: center; color: var(--text-muted); margin-bottom: 2rem; }
+
+.auth-input {
+    width: 100%;
+    background: var(--input-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    outline: none;
+}
+
+.btn-primary {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 53, 255, 0.2);
+}
+
+.activation-box {
+    margin-top: 20px;
+    text-align: center;
+    background: rgba(0, 53, 255, 0.04);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px dashed var(--primary-blue);
+}
+.activation-box a { text-decoration: none; color: var(--text-main); font-size: 0.85rem; }
+.activation-box strong { color: var(--primary-blue); }
+
+.divider {
+    margin: 1.5rem 0;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    line-height: 0.1em;
+}
+.divider span { background: var(--card-bg); padding: 0 10px; color: var(--text-muted); }
+
+.full-social {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    color: var(--text-main);
+}
+
+.auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; }
+.auth-footer a { color: var(--primary-blue); font-weight: 700; text-decoration: none; }
+
+/* --- COLUNA DIREITA --- */
+.auth-right {
+    flex: 1.1;
+    background: var(--right-panel-bg);
+    color: var(--right-text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    text-align: center;
+    position: relative;
+}
+
+.floating-mascot { width: 220px; animation: float 6s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+/* --- RESPONSIVIDADE --- */
+
+@media (max-width: 899px) {
+    .auth-body {
+        padding-top: 100px; /* Espaço para a "barra" superior */
+        align-items: flex-start;
     }
 
-    try {
-        btn.innerHTML = '<span class="loader"></span> Entrando...';
-        btn.classList.add('btn-loading');
-
-        const result = await signInWithEmailAndPassword(auth, emailInput.value, passInput.value);
-        await syncUserDatabase(result.user);
-
-        showToast("Login realizado!", "success");
-        // [CORREÇÃO] Caminho absoluto a partir da raiz
-        setTimeout(() => window.location.href = '/pages/dashboard.html', 1000);
-    } catch (error) {
-        console.error(error);
-        let msg = "Erro ao entrar.";
-        if(error.code === 'auth/invalid-credential') msg = "Email ou senha incorretos.";
-        showToast(msg, "error");
-        btn.innerHTML = originalText;
-        btn.classList.remove('btn-loading');
-    }
-});
-
-// REGISTRO EMAIL
-registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const nameInput = document.getElementById('regName');
-    const emailInput = document.getElementById('regEmail');
-    const passInput = document.getElementById('regPass');
-    const btn = registerForm.querySelector('button[type="submit"]');
-    const originalText = btn.innerHTML;
-
-    if (!nameInput || !emailInput || !passInput) {
-        showToast("Erro interno: Campos de registro não encontrados.", "error");
-        return;
+    .back-home {
+        top: 20px;
+        left: 20px;
+        background: var(--card-bg); /* Transforma em um botão sólido */
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    try {
-        btn.innerHTML = '<span class="loader"></span> Criando...';
-        btn.classList.add('btn-loading');
-
-        const result = await createUserWithEmailAndPassword(auth, emailInput.value, passInput.value);
-        
-        const user = result.user;
-        // Tenta atualizar o perfil imediatamente
-        try {
-            // Nota: updateProfile pode vir do import modular se necessário, 
-            // mas aqui estamos apenas criando a conta e sincronizando.
-            // O ideal é usar a função importada se estiver usando v9
-        } catch(e) { console.log("Erro ao setar nome no Auth", e); }
-        
-        // Vamos forçar o displayName no objeto antes de enviar pro DB
-        Object.defineProperty(user, 'displayName', { value: nameInput.value, writable: true });
-        
-        await syncUserDatabase(user);
-
-        showToast("Conta criada! Bem-vindo.", "success");
-        // [CORREÇÃO] Caminho absoluto a partir da raiz
-        setTimeout(() => window.location.href = '/pages/dashboard.html', 1500);
-    } catch (error) {
-        console.error(error);
-        let msg = "Erro ao criar conta.";
-        if(error.code === 'auth/email-already-in-use') msg = "Email já cadastrado.";
-        if(error.code === 'auth/weak-password') msg = "Senha muito fraca.";
-        showToast(msg, "error");
-        btn.innerHTML = originalText;
-        btn.classList.remove('btn-loading');
+    .auth-theme-toggle {
+        top: 20px;
+        right: 20px;
     }
-});
 
-// UI - ALTERNÂNCIA DE TELAS
-showRegisterBtn.addEventListener('click', (e) => {
-    if(e) e.preventDefault();
-    loginForm.classList.remove('active');
-    registerForm.classList.add('active');
-    formTitle.innerText = "Crie sua conta";
-    formSubtitle.innerText = "Junte-se à comunidade Bitto";
-});
-
-showLoginBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    registerForm.classList.remove('active');
-    loginForm.classList.add('active');
-    formTitle.innerText = "Bem-vindo de volta";
-    formSubtitle.innerText = "Entre para continuar seus estudos";
-});
-
-function showToast(message, type = 'success') {
-    let container = document.getElementById('toast-container');
-    if(!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
+    .auth-card {
+        flex-direction: column;
+        min-height: auto;
     }
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    
-    let icon = '';
-    if(type === 'success') icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-    if(type === 'info') icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-    if(type === 'error') icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
 
-    toast.innerHTML = `${icon} ${message}`;
-    container.appendChild(toast);
+    .auth-right { display: none; }
 
-    setTimeout(() => {
-        toast.style.animation = "fadeOutToast 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    .auth-left {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .auth-header h2 { font-size: 1.5rem; }
+}
+
+@media (min-width: 900px) {
+    body { overflow: hidden; }
 }
