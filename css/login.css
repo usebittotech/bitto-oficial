@@ -28,7 +28,7 @@
     --card-bg: #111111;
     --border-color: #333333;
     --input-bg: #1A1A1A;
-    --primary-blue: #3366FF; /* Azul mais claro para dark mode */
+    --primary-blue: #3366FF; 
     --right-panel-bg: linear-gradient(135deg, #111111 0%, #000000 100%);
 }
 
@@ -40,12 +40,50 @@ body {
     background-color: var(--bg-color);
     line-height: 1.5;
     min-height: 100vh;
-    /* Importante: overflow-x hidden previne rolagem lateral indesejada */
     overflow-x: hidden; 
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* --- EFEITOS VISUAIS (CRT & TILT) --- */
+/* --- ELEMENTOS DE NAVEGAÇÃO SUPERIOR --- */
+.back-home {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    z-index: 100;
+    transition: all 0.3s;
+}
+
+.back-home:hover {
+    transform: translateX(-3px);
+    color: var(--primary-blue);
+}
+
+.auth-theme-toggle { 
+    position: absolute; 
+    top: 20px; 
+    right: 20px; 
+    z-index: 100; 
+}
+
+.icon-button {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-main);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* --- EFEITOS VISUAIS --- */
 .crt-overlay {
     display: none;
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -55,11 +93,7 @@ body {
 }
 [data-theme="dark"] .crt-overlay { display: block; }
 
-.tilt-element { 
-    transform-style: preserve-3d; 
-    /* Transição suave para quando o mouse sai */
-    transition: transform 0.1s ease-out; 
-}
+.tilt-element { transform-style: preserve-3d; transition: transform 0.1s ease-out; }
 
 /* --- LAYOUT PRINCIPAL --- */
 .auth-body {
@@ -71,26 +105,6 @@ body {
     background-image: radial-gradient(circle at 50% 50%, rgba(0, 53, 255, 0.05) 0%, transparent 70%);
 }
 
-/* Botão de Tema (Sol/Lua) */
-.auth-theme-toggle { position: absolute; top: 20px; right: 20px; z-index: 10; }
-.icon-button {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-main);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-.icon-button:hover {
-    transform: scale(1.1);
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
-}
-
-/* Container do Cartão */
 .auth-container {
     width: 100%;
     max-width: 1000px;
@@ -110,20 +124,13 @@ body {
     position: relative;
 }
 
-[data-theme="dark"] .auth-card {
-    border: 1px solid #222;
-    box-shadow: 0 0 40px rgba(0, 53, 255, 0.15);
-}
-
-/* --- COLUNA ESQUERDA (FORMULÁRIOS) --- */
+/* --- COLUNA ESQUERDA --- */
 .auth-left {
     flex: 1;
     padding: 3rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    position: relative;
-    z-index: 2;
 }
 
 .auth-header { margin-bottom: 2rem; text-align: center; }
@@ -136,37 +143,21 @@ body {
     display: flex; justify-content: center; align-items: center;
     padding: 6px;
     margin: 0 auto 1rem auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
 
 .auth-header h2 {
     font-family: var(--font-display);
     font-size: 1.8rem;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.03em;
-    color: var(--text-main);
+    margin-bottom: 0.5rem;
 }
-.auth-header p { font-size: 0.95rem; color: var(--text-muted); }
 
-/* Animação de troca de form */
-.auth-form {
-    display: none;
-    flex-direction: column;
-    gap: 1.2rem;
-    animation: fadeIn 0.4s ease;
-}
+.auth-header p { text-align: center; color: var(--text-muted); margin-bottom: 2rem; }
+
+.auth-form { display: none; flex-direction: column; gap: 1.2rem; }
 .auth-form.active { display: flex; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Inputs e Labels */
-.form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 0.4rem;
-    display: block;
-    color: var(--text-main);
-}
+.form-group label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; display: block; }
 
 .auth-input {
     width: 100%;
@@ -174,8 +165,6 @@ body {
     color: var(--text-main);
     border: 1px solid var(--border-color);
     padding: 0.9rem 1rem;
-    font-family: var(--font-body);
-    font-size: 1rem;
     border-radius: 10px;
     outline: none;
     transition: all 0.2s;
@@ -183,251 +172,117 @@ body {
 
 .auth-input:focus {
     border-color: var(--primary-blue);
-    background: var(--card-bg);
     box-shadow: 0 0 0 3px rgba(0, 53, 255, 0.1);
 }
 
-/* Wrapper Senha */
 .password-wrapper { position: relative; display: flex; align-items: center; }
-.password-wrapper .auth-input { padding-right: 45px; }
-
-.toggle-pass-btn {
-    position: absolute;
-    right: 10px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 8px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 5px;
+.toggle-pass-btn { 
+    position: absolute; 
+    right: 10px; 
+    background: transparent; 
+    border: none; 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    display: flex;
+    align-items: center;
 }
-.toggle-pass-btn:hover { background: rgba(0,0,0,0.05); color: var(--primary-blue); }
 
-.forgot-pass {
-    font-size: 0.8rem;
-    color: var(--primary-blue);
-    text-decoration: none;
-    float: right;
-    margin-top: 0.5rem;
-    font-weight: 600;
-}
-.forgot-pass:hover { text-decoration: underline; }
-
-/* Botões */
 .btn-primary {
     background: var(--primary-blue);
     color: white;
     border: none;
     padding: 1rem;
-    font-size: 0.95rem;
     border-radius: 50px;
     font-weight: 700;
     cursor: pointer;
-    transition: 0.2s;
-    box-shadow: 0 4px 15px rgba(0, 53, 255, 0.25);
+    width: 100%;
     margin-top: 0.5rem;
-    display: flex; justify-content: center; align-items: center; gap: 10px;
+    transition: 0.2s;
 }
+
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 53, 255, 0.35);
 }
 
-.btn-green {
-    background: var(--accent-green);
-    color: #000; /* Texto preto no verde para contraste */
-    box-shadow: 0 4px 15px rgba(204, 255, 0, 0.3);
-}
-.btn-green:hover { box-shadow: 0 8px 20px rgba(204, 255, 0, 0.4); }
+.btn-green { background: var(--accent-green); color: #000; }
 
-/* Loader no botão */
-.btn-loading { opacity: 0.8; cursor: not-allowed; pointer-events: none; }
-.loader {
-    width: 18px; height: 18px;
-    border: 2px solid #fff;
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    animation: rotation 1s linear infinite;
-}
-.btn-green .loader { border-color: #000; border-bottom-color: transparent; }
-@keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-.full-width { width: 100%; }
-
-/* Divisor e Social */
 .divider {
     margin: 1.5rem 0;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
     line-height: 0.1em;
-    color: var(--text-muted);
-    font-size: 0.85rem;
 }
-.divider span { background: var(--card-bg); padding: 0 10px; }
+.divider span { background: var(--card-bg); padding: 0 10px; color: var(--text-muted); }
 
-.social-login { display: flex; justify-content: center; width: 100%; }
-
-/* Botão Google Full Width */
 .full-social {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 0.9rem;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     cursor: pointer;
     font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
     color: var(--text-main);
     transition: 0.2s;
-    font-size: 0.95rem;
-}
-.full-social:hover {
-    border-color: var(--primary-blue);
-    background: var(--input-bg);
-    transform: translateY(-1px);
 }
 
-.auth-footer { margin-top: 1.5rem; font-size: 0.9rem; text-align: center; color: var(--text-muted); }
+.auth-footer { margin-top: 1.5rem; text-align: center; font-size: 0.9rem; }
 .auth-footer a { color: var(--primary-blue); font-weight: 700; text-decoration: none; }
-.auth-footer a:hover { text-decoration: underline; }
 
-/* --- COLUNA DIREITA (MASCOTE) --- */
+/* --- COLUNA DIREITA --- */
 .auth-right {
     flex: 1;
     background: var(--right-panel-bg);
     color: var(--right-text);
-    display: none; /* Escondido no mobile por padrão */
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
     padding: 3rem;
+    text-align: center;
     position: relative;
-    overflow: hidden;
 }
 
-/* Grid de fundo sutil */
-.auth-right::before {
-    content: "";
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);
-    background-size: 30px 30px;
-    opacity: 0.6;
-}
-
-.floating-mascot {
-    width: 200px; height: 200px;
-    margin-bottom: 2rem;
-    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.3));
-    animation: float 6s ease-in-out infinite;
-    position: relative; z-index: 2;
-}
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
-}
-
-.auth-showcase h3 {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    position: relative; z-index: 2;
-    text-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-}
-.auth-showcase p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-bottom: 2rem;
-    max-width: 320px;
-    line-height: 1.6;
-    position: relative; z-index: 2;
-}
-
-.showcase-tags { display: flex; gap: 0.8rem; justify-content: center; position: relative; z-index: 2; }
-.showcase-tags span {
-    background: rgba(255,255,255,0.15);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.3);
-    backdrop-filter: blur(5px);
-}
-
-/* --- TOASTS --- */
-#toast-container {
-    position: fixed; top: 20px; right: 20px;
-    z-index: 10000;
-    display: flex; flex-direction: column; gap: 10px;
-    pointer-events: none;
-}
-.toast {
-    pointer-events: auto;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    min-width: 300px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    display: flex; align-items: center; gap: 12px;
-    font-size: 0.9rem; font-weight: 600; color: var(--text-main);
-    animation: slideInRight 0.4s ease forwards;
-    position: relative; overflow: hidden;
-}
-.toast::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
-.toast-success::before { background: var(--accent-green); }
-.toast-error::before { background: #FF4B4B; }
-.toast svg { flex-shrink: 0; }
-@keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes fadeOutToast { to { transform: translateY(-20px); opacity: 0; } }
+.floating-mascot { width: 200px; animation: float 6s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
 /* --- RESPONSIVIDADE (MEDIA QUERIES) --- */
 
-/* Desktop apenas */
 @media (min-width: 900px) {
-    body { 
-        overflow: hidden; /* Trava o scroll no PC para dar o efeito de app */
-    }
+    body { overflow: hidden; }
     .auth-right { display: flex; }
 }
 
-/* Tablet e Mobile */
 @media (max-width: 899px) {
     .auth-body {
-        /* Permite que a tela cresça se precisar */
-        height: auto;
-        min-height: 100vh;
-        padding: 15px;
-        overflow-y: auto; /* Garante scroll no mobile */
+        padding-top: 85px; /* Abre espaço no topo para o botão fixo */
+        align-items: flex-start;
+    }
+
+    .back-home {
+        top: 15px;
+        left: 15px;
+        background: var(--card-bg); /* Adiciona fundo para não sumir no gradiente */
+        padding: 8px 15px;
+        border-radius: 50px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .auth-theme-toggle {
+        top: 15px;
+        right: 15px;
     }
 
     .auth-card {
         flex-direction: column;
+        margin-top: 10px;
         min-height: auto;
-        height: auto; /* Remove altura fixa */
-        overflow: visible; /* Deixa o conteúdo expandir */
-        margin: 20px 0;
     }
 
-    .auth-left {
-        padding: 2rem 1.5rem;
-    }
-
-    /* Oculta a imagem no mobile para focar no login */
-    .auth-right {
-        display: none;
-    }
-
-    /* Ajuste de fontes para telas pequenas */
-    .auth-header h2 { font-size: 1.5rem; }
+    .auth-left { padding: 2.5rem 1.5rem; }
     
-    /* Desativa o Tilt 3D no mobile para performance e usabilidade */
-    .tilt-element {
-        transform: none !important;
-    }
+    .tilt-element { transform: none !important; } /* Desativa tilt no mobile */
 }
