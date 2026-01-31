@@ -21,7 +21,7 @@
         <div class="mobile-header">
             <div style="display: flex; flex-direction: column;">
                 <span class="logo-text">MENU</span>
-                <span class="plan-tag-mobile" id="userPlanMobile">Plano Pro</span>
+                <span class="plan-tag-mobile" id="userPlanMobile">Carregando...</span>
             </div>
             <button class="close-menu-btn" id="closeMenuBtn">✕</button>
         </div>
@@ -58,7 +58,7 @@
 
                 <div class="user-profile-container" id="profileBtn">
                     <div class="user-profile">
-                        <span class="plan-tag" id="userPlanNav">PRO</span>
+                        <span class="plan-tag" id="userPlanNav">...</span>
                         <span class="user-name" id="navUserName">Aluno</span>
                         <div class="avatar-circle">D</div>
                     </div>
@@ -95,6 +95,7 @@
     </nav>
 
     <div class="container main-wrapper">
+        
         <header class="dash-header">
             <div class="welcome-text">
                 <h1 id="greetingText">Olá, Dev! 👋</h1>
@@ -139,7 +140,8 @@
                     </div>
                 </div>
 
-                <div class="chatbot-messages" id="chatMessages"></div>
+                <div class="chatbot-messages" id="chatMessages">
+                </div>
 
                 <div class="chatbot-footer">
                     <div class="chat-chips">
@@ -157,11 +159,15 @@
 
         <section class="features-section">
             <h2 class="section-title">Ferramentas de Estudo</h2>
+            
             <div class="features-grid">
+                
                 <div class="feature-card tilt-element" data-color="blue" onclick="window.location.href='flashcards.html'">
                     <div class="feature-top">
                         <div class="feature-icon-box">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7l10-5 10 5-10 5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 7l10-5 10 5-10 5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            </svg>
                         </div>
                         <span class="arrow-icon">↗</span>
                     </div>
@@ -175,7 +181,9 @@
                 <div class="feature-card tilt-element" data-color="blue" onclick="window.location.href='review.html'">
                     <div class="feature-top">
                         <div class="feature-icon-box">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
                         </div>
                         <span class="arrow-icon">↗</span>
                     </div>
@@ -186,10 +194,13 @@
                     <button class="feature-btn">ACESSAR</button>
                 </div>
 
-                <div class="feature-card tilt-element" data-color="blue" onclick="window.location.href='quiz.html'">
+                <div class="feature-card tilt-element" data-color="green" onclick="window.location.href='quiz.html'">
                     <div class="feature-top">
                         <div class="feature-icon-box">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4m-2-2v4m10-4h2m-2 4h2"></path></svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                                <path d="M6 12h4m-2-2v4m10-4h2m-2 4h2"></path>
+                            </svg>
                         </div>
                         <span class="arrow-icon">↗</span>
                     </div>
@@ -199,8 +210,10 @@
                     </div>
                     <button class="feature-btn">ACESSAR</button>
                 </div>
+
             </div>
         </section>
+
     </div>
 
     <div class="modal-overlay" id="settingsModal">
