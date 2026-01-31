@@ -74,6 +74,29 @@ function updateInterface(user, dbData) {
     const displayName = dbData.displayName || user.displayName || "Estudante";
     const firstName = displayName.split(' ')[0];
 
+    // --- ATUALIZAÇÃO DO PLANO (DINÂMICO) ---
+    const planNav = document.getElementById('userPlanNav');
+    const planMobile = document.getElementById('userPlanMobile');
+    const userPlan = dbData.plan || "free";
+
+    if (planNav) {
+        planNav.innerText = userPlan.toUpperCase();
+        if (userPlan === 'free') {
+            planNav.style.background = 'var(--border-color)';
+            planNav.style.color = 'var(--text-muted)';
+            planNav.style.boxShadow = 'none';
+        } else {
+            planNav.style.background = 'var(--accent-green)';
+            planNav.style.color = 'var(--primary-blue)';
+            planNav.style.boxShadow = '0 0 10px rgba(204, 255, 0, 0.2)';
+        }
+    }
+
+    if (planMobile) {
+        planMobile.innerText = userPlan === 'free' ? 'Plano Gratuito' : 'Plano Pro';
+    }
+
+    // --- DADOS DO USUÁRIO ---
     document.getElementById('navUserName').innerText = firstName;
     document.getElementById('ddUserName').innerText = displayName;
     document.getElementById('userXP').innerText = currentXP;
@@ -161,7 +184,7 @@ if(mobileConfigBtn) mobileConfigBtn.addEventListener('click', (e) => { e.prevent
 if(mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', (e) => { e.preventDefault(); toggleMobileMenu(); openLogoutModal(); });
 
 // ==========================================
-// 4. CONFIGURAÇÕES E LOGOUT (CORRIGIDO)
+// 4. CONFIGURAÇÕES E LOGOUT
 // ==========================================
 const settingsModal = document.getElementById('settingsModal');
 const navConfigBtn = document.getElementById('navConfigBtn');
@@ -182,7 +205,6 @@ if(avatarInput) {
         const file = e.target.files[0];
         if (file) {
             try {
-                // CORREÇÃO: Comprime a imagem antes de gerar o preview
                 const compressedSrc = await compressImage(file);
                 const preview = document.getElementById('settingsAvatarPreview');
                 const placeholder = document.getElementById('settingsAvatarPlaceholder');
@@ -209,7 +231,6 @@ function setupSettingsSave(user) {
             newBtn.innerText = "Salvando...";
             newBtn.disabled = true;
             try {
-                // Atualiza perfil no Auth e prepara objeto Firestore
                 const updateData = { displayName: newName };
                 if (hasNewImage && previewSrc.startsWith('data:image')) updateData.photoURL = previewSrc; 
                 
@@ -273,20 +294,22 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-themeToggle.addEventListener('click', () => {
-    const html = document.documentElement;
-    const current = html.getAttribute('data-theme');
-    const newTheme = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('bitto_theme', newTheme);
-    updateThemeIcons(newTheme);
-});
+if(themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const newTheme = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('bitto_theme', newTheme);
+        updateThemeIcons(newTheme);
+    });
+}
 
 function updateThemeIcons(theme) {
     const sun = document.querySelector('.icon-sun');
     const moon = document.querySelector('.icon-moon');
-    if(theme === 'dark') { sun.style.display = 'none'; moon.style.display = 'block'; } 
-    else { sun.style.display = 'block'; moon.style.display = 'none'; }
+    if(theme === 'dark' && sun && moon) { sun.style.display = 'none'; moon.style.display = 'block'; } 
+    else if(sun && moon) { sun.style.display = 'block'; moon.style.display = 'none'; }
 }
 
 if(localStorage.getItem('bitto_theme') === 'dark') updateThemeIcons('dark');
@@ -304,7 +327,7 @@ function typeWriter(text, i) {
 document.addEventListener('DOMContentLoaded', () => { typeWriter("Oi! Sou o Bitto. Vamos evoluir juntos?", 0); });
 
 // ==========================================
-// 6. CHATBOT IA (TIMER DE 15s MANTIDO)
+// 6. CHATBOT IA
 // ==========================================
 window.sendChip = (text) => { if(chatInput) { chatInput.value = text; handleSend(); } }
 
@@ -345,7 +368,7 @@ async function handleSend() {
         }
     } catch (error) {
         removeLoadingMessage(loadingId);
-        addMessage("O Bitto precisa de um café. Tente em 30s.", 'bot');
+        addMessage("O Bitto precisa de um café. Tente em breve.", 'bot');
     }
 }
 
@@ -360,14 +383,11 @@ async function callGeminiChat(history) {
     return data.candidates[0].content.parts[0].text;
 }
 
-if(sendBtn) sendBtn.addEventListener('click', handleSend);
-if(chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
-
 function addMessage(text, type) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message message-${type}`;
     const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
     
     let contentHtml = type === 'bot' 
         ? `<div class="header-avatar" style="border:none; background: transparent; flex-shrink:0;"><div class="header-avatar" style="width:32px; height:32px;"><img src="../imagens/bittochat.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div></div><div class="message-bubble">${formattedText}<span class="message-time">${time}</span></div>` 
