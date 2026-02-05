@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Links</title>
+    <style>
+        /* ========================================
+        ÁREA DE CONFIGURAÇÃO DE ESTILO
+        SUBSTITUA COM SUAS CORES E FONTES AQUI
+        ========================================
+        */
+        :root {
+            /* CORES (Pegue os códigos HEX dos seus arquivos enviados) */
+            --cor-fundo-pagina: #121212;    /* Ex: Cor de fundo geral */
+            --cor-texto-principal: #ffffff; /* Ex: Cor do seu nome/bio */
+            
+            --cor-botao-fundo: #333333;     /* Ex: A cor principal dos botões */
+            --cor-botao-texto: #ffffff;     /* Ex: A cor do texto dentro do botão */
+            --cor-botao-hover: #444444;     /* Uma cor ligeiramente mais clara para quando passar o mouse */
+            
+            /* FONTES (Pegue o nome da fonte dos seus arquivos) */
+            /* Se sua fonte for importada (Google Fonts), coloque o @import aqui em cima */
+            --fonte-principal: 'Helvetica Neue', Arial, sans-serif; 
+        }
+
+        /* Reset Básico */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--cor-fundo-pagina);
+            color: var(--cor-texto-principal);
+            font-family: var(--fonte-principal);
+            /* Centraliza o conteúdo verticalmente e horizontalmente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        /* O container principal que limita a largura (estilo celular) */
+        .bio-container {
+            width: 100%;
+            max-width: 480px; /* Largura padrão estilo Linktree */
+            text-align: center;
+        }
+
+        /* Estilos do Perfil */
+        .profile-section {
+            margin-bottom: 35px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; /* Deixa a imagem redonda */
+            object-fit: cover;
+            border: 3px solid var(--cor-botao-fundo); /* Opcional: borda na foto */
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .profile-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .profile-bio {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Estilos dos Links */
+        .links-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Espaço entre os botões */
+        }
+
+        .link-btn {
+            display: block;
+            width: 100%;
+            padding: 16px 20px;
+            background-color: var(--cor-botao-fundo);
+            color: var(--cor-botao-texto);
+            text-decoration: none; /* Remove o sublinhado padrão de links */
+            font-weight: 600;
+            border-radius: 50px; /* Bordas bem arredondadas */
+            transition: all 0.3s ease; /* Suaviza a animação ao passar o mouse */
+            border: 2px solid transparent; /* Prepara para borda no hover se quiser */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Efeito ao passar o mouse (Hover) */
+        .link-btn:hover {
+            background-color: var(--cor-botao-hover);
+            transform: translateY(-3px); /* Leve elevação */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Efeito ao clicar (Active) */
+        .link-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <main class="bio-container">
+        
+        <section class="profile-section">
+            <img src="https://placehold.co/100x100/333333/ffffff?text=Foto" alt="Foto de Perfil" class="profile-pic">
+            
+            <h1 class="profile-name">Seu Nome ou @Arroba</h1>
+            
+            <p class="profile-bio">Uma breve descrição sobre você ou seu negócio.</p>
+        </section>
+
+        <section class="links-section">
+            
+            <a href="LINK_1_AQUI" target="_blank" class="link-btn">
+               Título do Link 1
+            </a>
+
+            <a href="LINK_2_AQUI" target="_blank" class="link-btn">
+                Título do Link 2
+            </a>
+
+            <a href="LINK_3_AQUI" target="_blank" class="link-btn">
+                Título do Link 3
+            </a>
+
+        </section>
+
+    </main>
+
+    </body>
+</html>
