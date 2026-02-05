@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Links Oficiais | Bitto</title>
     <meta name="description" content="Acesse os links oficiais da Bitto. Estudo inteligente com IA.">
     <meta name="theme-color" content="#0a0a0b">
@@ -16,16 +16,17 @@
     <style>
         :root {
             /* === PALETA DARK MODE === */
-            --bg-main: #0a0a0b;       /* Preto Fundo */
-            --card-bg: #141416;       /* Cinza Dark (Cartões) */
-            --primary: #0035ff;       /* Azul Bitto */
-            --accent: #ccff00;        /* Neon Verde */
-            --text-main: #ffffff;     
-            --text-sec: #9ca3af;      
-            --border-glass: rgba(255, 255, 255, 0.08);
+            --bg-main: #0a0a0b;
+            --card-bg: #141416;
+            --primary: #0035ff;
+            --accent: #ccff00;
+            --text-main: #ffffff;
+            --text-sec: #9ca3af;
             
-            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5);
-            --shadow-hover: 0 20px 40px -5px rgba(0, 53, 255, 0.25);
+            /* Bordas e Sombras Otimizadas */
+            --border-glass: 1px solid rgba(255, 255, 255, 0.12); /* Mais nítido */
+            --shadow-sm: 0 4px 24px rgba(0, 0, 0, 0.6);
+            --shadow-hover: 0 10px 40px -10px rgba(0, 53, 255, 0.4);
             
             --font-heading: 'Outfit', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -37,46 +38,76 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             font-family: var(--font-body);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            
+            /* Centralização e Altura Mobile-First */
+            min-height: 100dvh; /* dvh corrige a barra do navegador no celular */
+            width: 100%;
+            display: grid;
+            place-items: center;
             padding: 20px;
-            background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
-            background-size: 30px 30px;
+            
+            /* Textura de fundo */
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
+        /* Container Limitador */
         .container {
             width: 100%;
-            max-width: 440px;
+            max-width: 420px; /* Levemente menor para focar a visão no mobile */
             position: relative;
+            z-index: 10;
+        }
+
+        /* === BOTÃO DE COMPARTILHAR === */
+        .share-pill {
+            position: absolute;
+            top: -5px; right: 0;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 14px;
+            border-radius: 50px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-sec);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            border: var(--border-glass);
+            transition: 0.3s;
+            z-index: 20;
+        }
+        .share-pill:hover {
+            background: var(--primary);
+            color: var(--text-main);
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
 
         /* === PERFIL === */
         .profile-section {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            margin-top: 10px; /* Espaço para o botão compartilhar não colar */
             position: relative;
         }
 
         .avatar-container {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 15px;
+            width: 105px;
+            height: 105px;
+            margin: 0 auto 16px;
             position: relative;
         }
         
         .avatar-pulse {
-            position: absolute; inset: 0;
+            position: absolute; inset: -4px;
             border-radius: 50%;
             border: 2px solid var(--primary);
             animation: pulseRing 3s infinite;
             opacity: 0;
         }
         @keyframes pulseRing {
-            0% { transform: scale(0.95); opacity: 0.6; }
-            100% { transform: scale(1.5); opacity: 0; }
+            0% { transform: scale(0.95); opacity: 0.5; }
+            100% { transform: scale(1.4); opacity: 0; }
         }
         
         .avatar {
@@ -92,22 +123,21 @@
 
         .status-dot {
             position: absolute;
-            bottom: 5px; right: 5px;
-            width: 24px; height: 24px;
+            bottom: 4px; right: 4px;
+            width: 26px; height: 26px;
             background: var(--accent);
-            border: 3px solid var(--bg-main);
+            border: 4px solid var(--bg-main);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             z-index: 3;
             color: var(--bg-main);
         }
-        .status-dot svg { width: 14px; height: 14px; stroke-width: 3; }
 
         .logo-title {
             font-family: var(--font-heading);
             font-weight: 800;
-            font-size: 2rem;
-            margin-bottom: 5px;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
             color: var(--text-main);
         }
@@ -117,169 +147,156 @@
             font-size: 0.95rem;
             color: var(--text-sec);
             line-height: 1.5;
-            max-width: 95%;
+            max-width: 90%;
             margin: 0 auto;
         }
 
-        /* === BOTÃO DE COMPARTILHAR === */
-        .share-pill {
-            position: absolute;
-            top: -10px; right: 0;
-            background: var(--card-bg);
-            padding: 8px 14px;
-            border-radius: 30px;
-            display: flex; align-items: center; gap: 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-main);
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: 0.3s ease;
-            z-index: 10;
-            border: 1px solid var(--border-glass);
-        }
-        .share-pill:hover {
-            transform: translateY(-2px);
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        /* === LISTA DE LINKS === */
+        /* === LISTA DE LINKS (Otimizada) === */
         .links-list {
             display: flex; flex-direction: column; gap: 14px;
+            width: 100%;
         }
 
         .link-card {
             background: var(--card-bg);
-            padding: 18px 22px;
-            border-radius: 18px;
+            padding: 18px 20px; /* Padding equilibrado */
+            border-radius: 16px;
             text-decoration: none;
             display: flex; align-items: center; justify-content: space-between;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: transform 0.2s ease, background 0.2s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-glass);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            
+            /* Borda melhorada */
+            border: var(--border-glass); 
         }
 
-        /* Hover Effect */
-        .link-card:hover {
-            transform: translateY(-3px) scale(1.01);
-            border-color: rgba(255, 255, 255, 0.2);
+        /* Estado Ativo (Toque no celular) */
+        .link-card:active {
+            transform: scale(0.98);
             background: #1e1e20;
         }
+        /* Hover (Desktop) */
+        @media (hover: hover) {
+            .link-card:hover {
+                transform: translateY(-3px);
+                border-color: rgba(255, 255, 255, 0.3);
+                background: #1e1e20;
+            }
+        }
 
-        .link-info { display: flex; flex-direction: column; }
+        .link-info { display: flex; flex-direction: column; flex: 1; padding-right: 10px; }
 
         .link-title {
             color: var(--text-main);
             font-family: var(--font-heading);
             font-weight: 700;
             font-size: 1.05rem;
+            line-height: 1.2;
         }
         .link-desc {
             color: var(--text-sec);
             font-size: 0.85rem;
-            margin-top: 3px;
+            margin-top: 4px;
             font-weight: 500;
         }
 
         .link-icon {
-            width: 40px; height: 40px;
+            width: 42px; height: 42px;
             background: rgba(255,255,255,0.05);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             color: var(--text-main);
-            transition: 0.3s;
+            flex-shrink: 0; /* Impede o ícone de esmagar em telas pequenas */
         }
         
-        .link-card:hover .link-icon {
-            background: var(--primary);
-            color: var(--text-main);
-            transform: rotate(-5deg);
-        }
-        .link-card:hover .link-title { color: var(--primary); }
-
-        /* === LINK DESTAQUE (Azul) === */
         .link-card.featured {
             background: var(--primary);
             border: 1px solid var(--primary);
+            box-shadow: 0 10px 30px -5px rgba(0, 53, 255, 0.4);
         }
         .link-card.featured .link-title { color: #ffffff; }
-        .link-card.featured .link-desc { color: rgba(255,255,255,0.8); }
+        .link-card.featured .link-desc { color: rgba(255,255,255,0.85); }
         .link-card.featured .link-icon {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             color: var(--accent);
         }
-        .link-card.featured:hover {
-            background: #0026e6;
-            box-shadow: 0 15px 40px -10px rgba(0, 53, 255, 0.5);
-        }
-        .link-card.featured:hover .link-icon {
-             background: var(--accent); color: var(--bg-main);
-        }
 
-        /* === SOCIAL MEDIA SECTION === */
+        /* === REDES SOCIAIS === */
         .social-section {
-            margin-top: 35px;
+            margin-top: 40px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .social-btn {
-            width: 48px; height: 48px;
+            width: 50px; height: 50px;
             border-radius: 50%;
             background: var(--card-bg);
-            border: 1px solid var(--border-glass);
+            border: var(--border-glass);
             display: flex; align-items: center; justify-content: center;
             color: var(--text-sec);
-            transition: all 0.3s ease;
+            transition: 0.3s;
             text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
         .social-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
+        .social-btn:active { transform: scale(0.95); }
         .social-btn:hover {
-            background: var(--white);
+            background: var(--text-main);
             color: var(--bg-main);
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
         }
-        /* Cor específica no hover para cada rede */
-        .social-btn.tiktok:hover { color: #000; box-shadow: 0 5px 20px rgba(0, 242, 234, 0.4); }
-        .social-btn.insta:hover { color: #E1306C; }
-        .social-btn.x:hover { color: #000; }
+        .social-btn.tiktok:hover { color: #000; box-shadow: 0 0 15px rgba(0, 242, 234, 0.5); }
+        .social-btn.insta:hover { color: #E1306C; box-shadow: 0 0 15px rgba(225, 48, 108, 0.5); }
+        .social-btn.x:hover { color: #000; box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
 
         /* Footer */
-        footer { margin-top: 40px; text-align: center; }
+        footer { margin-top: 40px; text-align: center; width: 100%; }
         .logo-footer {
             font-family: var(--font-heading);
             font-weight: 700;
             color: var(--text-sec);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 1px;
-            opacity: 0.5;
+            opacity: 0.4;
+            text-transform: uppercase;
         }
 
-        /* Toast Notificação */
+        /* Toast */
         .toast {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--accent); color: var(--bg-main);
-            padding: 10px 24px; border-radius: 30px;
+            padding: 12px 24px; border-radius: 50px;
             font-weight: 800; font-size: 0.9rem;
             opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(204, 255, 0, 0.3); z-index: 100;
+            box-shadow: 0 10px 30px rgba(204, 255, 0, 0.3); z-index: 1000;
             display: flex; align-items: center; gap: 8px;
+            white-space: nowrap;
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* Animação */
+        /* Animação de Entrada */
         .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; transform: translateY(20px); }
         .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.2s; }
         .d-3 { animation-delay: 0.3s; } .d-4 { animation-delay: 0.4s; }
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* === MÍDIA QUERIES (Ajustes Finos para Telas Pequenas) === */
+        @media (max-width: 380px) {
+            .container { max-width: 100%; }
+            .logo-title { font-size: 1.6rem; }
+            .link-card { padding: 15px 16px; }
+            .link-title { font-size: 0.95rem; }
+            .link-desc { font-size: 0.8rem; }
+            .link-icon { width: 36px; height: 36px; }
+            .social-btn { width: 44px; height: 44px; }
+        }
 
     </style>
 </head>
@@ -296,9 +313,8 @@
             <div class="avatar-container">
                 <div class="avatar-pulse"></div>
                 <img src="imagens/bittoofc.png" alt="Bitto Oficial" class="avatar">
-                
                 <div class="status-dot">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
             </div>
             
@@ -351,11 +367,10 @@
         </main>
 
         <div class="social-section fade-in d-4">
-            
             <a href="https://www.instagram.com/usebitto" target="_blank" class="social-btn insta" aria-label="Instagram">
                 <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
             </a>
-
+            
             <a href="https://x.com/usebitto" target="_blank" class="social-btn x" aria-label="X (Twitter)">
                 <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
@@ -363,7 +378,6 @@
             <a href="https://www.tiktok.com/@usebitto" target="_blank" class="social-btn tiktok" aria-label="TikTok">
                 <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
             </a>
-
         </div>
 
         <footer>
@@ -379,13 +393,9 @@
 
     <script>
         const officialUrl = 'https://www.usebitto.com/bio.html';
-
         function shareBio() {
             if (navigator.share) {
-                navigator.share({
-                    title: 'Links Bitto',
-                    url: officialUrl
-                }).catch(console.error);
+                navigator.share({ title: 'Links Bitto', url: officialUrl }).catch(console.error);
             } else {
                 navigator.clipboard.writeText(officialUrl).then(() => {
                     const toast = document.getElementById('toast');
