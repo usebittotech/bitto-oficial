@@ -7,17 +7,17 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --primary: #0035ff;
-            --accent: #ccff00;
-            --bg: #050506;
-            --card-bg: rgba(20, 20, 22, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
+            --primary-glow: rgba(0, 53, 255, 0.4);
+            --bg: #030304;
             --text: #ffffff;
             --text-sec: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,82 +30,88 @@
             display: flex;
             justify-content: center;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* === ANIMAÇÃO DE FUNDO IMERSIVA === */
-        body::before {
-            content: "";
+        /* === FUNDO DE ALTA IMERSÃO === */
+        .bg-glow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(0, 53, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(204, 255, 0, 0.05) 0%, transparent 50%);
             z-index: -1;
-            animation: backgroundFlow 10s infinite alternate ease-in-out;
+            background: radial-gradient(circle at 50% -20%, #001a80 0%, transparent 50%);
         }
 
-        @keyframes backgroundFlow {
-            from { transform: scale(1); opacity: 0.6; }
-            to { transform: scale(1.3); opacity: 1; }
+        .mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: #030304;
+            background-image: 
+                radial-gradient(at 0% 100%, rgba(0, 53, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(204, 255, 0, 0.03) 0px, transparent 50%);
+            animation: meshMove 15s infinite alternate ease-in-out;
+        }
+
+        @keyframes meshMove {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
         }
 
         .container {
             width: 100%;
-            max-width: 420px;
-            padding: 60px 24px;
+            max-width: 410px;
+            padding: 70px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 1;
         }
 
-        /* === PERFIL === */
+        /* === PERFIL STATUS === */
         .profile {
             text-align: center;
-            margin-bottom: 48px;
-            animation: profileReveal 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin-bottom: 54px;
+            animation: fadeInScale 1s cubic-bezier(0.2, 1, 0.2, 1);
         }
 
-        @keyframes profileReveal {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .avatar-wrapper {
-            width: 115px; height: 115px;
-            margin: 0 auto 24px;
+        .avatar-container {
             position: relative;
+            width: 120px; height: 120px;
+            margin: 0 auto 28px;
         }
 
         .avatar {
             width: 100%; height: 100%;
-            border-radius: 40px;
-            background: #111;
-            padding: 10px;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            position: relative; z-index: 2;
+            border-radius: 44px;
+            background: #0a0a0b;
+            padding: 8px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative; z-index: 5;
         }
 
-        .avatar-glow {
-            position: absolute; inset: -5px;
-            background: var(--primary);
-            filter: blur(20px);
+        .avatar-ring {
+            position: absolute; inset: -3px;
+            background: linear-gradient(135deg, var(--primary), #ccff00);
+            border-radius: 46px;
+            z-index: 1;
             opacity: 0.3;
-            border-radius: 40px;
-            animation: pulse 3s infinite alternate;
+            filter: blur(8px);
+            animation: ringSpin 6s infinite linear;
         }
 
-        @keyframes pulse {
-            from { opacity: 0.2; transform: scale(0.95); }
-            to { opacity: 0.5; transform: scale(1.05); }
+        @keyframes ringSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .logo-title {
             font-family: 'Outfit', sans-serif;
             font-weight: 800;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             letter-spacing: -1.5px;
+            margin-bottom: 6px;
         }
         .logo-title span { color: var(--primary); }
 
@@ -113,191 +119,215 @@
             font-size: 0.95rem;
             color: var(--text-sec);
             font-weight: 500;
-            margin-top: 8px;
+            max-width: 280px;
+            line-height: 1.4;
         }
 
-        /* === LINKS LIST === */
-        .links-list {
-            display: flex; flex-direction: column; gap: 16px;
+        /* === LINKS TURBINADOS === */
+        .links-wrapper {
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .link-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 20px;
-            border-radius: 28px;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--card-border);
+            padding: 22px;
+            border-radius: 30px;
             text-decoration: none;
             display: flex; align-items: center; justify-content: space-between;
-            border: 1px solid var(--border);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hover & Tap Effect */
+        .link-card::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
         }
 
         .link-card:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.05);
+            transform: scale(0.97) translateY(2px);
+            background: rgba(255, 255, 255, 0.08);
             border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
         }
 
-        .card-inner { display: flex; align-items: center; gap: 18px; }
+        .link-card:active::before { transform: translateX(100%); }
+
+        .card-left { display: flex; align-items: center; gap: 20px; }
 
         .icon-box {
-            width: 52px; height: 52px;
+            width: 56px; height: 56px;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 18px;
+            border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
             color: var(--text);
-            border: 1px solid var(--border);
-            transition: 0.3s;
+            border: 1px solid var(--card-border);
+            transition: 0.4s;
         }
 
         .link-card:active .icon-box {
             background: var(--primary);
             border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(0, 53, 255, 0.3);
         }
 
-        .link-title { 
+        .title-main { 
             display: block;
             color: var(--text);
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
         }
-        .link-desc {
+        .desc-sub {
             color: var(--text-sec);
             font-size: 0.85rem;
             margin-top: 2px;
+            font-weight: 500;
         }
 
-        /* Destaque (Site Oficial) */
+        /* Card Site Oficial (Featured) */
         .featured {
             background: var(--primary);
             border: none;
-            box-shadow: 0 15px 35px rgba(0, 53, 255, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(0, 53, 255, 0.4);
         }
-        .featured .link-desc { color: rgba(255, 255, 255, 0.7); }
-        .featured .icon-box { background: rgba(255, 255, 255, 0.2); border: none; }
+        .featured .title-main { color: white; }
+        .featured .desc-sub { color: rgba(255, 255, 255, 0.7); }
+        .featured .icon-box { background: rgba(255, 255, 255, 0.15); border: none; }
 
-        /* === FOOTER ACTIONS === */
-        .footer-actions {
-            margin-top: 48px;
+        /* === FOOTER & SHARE === */
+        .footer-section {
+            margin-top: 50px;
             display: flex; flex-direction: column; align-items: center; gap: 32px;
+            width: 100%;
         }
 
         .share-pill {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            padding: 14px 28px;
+            border: 1px solid var(--card-border);
+            padding: 14px 30px;
             border-radius: 100px;
             font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--text);
+            font-size: 0.9rem;
+            color: white;
             display: flex; align-items: center; gap: 10px;
-            cursor: pointer;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .share-pill:active { background: white; color: black; }
+        .share-pill:active { transform: scale(1.1); background: white; color: black; }
 
-        .socials { display: flex; gap: 28px; }
-        .socials a { color: var(--text-sec); transition: 0.3s; }
-        .socials a:active { color: var(--accent); transform: scale(1.2); }
+        .social-row { display: flex; gap: 30px; }
+        .social-row a { color: var(--text-sec); transition: 0.4s; }
+        .social-row a:active { color: var(--primary); transform: translateY(-5px) scale(1.2); }
 
         footer {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
-            color: rgba(255, 255, 255, 0.2);
-            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 2.5px;
             text-transform: uppercase;
         }
 
-        /* Staggered Animations */
+        /* Staggered Entrance */
         .stagger {
             opacity: 0;
-            animation: slideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
-        .s-1 { animation-delay: 0.2s; }
-        .s-2 { animation-delay: 0.3s; }
-        .s-3 { animation-delay: 0.4s; }
-        .s-4 { animation-delay: 0.5s; }
+        .s-1 { animation-delay: 0.1s; }
+        .s-2 { animation-delay: 0.2s; }
+        .s-3 { animation-delay: 0.3s; }
+        .s-4 { animation-delay: 0.4s; }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
     </style>
 </head>
 <body>
 
+    <div class="bg-glow"></div>
+    <div class="mesh"></div>
+
     <div class="container">
         
         <header class="profile">
-            <div class="avatar-wrapper">
-                <div class="avatar-glow"></div>
+            <div class="avatar-container">
+                <div class="avatar-ring"></div>
                 <img src="imagens/bittoofc.png" alt="Bitto Oficial" class="avatar">
             </div>
             <h1 class="logo-title">BITTO<span>.</span></h1>
             <p class="bio-text">A plataforma de estudo inteligente para universitários.</p>
         </header>
 
-        <nav class="links-list">
+        <nav class="links-wrapper">
             
             <a href="pages/login.html" class="link-card stagger s-1">
-                <div class="card-inner">
+                <div class="card-left">
                     <div class="icon-box">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
                     </div>
                     <div>
-                        <span class="link-title">Acesse sua conta!</span>
-                        <span class="link-desc">Faça login na plataforma</span>
+                        <span class="title-main">Acesse sua conta!</span>
+                        <span class="desc-sub">Faça login na plataforma</span>
                     </div>
                 </div>
             </a>
 
             <a href="index.html" class="link-card featured stagger s-2">
-                <div class="card-inner">
+                <div class="card-left">
                     <div class="icon-box">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     </div>
                     <div>
-                        <span class="link-title">Conheça nossas ferramentas</span>
-                        <span class="link-desc">Acesse o Site Oficial</span>
+                        <span class="title-main">Conheça nossas ferramentas</span>
+                        <span class="desc-sub">Acesse o Site Oficial</span>
                     </div>
                 </div>
             </a>
 
             <a href="site/parceiro.html" class="link-card stagger s-3">
-                <div class="card-inner">
+                <div class="card-left">
                     <div class="icon-box">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <div>
-                        <span class="link-title">Embaixadores BITTO</span>
-                        <span class="link-desc">Seja um afiliado e ganhe dinheiro</span>
+                        <span class="title-main">Embaixadores BITTO</span>
+                        <span class="desc-sub">Seja um afiliado e ganhe dinheiro</span>
                     </div>
                 </div>
             </a>
 
             <a href="mailto:usebitto.tech@gmail.com" class="link-card stagger s-4">
-                <div class="card-inner">
+                <div class="card-left">
                     <div class="icon-box">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </div>
                     <div>
-                        <span class="link-title">Suporte</span>
-                        <span class="link-desc">usebitto.tech@gmail.com</span>
+                        <span class="title-main">Suporte</span>
+                        <span class="desc-sub">usebitto.tech@gmail.com</span>
                     </div>
                 </div>
             </a>
 
         </nav>
 
-        <div class="footer-actions stagger s-4">
+        <div class="footer-section stagger s-4">
             <button class="share-pill" onclick="share()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                Compartilhar Link
+                Compartilhar Acesso
             </button>
 
-            <div class="socials">
+            <div class="social-row">
                 <a href="https://www.instagram.com/usebitto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
                 <a href="https://www.tiktok.com/@usebitto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg></a>
                 <a href="https://x.com/usebitto"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
@@ -311,7 +341,7 @@
     <script>
         function share() {
             if (navigator.share) {
-                navigator.share({ title: 'Bitto | Conecte-se', url: window.location.href });
+                navigator.share({ title: 'BITTO | Links', url: window.location.href });
             } else {
                 navigator.clipboard.writeText(window.location.href);
                 alert('Link copiado!');
