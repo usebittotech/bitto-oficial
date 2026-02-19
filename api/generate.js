@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
     const { contents, model } = req.body;
     // Garante que usa o -exp se o front não mandar, ou usa o que vier
-    const modelName = model || "gemini-2.0-flash"; 
+    const modelName = model || "gemini-2.5-flash"; 
 
     try {
         const googleResponse = await fetch(
