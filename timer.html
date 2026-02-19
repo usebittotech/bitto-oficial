@@ -1,474 +1,882 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bitto Focus Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap');
+      /* === VARIÁVEIS OFICIAIS BITTO === */
+      :root {
+        --primary: #0035ff;
+        --accent: #ccff00;
+        --bg: #000000;
+        --glass: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #ffffff;
+        --text-sec: #94a3b8;
+        --font-main: "Inter", sans-serif;
+        --font-display: "Outfit", sans-serif;
+      }
 
-        /* === VARIÁVEIS DE TEMA (Identidade Bitto) === */
-        :root {
-            --bg-color: #faf9f6;
-            --text-color: #18181b;
-            --text-muted: #71717a;
-            --accent: #facc15; 
-            --accent-hover: #eab308;
-            --panel-bg: rgba(255, 255, 255, 0.85);
-            --border-color: #e4e4e7;
-            --timer-color: #18181b;
-            --progress-bg: #e4e4e7;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: var(--font-main);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* === BACKGROUND ANIMADO (Da Bio) === */
+      .nebula {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background:
+          radial-gradient(
+            circle at 50% -20%,
+            rgba(0, 53, 255, 0.25) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 0% 100%,
+            rgba(0, 53, 255, 0.05) 0%,
+            transparent 40%
+          );
+        animation: nebulaPulse 12s infinite alternate ease-in-out;
+      }
+
+      @keyframes nebulaPulse {
+        from {
+          transform: scale(1);
+          opacity: 0.7;
         }
-
-        [data-theme="dark"] {
-            --bg-color: #09090b;
-            --text-color: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --accent: #fde047;
-            --accent-hover: #facc15;
-            --panel-bg: rgba(24, 24, 27, 0.75);
-            --border-color: #27272a;
-            --timer-color: #dbeafe; 
-            --progress-bg: #27272a;
+        to {
+          transform: scale(1.1);
+          opacity: 1;
         }
+      }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.05) 1px,
+          transparent 1px
+        );
+        background-size: 32px 32px;
+        z-index: -1;
+        mask-image: radial-gradient(circle at center, black, transparent 80%);
+        -webkit-mask-image: radial-gradient(
+          circle at center,
+          black,
+          transparent 80%
+        );
+      }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
+      /* === HEADER === */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        z-index: 10;
+      }
 
-        /* === CABEÇALHO === */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            z-index: 10;
-        }
+      .logo-text {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 900;
+        letter-spacing: -1px;
+        background: linear-gradient(to bottom, #fff 60%, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-decoration: none;
+      }
+      .logo-text span {
+        color: var(--accent);
+        -webkit-text-fill-color: var(--accent);
+      }
 
-        .back-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
-            font-size: 0.95rem;
-        }
+      .back-link {
+        text-decoration: none;
+        color: var(--text-sec);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.3s;
+        font-size: 0.95rem;
+        background: var(--glass);
+        padding: 8px 16px;
+        border-radius: 50px;
+        border: 1px solid var(--border);
+      }
+      .back-link:hover {
+        color: var(--text);
+        border-color: var(--primary);
+      }
 
-        .back-link:hover { color: var(--text-color); }
+      /* === CONTEÚDO PRINCIPAL (TIMER) === */
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
 
-        .top-controls { display: flex; gap: 15px; }
+      .quote-container {
+        height: 40px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .quote {
+        font-size: 1.1rem;
+        color: var(--text-sec);
+        font-style: italic;
+        text-align: center;
+        max-width: 600px;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+      }
 
-        .icon-btn {
-            background: transparent; border: 1px solid var(--border-color); color: var(--text-color);
-            width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center;
-            align-items: center; cursor: pointer; transition: all 0.3s ease;
-        }
-        .icon-btn:hover { background: var(--border-color); }
+      .timer-modes {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        background: var(--glass);
+        padding: 6px;
+        border-radius: 50px;
+        border: 1px solid var(--border);
+      }
 
-        /* === CONTEÚDO PRINCIPAL === */
-        .main-content {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;
-        }
+      .timer-modes button {
+        background: transparent;
+        border: none;
+        color: var(--text-sec);
+        padding: 10px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+      }
 
-        .quote-container {
-            height: 40px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
-        }
+      .timer-modes button.active {
+        background: rgba(0, 53, 255, 0.2);
+        color: #fff;
+        border: 1px solid var(--primary);
+        box-shadow: 0 0 20px rgba(0, 53, 255, 0.3);
+      }
 
-        .quote {
-            font-size: 1.1rem; color: var(--text-muted); font-style: italic; text-align: center;
-            max-width: 600px; opacity: 1; transition: opacity 0.5s ease;
-        }
+      .timer-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+      }
 
-        .timer-modes {
-            display: flex; gap: 15px; margin-bottom: 30px; background: var(--border-color); padding: 6px; border-radius: 50px;
-        }
+      .timer-display {
+        font-family: var(--font-display);
+        font-size: 14vw;
+        font-weight: 900;
+        letter-spacing: -6px;
+        background: linear-gradient(to bottom, #ffffff 30%, var(--text-sec));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 15px;
+        filter: drop-shadow(0px 10px 30px rgba(0, 53, 255, 0.2));
+      }
 
-        .timer-modes button {
-            background: transparent; border: none; color: var(--text-muted); padding: 10px 25px;
-            border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem;
-        }
+      /* === BARRA DE PROGRESSO === */
+      .progress-container {
+        width: 80%;
+        max-width: 500px;
+        height: 8px;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 15px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      }
 
-        .timer-modes button.active {
-            background: var(--bg-color); color: var(--text-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+      .progress-bar {
+        height: 100%;
+        width: 100%;
+        background-color: var(--accent);
+        transition:
+          width 1s linear,
+          background-color 0.5s ease,
+          box-shadow 0.5s ease;
+        border-radius: 10px;
+        box-shadow: 0 0 10px var(--accent);
+      }
 
-        .timer-wrapper {
-            display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;
-        }
+      .cycle-counter {
+        font-size: 0.9rem;
+        color: var(--text-sec);
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .cycle-counter span {
+        color: var(--accent);
+      }
 
+      /* === CONTROLES === */
+      .controls-main button {
+        border: none;
+        padding: 18px 50px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin: 0 10px;
+      }
+
+      #btn-start {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 10px 30px -10px rgba(0, 53, 255, 0.6);
+      }
+      #btn-start:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px -10px rgba(0, 53, 255, 0.8);
+      }
+
+      .btn-reset {
+        background: transparent !important;
+        border: 2px solid var(--border) !important;
+        color: var(--text) !important;
+      }
+      .btn-reset:hover {
+        border-color: var(--text-sec) !important;
+        background: var(--glass) !important;
+      }
+
+      /* === PAINEL DE TAREFAS (GLASSMORPHISM) === */
+      .task-panel {
+        position: fixed;
+        top: 20px;
+        bottom: 20px;
+        right: -500px;
+        width: 400px;
+        min-width: 300px;
+        max-width: 80vw;
+        background: rgba(10, 10, 10, 0.6);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        box-shadow: -10px 0 50px rgba(0, 0, 0, 0.5);
+        transition: right 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        padding: 30px;
+        z-index: 100;
+        resize: horizontal;
+        direction: rtl;
+        overflow: hidden;
+      }
+      .task-panel.open {
+        right: 20px;
+      }
+      .task-content {
+        direction: ltr;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+      .panel-header h2 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+      }
+      .close-btn {
+        background: var(--glass);
+        border: 1px solid var(--border);
+        color: #fff;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+      }
+      .close-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .input-group input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text);
+        font-size: 1rem;
+        outline: none;
+        transition: 0.3s;
+      }
+      .input-group input:focus {
+        border-color: var(--primary);
+        background: rgba(0, 53, 255, 0.05);
+      }
+      .input-group button {
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 0 24px;
+        border-radius: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .input-group button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+      }
+
+      .task-list {
+        list-style: none;
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+      .task-list::-webkit-scrollbar {
+        width: 4px;
+      }
+      .task-list::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+      }
+
+      .task-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 10px;
+        border-bottom: 1px dashed var(--border);
+        transition: 0.3s;
+        border-radius: 12px;
+      }
+      .task-item:hover {
+        background: var(--glass);
+      }
+
+      .task-item input[type="checkbox"] {
+        margin-right: 15px;
+        width: 20px;
+        height: 20px;
+        appearance: none;
+        border: 2px solid var(--text-sec);
+        border-radius: 6px;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        transition: 0.2s;
+      }
+      .task-item input[type="checkbox"]:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .task-item input[type="checkbox"]:checked::after {
+        content: "✔";
+        position: absolute;
+        color: #000;
+        font-size: 14px;
+        top: -1px;
+        left: 3px;
+        font-weight: 900;
+      }
+
+      .task-item span {
+        flex: 1;
+        font-size: 1.05rem;
+        color: var(--text);
+        transition: all 0.3s;
+      }
+      .task-item.completed span {
+        text-decoration: line-through;
+        color: var(--text-sec);
+      }
+
+      .delete-btn {
+        background: transparent;
+        border: none;
+        color: #ff3366;
+        cursor: pointer;
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+        padding: 5px;
+      }
+      .task-item:hover .delete-btn {
+        opacity: 1;
+      }
+
+      .export-btn {
+        margin-top: 20px;
+        background: rgba(0, 53, 255, 0.1);
+        border: 1px solid var(--primary);
+        padding: 16px;
+        border-radius: 16px;
+        font-weight: 700;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+      .export-btn:hover {
+        background: var(--primary);
+        box-shadow: 0 10px 20px rgba(0, 53, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* === BOTAO FLUTUANTE === */
+      .btn-floating-tasks {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 16px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 50;
+        transition: all 0.3s;
+      }
+      .btn-floating-tasks:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-5px);
+      }
+
+      @media (max-width: 768px) {
         .timer-display {
-            font-size: 14vw; font-weight: 800; letter-spacing: -4px; color: var(--timer-color);
-            line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0px 10px 30px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
+          font-size: 24vw;
+          letter-spacing: -2px;
         }
-
-        /* === BARRA DE PROGRESSO === */
-        .progress-container {
-            width: 80%; max-width: 500px; height: 6px; background: var(--progress-bg);
-            border-radius: 10px; overflow: hidden; margin-bottom: 15px;
-        }
-
-        .progress-bar {
-            height: 100%; width: 100%; background-color: #10b981; /* Verde padrão */
-            transition: width 1s linear, background-color 0.5s ease; border-radius: 10px;
-        }
-
-        .cycle-counter {
-            font-size: 0.9rem; color: var(--text-muted); font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
-        }
-
-        .controls-main button {
-            background: var(--text-color); color: var(--bg-color); border: none; padding: 16px 45px;
-            font-size: 1.1rem; border-radius: 50px; font-weight: 600; cursor: pointer; transition: transform 0.2s, opacity 0.2s; margin: 0 10px;
-        }
-
-        .controls-main button:hover { opacity: 0.9; transform: scale(1.05); }
-        .controls-main .btn-reset { background: transparent; border: 2px solid var(--border-color); color: var(--text-color); }
-
-        /* === PAINEL DE TAREFAS === */
         .task-panel {
-            position: fixed; top: 20px; bottom: 20px; right: -500px; width: 400px; min-width: 300px; max-width: 80vw;
-            background: var(--panel-bg); backdrop-filter: blur(15px); border: 1px solid var(--border-color);
-            border-radius: 24px; box-shadow: -10px 0 40px rgba(0,0,0,0.1); transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; padding: 30px; z-index: 100; resize: horizontal; direction: rtl; overflow: hidden;
+          width: 95vw;
+          right: -100vw;
+          bottom: 10px;
+          top: 10px;
+          border-radius: 20px;
+          resize: none;
         }
-        .task-panel.open { right: 20px; }
-        .task-content { direction: ltr; display: flex; flex-direction: column; height: 100%; }
-
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .panel-header h2 { font-size: 1.2rem; font-weight: 600; }
-        .close-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.5rem; }
-
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .input-group input {
-            flex: 1; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 12px;
-            background: var(--bg-color); color: var(--text-color); font-size: 1rem; outline: none;
+        .task-panel.open {
+          right: 2.5vw;
         }
-        .input-group input:focus { border-color: var(--accent); }
-        .input-group button {
-            background: var(--text-color); color: var(--bg-color); border: none; padding: 0 20px; border-radius: 12px; font-weight: 600; cursor: pointer;
+        .delete-btn {
+          opacity: 1;
         }
-
-        .task-list { list-style: none; flex: 1; overflow-y: auto; padding-right: 5px; }
-        .task-list::-webkit-scrollbar { width: 4px; }
-        .task-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
-
-        .task-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-        .task-item input[type="checkbox"] { margin-right: 15px; width: 18px; height: 18px; accent-color: var(--text-color); cursor: pointer; }
-        .task-item span { flex: 1; font-size: 1rem; color: var(--text-color); transition: all 0.3s; }
-        .task-item.completed span { text-decoration: line-through; color: var(--text-muted); }
-
-        .delete-btn { background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem; opacity: 0; transition: opacity 0.3s; }
-        .task-item:hover .delete-btn { opacity: 1; }
-
-        .export-btn {
-            margin-top: 20px; background: transparent; border: 1px solid var(--border-color); padding: 15px;
-            border-radius: 12px; font-weight: 600; color: var(--text-color); cursor: pointer; display: flex; justify-content: center; gap: 8px; transition: all 0.3s;
+        .controls-main button {
+          padding: 15px 30px;
+          font-size: 1rem;
         }
-        .export-btn:hover { background: var(--border-color); }
-
-        .btn-floating-tasks {
-            position: fixed; bottom: 30px; right: 30px; background: var(--text-color); color: var(--bg-color);
-            border: none; padding: 15px 25px; border-radius: 50px; font-weight: 600; font-size: 1rem;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 50; transition: transform 0.3s;
-        }
-        .btn-floating-tasks:hover { transform: translateY(-5px); }
-
-        @media (max-width: 768px) {
-            .timer-display { font-size: 22vw; }
-            .task-panel { width: 90vw; right: -100vw; bottom: 10px; top: 10px; border-radius: 16px; resize: none; }
-            .task-panel.open { right: 5vw; }
-            .delete-btn { opacity: 1; }
-        }
+      }
     </style>
-</head>
-<body data-theme="dark">
+  </head>
+  <body>
+    <div class="nebula"></div>
+    <div class="particles"></div>
 
     <header>
-        <a href="https://usebitto.com" class="back-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Voltar para Bitto
-        </a>
-        <div class="top-controls">
-            <button class="icon-btn" onclick="toggleTheme()" title="Alternar Tema" id="theme-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-        </div>
+      <a href="https://usebitto.com" class="logo-text">BITTO<span>.</span></a>
+      <a href="https://usebitto.com" class="back-link">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Início
+      </a>
     </header>
 
     <main class="main-content">
-        <div class="quote-container">
-            <p class="quote" id="motivational-quote">"Os velhos métodos não abrirão novas portas."</p>
+      <div class="quote-container">
+        <p class="quote" id="motivational-quote">
+          "O foco de hoje é o resultado de amanhã."
+        </p>
+      </div>
+
+      <div class="timer-modes">
+        <button id="mode-pomodoro" class="active" onclick="setMode('pomodoro')">
+          Foco
+        </button>
+        <button id="mode-short" onclick="setMode('short')">Pausa Curta</button>
+        <button id="mode-long" onclick="setMode('long')">Pausa Longa</button>
+      </div>
+
+      <div class="timer-wrapper">
+        <div class="timer-display" id="timer">25:00</div>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
         </div>
 
-        <div class="timer-modes">
-            <button id="mode-pomodoro" class="active" onclick="setMode('pomodoro')">Foco</button>
-            <button id="mode-short" onclick="setMode('short')">Pausa Curta</button>
-            <button id="mode-long" onclick="setMode('long')">Pausa Longa</button>
+        <div class="cycle-counter" id="cycle-display">
+          Ciclos de Foco: <span id="cycle-number">0</span>
         </div>
+      </div>
 
-        <div class="timer-wrapper">
-            <div class="timer-display" id="timer">25:00</div>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            
-            <div class="cycle-counter" id="cycle-display">🔥 Ciclos concluídos: 0</div>
-        </div>
-
-        <div class="controls-main">
-            <button id="btn-start" onclick="toggleTimer()">Iniciar Foco</button>
-            <button class="btn-reset" onclick="resetTimer()">Resetar</button>
-        </div>
+      <div class="controls-main">
+        <button id="btn-start" onclick="toggleTimer()">Iniciar Sessão</button>
+        <button class="btn-reset" onclick="resetTimer()">Resetar</button>
+      </div>
     </main>
 
     <button class="btn-floating-tasks" onclick="togglePanel()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        Checklist
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+        ></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      Painel de Tarefas
     </button>
 
     <aside class="task-panel" id="task-panel">
-        <div class="task-content">
-            <div class="panel-header">
-                <h2>O que fazer hoje?</h2>
-                <button class="close-btn" onclick="togglePanel()">&times;</button>
-            </div>
-            
-            <div class="input-group">
-                <input type="text" id="task-input" placeholder="Adicionar nova meta..." onkeypress="handleKeyPress(event)">
-                <button onclick="addTask()">Add</button>
-            </div>
-
-            <ul class="task-list" id="task-list"></ul>
-
-            <button class="export-btn" onclick="exportTasks()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Exportar Relatório
-            </button>
+      <div class="task-content">
+        <div class="panel-header">
+          <h2>Metas da Sessão</h2>
+          <button class="close-btn" onclick="togglePanel()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
+
+        <div class="input-group">
+          <input
+            type="text"
+            id="task-input"
+            placeholder="Adicione um objetivo..."
+            onkeypress="handleKeyPress(event)"
+          />
+          <button onclick="addTask()">Add</button>
+        </div>
+
+        <ul class="task-list" id="task-list"></ul>
+
+        <button class="export-btn" onclick="exportTasks()">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Exportar Relatório
+        </button>
+      </div>
     </aside>
 
     <script>
-        // === TEMA ===
-        const body = document.body;
-        const savedTheme = localStorage.getItem('bitto_theme') || 'dark';
-        body.setAttribute('data-theme', savedTheme);
+      function togglePanel() {
+        document.getElementById("task-panel").classList.toggle("open");
+      }
 
-        function toggleTheme() {
-            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('bitto_theme', newTheme);
+      // === FRASES ROTATIVAS (Foco em Universitários/Estudo) ===
+      const quotes = [
+        "A aprovação é construída no silêncio da sua rotina.",
+        "Constância é melhor que intensidade.",
+        "O seu 'eu' do futuro agradece pelo esforço de hoje.",
+        "Desconecte-se das distrações. Conecte-se aos seus objetivos.",
+        "A revisão é a mãe da retenção.",
+        "Não conte os dias, faça os dias contarem.",
+      ];
+
+      let quoteIndex = 0;
+      const quoteEl = document.getElementById("motivational-quote");
+
+      setInterval(() => {
+        quoteEl.style.opacity = 0;
+        setTimeout(() => {
+          quoteIndex = (quoteIndex + 1) % quotes.length;
+          quoteEl.textContent = `"${quotes[quoteIndex]}"`;
+          quoteEl.style.opacity = 1;
+        }, 500);
+      }, 12000);
+
+      // === TIMER E PROGRESSO ===
+      let timer;
+      const times = { pomodoro: 25, short: 5, long: 15 };
+      let minutes = times.pomodoro;
+      let seconds = 0;
+      let isRunning = false;
+      let currentMode = "pomodoro";
+
+      let focusCycles = parseInt(localStorage.getItem("bitto_cycles")) || 0;
+      document.getElementById("cycle-number").textContent = focusCycles;
+
+      const timerDisplay = document.getElementById("timer");
+      const startBtn = document.getElementById("btn-start");
+      const progressBar = document.getElementById("progress-bar");
+
+      function updateDisplay() {
+        const m = minutes.toString().padStart(2, "0");
+        const s = seconds.toString().padStart(2, "0");
+        timerDisplay.textContent = `${m}:${s}`;
+        document.title = `${m}:${s} | BITTO`;
+        updateProgressBar();
+      }
+
+      function updateProgressBar() {
+        const totalSecondsInMode = times[currentMode] * 60;
+        const currentSecondsLeft = minutes * 60 + seconds;
+        const percentage = (currentSecondsLeft / totalSecondsInMode) * 100;
+
+        progressBar.style.width = `${percentage}%`;
+
+        // Lógica de Cores da Barra (Identidade Bitto)
+        if (percentage > 50) {
+          progressBar.style.backgroundColor = "var(--accent)"; // Verde/Amarelo Neon
+          progressBar.style.boxShadow = "0 0 10px var(--accent)";
+        } else if (percentage > 15) {
+          progressBar.style.backgroundColor = "var(--primary)"; // Azul Vibrante
+          progressBar.style.boxShadow = "0 0 10px var(--primary)";
+        } else {
+          progressBar.style.backgroundColor = "#ff3366"; // Vermelho Alerta
+          progressBar.style.boxShadow = "0 0 10px #ff3366";
         }
+      }
 
-        function togglePanel() { document.getElementById('task-panel').classList.toggle('open'); }
-
-        // === FRASES ROTATIVAS ===
-        const quotes = [
-            "Os velhos métodos não abrirão novas portas.",
-            "Constância é melhor que intensidade.",
-            "Um passo de cada vez. O foco de hoje é o resultado de amanhã.",
-            "A disciplina é a ponte entre metas e realizações.",
-            "Pequenos progressos diários levam a grandes resultados.",
-            "Desconecte-se das distrações. Conecte-se aos seus objetivos.",
-            "A revisão é a mãe da retenção. Mantenha o foco!"
-        ];
-        
-        let quoteIndex = 0;
-        const quoteEl = document.getElementById('motivational-quote');
-
-        setInterval(() => {
-            quoteEl.style.opacity = 0;
-            setTimeout(() => {
-                quoteIndex = (quoteIndex + 1) % quotes.length;
-                quoteEl.textContent = `"${quotes[quoteIndex]}"`;
-                quoteEl.style.opacity = 1;
-            }, 500);
-        }, 15000); // Muda a cada 15 segundos
-
-        // === TIMER E PROGRESSO ===
-        let timer;
-        const times = { pomodoro: 25, short: 5, long: 15 };
-        let minutes = times.pomodoro;
-        let seconds = 0;
-        let isRunning = false;
-        let currentMode = 'pomodoro';
-        
-        // Carrega ciclos do localStorage para não perder ao atualizar a página
-        let focusCycles = parseInt(localStorage.getItem('bitto_cycles')) || 0; 
-        document.getElementById('cycle-display').textContent = `🔥 Ciclos concluídos: ${focusCycles}`;
-
-        const timerDisplay = document.getElementById('timer');
-        const startBtn = document.getElementById('btn-start');
-        const progressBar = document.getElementById('progress-bar');
-
-        function updateDisplay() {
-            const m = minutes.toString().padStart(2, '0');
-            const s = seconds.toString().padStart(2, '0');
-            timerDisplay.textContent = `${m}:${s}`;
-            document.title = `${m}:${s} - Bitto Focus`;
-            updateProgressBar();
-        }
-
-        function updateProgressBar() {
-            const totalSecondsInMode = times[currentMode] * 60;
-            const currentSecondsLeft = (minutes * 60) + seconds;
-            const percentage = (currentSecondsLeft / totalSecondsInMode) * 100;
-            
-            progressBar.style.width = `${percentage}%`;
-
-            // Muda a cor com base no tempo (Verde -> Amarelo -> Vermelho)
-            if (percentage > 50) {
-                progressBar.style.backgroundColor = '#10b981'; // Verde
-            } else if (percentage > 20) {
-                progressBar.style.backgroundColor = '#facc15'; // Amarelo Bitto
-            } else {
-                progressBar.style.backgroundColor = '#ef4444'; // Vermelho
-            }
-        }
-
-        function setMode(mode) {
-            clearInterval(timer);
-            isRunning = false;
-            startBtn.textContent = mode === 'pomodoro' ? "Iniciar Foco" : "Iniciar Pausa";
-            currentMode = mode;
-            minutes = times[mode];
-            seconds = 0;
-            updateDisplay();
-
-            document.querySelectorAll('.timer-modes button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`mode-${mode}`).classList.add('active');
-        }
-
-        function handleTimerComplete() {
-            clearInterval(timer);
-            isRunning = false;
-            
-            if (currentMode === 'pomodoro') {
-                focusCycles++;
-                localStorage.setItem('bitto_cycles', focusCycles);
-                document.getElementById('cycle-display').textContent = `🔥 Ciclos concluídos: ${focusCycles}`;
-                alert("Foco concluído! Excelente trabalho. Que tal uma pausa?");
-                setMode('short'); // Sugere pausa curta automaticamente
-            } else {
-                alert("Pausa finalizada! Pronto para voltar ao foco?");
-                setMode('pomodoro');
-            }
-        }
-
-        function toggleTimer() {
-            if (isRunning) {
-                clearInterval(timer);
-                startBtn.textContent = "Continuar";
-            } else {
-                timer = setInterval(() => {
-                    if (seconds === 0) {
-                        if (minutes === 0) {
-                            handleTimerComplete();
-                            return;
-                        }
-                        minutes--;
-                        seconds = 59;
-                    } else {
-                        seconds--;
-                    }
-                    updateDisplay();
-                }, 1000);
-                startBtn.textContent = "Pausar";
-            }
-            isRunning = !isRunning;
-        }
-
-        function resetTimer() {
-            clearInterval(timer);
-            isRunning = false;
-            minutes = times[currentMode];
-            seconds = 0;
-            startBtn.textContent = currentMode === 'pomodoro' ? "Iniciar Foco" : "Iniciar Pausa";
-            updateDisplay();
-        }
-
-        // === TAREFAS ===
-        let tasks = JSON.parse(localStorage.getItem('bitto_tasks')) || [];
-
-        function saveTasks() { localStorage.setItem('bitto_tasks', JSON.stringify(tasks)); }
-
-        function renderTasks() {
-            const list = document.getElementById('task-list');
-            list.innerHTML = '';
-            tasks.forEach((task, index) => {
-                const li = document.createElement('li');
-                li.className = `task-item ${task.completed ? 'completed' : ''}`;
-                li.innerHTML = `
-                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
-                    <span>${task.text}</span>
-                    <button class="delete-btn" title="Excluir" onclick="deleteTask(${index})">&times;</button>
-                `;
-                list.appendChild(li);
-            });
-        }
-
-        function addTask() {
-            const input = document.getElementById('task-input');
-            const text = input.value.trim();
-            if (text) {
-                tasks.push({ text: text, completed: false });
-                input.value = '';
-                saveTasks();
-                renderTasks();
-            }
-        }
-
-        function handleKeyPress(e) { if (e.key === 'Enter') addTask(); }
-
-        function toggleTask(index) { tasks[index].completed = !tasks[index].completed; saveTasks(); renderTasks(); }
-        function deleteTask(index) { tasks.splice(index, 1); saveTasks(); renderTasks(); }
-
-        // === EXPORTAÇÃO PROFISSIONAL PARA TXT ===
-        function exportTasks() {
-            if (tasks.length === 0) return alert("Adicione tarefas antes de exportar o relatório.");
-            
-            const dataAtual = new Date().toLocaleDateString('pt-BR');
-            const concluidas = tasks.filter(t => t.completed).length;
-            const total = tasks.length;
-            
-            let txtContent = `=================================================\n`;
-            txtContent += `             RELATÓRIO DE FOCO - BITTO           \n`;
-            txtContent += `=================================================\n`;
-            txtContent += `Data: ${dataAtual}\n`;
-            txtContent += `Ciclos de Foco Concluídos: ${focusCycles} 🔥\n`;
-            txtContent += `Progresso das Metas: ${concluidas} de ${total} concluídas.\n`;
-            txtContent += `-------------------------------------------------\n\n`;
-            txtContent += `[ CHECKLIST DO DIA ]\n\n`;
-            
-            tasks.forEach(t => {
-                txtContent += `${t.completed ? '[ x ]' : '[   ]'} ${t.text}\n`;
-            });
-            
-            txtContent += `\n=================================================\n`;
-            txtContent += `Gerado via Workspace Bitto | usebitto.com\n`;
-
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([txtContent], { type: "text/plain;charset=utf-8" }));
-            a.download = `Bitto_Relatorio_${dataAtual.replace(/\//g, '-')}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // Inicialização
+      function setMode(mode) {
+        clearInterval(timer);
+        isRunning = false;
+        startBtn.textContent = "Iniciar Sessão";
+        currentMode = mode;
+        minutes = times[mode];
+        seconds = 0;
         updateDisplay();
+
+        document
+          .querySelectorAll(".timer-modes button")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.getElementById(`mode-${mode}`).classList.add("active");
+      }
+
+      function handleTimerComplete() {
+        clearInterval(timer);
+        isRunning = false;
+
+        if (currentMode === "pomodoro") {
+          focusCycles++;
+          localStorage.setItem("bitto_cycles", focusCycles);
+          document.getElementById("cycle-number").textContent = focusCycles;
+          alert("Sessão concluída! Excelente trabalho. Faça uma pausa.");
+          setMode("short");
+        } else {
+          alert("Pausa finalizada! Pronto para voltar aos estudos?");
+          setMode("pomodoro");
+        }
+      }
+
+      function toggleTimer() {
+        if (isRunning) {
+          clearInterval(timer);
+          startBtn.textContent = "Continuar";
+        } else {
+          timer = setInterval(() => {
+            if (seconds === 0) {
+              if (minutes === 0) {
+                handleTimerComplete();
+                return;
+              }
+              minutes--;
+              seconds = 59;
+            } else {
+              seconds--;
+            }
+            updateDisplay();
+          }, 1000);
+          startBtn.textContent = "Pausar";
+        }
+        isRunning = !isRunning;
+      }
+
+      function resetTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        minutes = times[currentMode];
+        seconds = 0;
+        startBtn.textContent = "Iniciar Sessão";
+        updateDisplay();
+      }
+
+      // === TAREFAS ===
+      let tasks = JSON.parse(localStorage.getItem("bitto_tasks")) || [];
+
+      function saveTasks() {
+        localStorage.setItem("bitto_tasks", JSON.stringify(tasks));
+      }
+
+      function renderTasks() {
+        const list = document.getElementById("task-list");
+        list.innerHTML = "";
+        tasks.forEach((task, index) => {
+          const li = document.createElement("li");
+          li.className = `task-item ${task.completed ? "completed" : ""}`;
+          li.innerHTML = `
+                    <input type="checkbox" ${task.completed ? "checked" : ""} onchange="toggleTask(${index})">
+                    <span>${task.text}</span>
+                    <button class="delete-btn" title="Excluir" onclick="deleteTask(${index})">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                `;
+          list.appendChild(li);
+        });
+      }
+
+      function addTask() {
+        const input = document.getElementById("task-input");
+        const text = input.value.trim();
+        if (text) {
+          tasks.push({ text: text, completed: false });
+          input.value = "";
+          saveTasks();
+          renderTasks();
+        }
+      }
+
+      function handleKeyPress(e) {
+        if (e.key === "Enter") addTask();
+      }
+      function toggleTask(index) {
+        tasks[index].completed = !tasks[index].completed;
+        saveTasks();
         renderTasks();
+      }
+      function deleteTask(index) {
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+      }
+
+      // === EXPORTAÇÃO DE RELATÓRIO ===
+      function exportTasks() {
+        if (tasks.length === 0)
+          return alert("Adicione tarefas antes de exportar o relatório.");
+
+        const dataAtual = new Date().toLocaleDateString("pt-BR");
+        const concluidas = tasks.filter((t) => t.completed).length;
+        const total = tasks.length;
+
+        let txtContent = `=================================================\n`;
+        txtContent += `             RELATÓRIO DE ESTUDOS - BITTO        \n`;
+        txtContent += `=================================================\n`;
+        txtContent += `Data: ${dataAtual}\n`;
+        txtContent += `Ciclos de Foco Concluídos: ${focusCycles}\n`;
+        txtContent += `Progresso das Metas: ${concluidas} de ${total} concluídas.\n`;
+        txtContent += `-------------------------------------------------\n\n`;
+        txtContent += `[ CHECKLIST DO DIA ]\n\n`;
+
+        tasks.forEach((t) => {
+          txtContent += `${t.completed ? "[ ✔ ]" : "[   ]"} ${t.text}\n`;
+        });
+
+        txtContent += `\n=================================================\n`;
+        txtContent += `Plataforma inteligente para universitários.\n`;
+        txtContent += `usebitto.com\n`;
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([txtContent], { type: "text/plain;charset=utf-8" }),
+        );
+        a.download = `Bitto_Relatorio_${dataAtual.replace(/\//g, "-")}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      // Inicialização
+      updateDisplay();
+      renderTasks();
     </script>
-</body>
+  </body>
 </html>
