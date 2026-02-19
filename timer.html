@@ -7,16 +7,17 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap');
 
-        /* === VARIÁVEIS DE TEMA === */
+        /* === VARIÁVEIS DE TEMA (Identidade Bitto) === */
         :root {
             --bg-color: #faf9f6;
             --text-color: #18181b;
             --text-muted: #71717a;
-            --accent: #facc15; /* Amarelo do marca-texto */
+            --accent: #facc15; 
             --accent-hover: #eab308;
             --panel-bg: rgba(255, 255, 255, 0.85);
             --border-color: #e4e4e7;
             --timer-color: #18181b;
+            --progress-bg: #e4e4e7;
         }
 
         [data-theme="dark"] {
@@ -27,7 +28,8 @@
             --accent-hover: #facc15;
             --panel-bg: rgba(24, 24, 27, 0.75);
             --border-color: #27272a;
-            --timer-color: #dbeafe; /* Azul claro da foto */
+            --timer-color: #dbeafe; 
+            --progress-bg: #27272a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -42,7 +44,7 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* === NAVEGAÇÃO SUPERIOR === */
+        /* === CABEÇALHO === */
         header {
             display: flex;
             justify-content: space-between;
@@ -54,147 +56,98 @@
         .back-link {
             text-decoration: none;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
             transition: color 0.3s;
+            font-size: 0.95rem;
         }
 
         .back-link:hover { color: var(--text-color); }
 
-        .top-controls {
-            display: flex;
-            gap: 15px;
-        }
+        .top-controls { display: flex; gap: 15px; }
 
         .icon-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-color);
+            width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; cursor: pointer; transition: all 0.3s ease;
         }
-
         .icon-btn:hover { background: var(--border-color); }
 
-        /* === TIMER FULL SCREEN === */
+        /* === CONTEÚDO PRINCIPAL === */
         .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;
+        }
+
+        .quote-container {
+            height: 40px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
         }
 
         .quote {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            font-style: italic;
-            text-align: center;
-            max-width: 600px;
-        }
-
-        .timer-display {
-            font-size: 15vw; /* Responsivo e Gigante */
-            font-weight: 800;
-            letter-spacing: -5px;
-            color: var(--timer-color);
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-            text-shadow: 0px 10px 30px rgba(0,0,0,0.05);
-            margin-bottom: 40px;
+            font-size: 1.1rem; color: var(--text-muted); font-style: italic; text-align: center;
+            max-width: 600px; opacity: 1; transition: opacity 0.5s ease;
         }
 
         .timer-modes {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            background: var(--border-color);
-            padding: 5px;
-            border-radius: 50px;
+            display: flex; gap: 15px; margin-bottom: 30px; background: var(--border-color); padding: 6px; border-radius: 50px;
         }
 
         .timer-modes button {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 10px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            background: transparent; border: none; color: var(--text-muted); padding: 10px 25px;
+            border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem;
         }
 
         .timer-modes button.active {
-            background: var(--bg-color);
-            color: var(--text-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: var(--bg-color); color: var(--text-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .timer-wrapper {
+            display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;
+        }
+
+        .timer-display {
+            font-size: 14vw; font-weight: 800; letter-spacing: -4px; color: var(--timer-color);
+            line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0px 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        /* === BARRA DE PROGRESSO === */
+        .progress-container {
+            width: 80%; max-width: 500px; height: 6px; background: var(--progress-bg);
+            border-radius: 10px; overflow: hidden; margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%; width: 100%; background-color: #10b981; /* Verde padrão */
+            transition: width 1s linear, background-color 0.5s ease; border-radius: 10px;
+        }
+
+        .cycle-counter {
+            font-size: 0.9rem; color: var(--text-muted); font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
         }
 
         .controls-main button {
-            background: var(--text-color);
-            color: var(--bg-color);
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            margin: 0 10px;
+            background: var(--text-color); color: var(--bg-color); border: none; padding: 16px 45px;
+            font-size: 1.1rem; border-radius: 50px; font-weight: 600; cursor: pointer; transition: transform 0.2s, opacity 0.2s; margin: 0 10px;
         }
 
         .controls-main button:hover { opacity: 0.9; transform: scale(1.05); }
-        .controls-main .btn-reset { background: transparent; border: 2px solid var(--text-color); color: var(--text-color); }
+        .controls-main .btn-reset { background: transparent; border: 2px solid var(--border-color); color: var(--text-color); }
 
-        /* === PAINEL DE TAREFAS (GAVETA FLUTUANTE) === */
+        /* === PAINEL DE TAREFAS === */
         .task-panel {
-            position: fixed;
-            top: 20px;
-            bottom: 20px;
-            right: -500px; /* Escondido por padrão */
-            width: 400px;
-            min-width: 300px;
-            max-width: 80vw;
-            background: var(--panel-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            box-shadow: -10px 0 40px rgba(0,0,0,0.1);
-            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            padding: 30px;
-            z-index: 100;
-            resize: horizontal; /* Permite redimensionar */
-            direction: rtl; /* Faz o resize ficar na esquerda */
-            overflow: hidden;
+            position: fixed; top: 20px; bottom: 20px; right: -500px; width: 400px; min-width: 300px; max-width: 80vw;
+            background: var(--panel-bg); backdrop-filter: blur(15px); border: 1px solid var(--border-color);
+            border-radius: 24px; box-shadow: -10px 0 40px rgba(0,0,0,0.1); transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; padding: 30px; z-index: 100; resize: horizontal; direction: rtl; overflow: hidden;
         }
-
         .task-panel.open { right: 20px; }
         .task-content { direction: ltr; display: flex; flex-direction: column; height: 100%; }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .panel-header h2 { font-size: 1.2rem; font-weight: 600; }
-
-        .close-btn {
-            background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.5rem;
-        }
+        .close-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.5rem; }
 
         .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
         .input-group input {
@@ -203,25 +156,19 @@
         }
         .input-group input:focus { border-color: var(--accent); }
         .input-group button {
-            background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 12px; font-weight: 600; cursor: pointer;
+            background: var(--text-color); color: var(--bg-color); border: none; padding: 0 20px; border-radius: 12px; font-weight: 600; cursor: pointer;
         }
 
         .task-list { list-style: none; flex: 1; overflow-y: auto; padding-right: 5px; }
         .task-list::-webkit-scrollbar { width: 4px; }
         .task-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
 
-        .task-item {
-            display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);
-        }
-        .task-item input[type="checkbox"] {
-            margin-right: 15px; width: 18px; height: 18px; accent-color: var(--text-color); cursor: pointer;
-        }
+        .task-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .task-item input[type="checkbox"] { margin-right: 15px; width: 18px; height: 18px; accent-color: var(--text-color); cursor: pointer; }
         .task-item span { flex: 1; font-size: 1rem; color: var(--text-color); transition: all 0.3s; }
         .task-item.completed span { text-decoration: line-through; color: var(--text-muted); }
 
-        .delete-btn {
-            background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem; opacity: 0; transition: opacity 0.3s;
-        }
+        .delete-btn { background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem; opacity: 0; transition: opacity 0.3s; }
         .task-item:hover .delete-btn { opacity: 1; }
 
         .export-btn {
@@ -230,7 +177,6 @@
         }
         .export-btn:hover { background: var(--border-color); }
 
-        /* Flutuante para abrir tarefas */
         .btn-floating-tasks {
             position: fixed; bottom: 30px; right: 30px; background: var(--text-color); color: var(--bg-color);
             border: none; padding: 15px 25px; border-radius: 50px; font-weight: 600; font-size: 1rem;
@@ -239,14 +185,16 @@
         .btn-floating-tasks:hover { transform: translateY(-5px); }
 
         @media (max-width: 768px) {
-            .timer-display { font-size: 25vw; }
+            .timer-display { font-size: 22vw; }
             .task-panel { width: 90vw; right: -100vw; bottom: 10px; top: 10px; border-radius: 16px; resize: none; }
             .task-panel.open { right: 5vw; }
             .delete-btn { opacity: 1; }
         }
     </style>
 </head>
-<body data-theme="dark"> <header>
+<body data-theme="dark">
+
+    <header>
         <a href="https://usebitto.com" class="back-link">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             Voltar para Bitto
@@ -259,7 +207,9 @@
     </header>
 
     <main class="main-content">
-        <p class="quote">"Os velhos métodos não abrirão novas portas."</p>
+        <div class="quote-container">
+            <p class="quote" id="motivational-quote">"Os velhos métodos não abrirão novas portas."</p>
+        </div>
 
         <div class="timer-modes">
             <button id="mode-pomodoro" class="active" onclick="setMode('pomodoro')">Foco</button>
@@ -267,7 +217,15 @@
             <button id="mode-long" onclick="setMode('long')">Pausa Longa</button>
         </div>
 
-        <div class="timer-display" id="timer">25:00</div>
+        <div class="timer-wrapper">
+            <div class="timer-display" id="timer">25:00</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="cycle-counter" id="cycle-display">🔥 Ciclos concluídos: 0</div>
+        </div>
 
         <div class="controls-main">
             <button id="btn-start" onclick="toggleTimer()">Iniciar Foco</button>
@@ -277,7 +235,7 @@
 
     <button class="btn-floating-tasks" onclick="togglePanel()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        Anotações
+        Checklist
     </button>
 
     <aside class="task-panel" id="task-panel">
@@ -288,7 +246,7 @@
             </div>
             
             <div class="input-group">
-                <input type="text" id="task-input" placeholder="Nova tarefa..." onkeypress="handleKeyPress(event)">
+                <input type="text" id="task-input" placeholder="Adicionar nova meta..." onkeypress="handleKeyPress(event)">
                 <button onclick="addTask()">Add</button>
             </div>
 
@@ -296,55 +254,93 @@
 
             <button class="export-btn" onclick="exportTasks()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Exportar (.txt)
+                Exportar Relatório
             </button>
         </div>
     </aside>
 
     <script>
-        // === TEMA CLARO / ESCURO ===
+        // === TEMA ===
         const body = document.body;
-        const themeBtn = document.getElementById('theme-btn');
-        
-        // Verifica se há preferência salva
-        const savedTheme = localStorage.getItem('saas_theme') || 'dark';
+        const savedTheme = localStorage.getItem('bitto_theme') || 'dark';
         body.setAttribute('data-theme', savedTheme);
 
         function toggleTheme() {
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('saas_theme', newTheme);
+            localStorage.setItem('bitto_theme', newTheme);
         }
 
-        // === TOGGLE DO PAINEL DE TAREFAS ===
-        function togglePanel() {
-            const panel = document.getElementById('task-panel');
-            panel.classList.toggle('open');
-        }
+        function togglePanel() { document.getElementById('task-panel').classList.toggle('open'); }
 
-        // === LÓGICA DO TIMER ===
+        // === FRASES ROTATIVAS ===
+        const quotes = [
+            "Os velhos métodos não abrirão novas portas.",
+            "Constância é melhor que intensidade.",
+            "Um passo de cada vez. O foco de hoje é o resultado de amanhã.",
+            "A disciplina é a ponte entre metas e realizações.",
+            "Pequenos progressos diários levam a grandes resultados.",
+            "Desconecte-se das distrações. Conecte-se aos seus objetivos.",
+            "A revisão é a mãe da retenção. Mantenha o foco!"
+        ];
+        
+        let quoteIndex = 0;
+        const quoteEl = document.getElementById('motivational-quote');
+
+        setInterval(() => {
+            quoteEl.style.opacity = 0;
+            setTimeout(() => {
+                quoteIndex = (quoteIndex + 1) % quotes.length;
+                quoteEl.textContent = `"${quotes[quoteIndex]}"`;
+                quoteEl.style.opacity = 1;
+            }, 500);
+        }, 15000); // Muda a cada 15 segundos
+
+        // === TIMER E PROGRESSO ===
         let timer;
-        let minutes = 25;
+        const times = { pomodoro: 25, short: 5, long: 15 };
+        let minutes = times.pomodoro;
         let seconds = 0;
         let isRunning = false;
         let currentMode = 'pomodoro';
+        
+        // Carrega ciclos do localStorage para não perder ao atualizar a página
+        let focusCycles = parseInt(localStorage.getItem('bitto_cycles')) || 0; 
+        document.getElementById('cycle-display').textContent = `🔥 Ciclos concluídos: ${focusCycles}`;
 
-        const times = { pomodoro: 25, short: 5, long: 15 };
         const timerDisplay = document.getElementById('timer');
         const startBtn = document.getElementById('btn-start');
+        const progressBar = document.getElementById('progress-bar');
 
         function updateDisplay() {
             const m = minutes.toString().padStart(2, '0');
             const s = seconds.toString().padStart(2, '0');
             timerDisplay.textContent = `${m}:${s}`;
             document.title = `${m}:${s} - Bitto Focus`;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const totalSecondsInMode = times[currentMode] * 60;
+            const currentSecondsLeft = (minutes * 60) + seconds;
+            const percentage = (currentSecondsLeft / totalSecondsInMode) * 100;
+            
+            progressBar.style.width = `${percentage}%`;
+
+            // Muda a cor com base no tempo (Verde -> Amarelo -> Vermelho)
+            if (percentage > 50) {
+                progressBar.style.backgroundColor = '#10b981'; // Verde
+            } else if (percentage > 20) {
+                progressBar.style.backgroundColor = '#facc15'; // Amarelo Bitto
+            } else {
+                progressBar.style.backgroundColor = '#ef4444'; // Vermelho
+            }
         }
 
         function setMode(mode) {
             clearInterval(timer);
             isRunning = false;
-            startBtn.textContent = "Iniciar";
+            startBtn.textContent = mode === 'pomodoro' ? "Iniciar Foco" : "Iniciar Pausa";
             currentMode = mode;
             minutes = times[mode];
             seconds = 0;
@@ -352,6 +348,22 @@
 
             document.querySelectorAll('.timer-modes button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`mode-${mode}`).classList.add('active');
+        }
+
+        function handleTimerComplete() {
+            clearInterval(timer);
+            isRunning = false;
+            
+            if (currentMode === 'pomodoro') {
+                focusCycles++;
+                localStorage.setItem('bitto_cycles', focusCycles);
+                document.getElementById('cycle-display').textContent = `🔥 Ciclos concluídos: ${focusCycles}`;
+                alert("Foco concluído! Excelente trabalho. Que tal uma pausa?");
+                setMode('short'); // Sugere pausa curta automaticamente
+            } else {
+                alert("Pausa finalizada! Pronto para voltar ao foco?");
+                setMode('pomodoro');
+            }
         }
 
         function toggleTimer() {
@@ -362,10 +374,7 @@
                 timer = setInterval(() => {
                     if (seconds === 0) {
                         if (minutes === 0) {
-                            clearInterval(timer);
-                            isRunning = false;
-                            startBtn.textContent = "Iniciar";
-                            alert("Tempo esgotado! Hora de trocar o foco.");
+                            handleTimerComplete();
                             return;
                         }
                         minutes--;
@@ -385,14 +394,14 @@
             isRunning = false;
             minutes = times[currentMode];
             seconds = 0;
-            startBtn.textContent = "Iniciar";
+            startBtn.textContent = currentMode === 'pomodoro' ? "Iniciar Foco" : "Iniciar Pausa";
             updateDisplay();
         }
 
-        // === LÓGICA DAS TAREFAS ===
-        let tasks = JSON.parse(localStorage.getItem('saas_tasks')) || [];
+        // === TAREFAS ===
+        let tasks = JSON.parse(localStorage.getItem('bitto_tasks')) || [];
 
-        function saveTasks() { localStorage.setItem('saas_tasks', JSON.stringify(tasks)); }
+        function saveTasks() { localStorage.setItem('bitto_tasks', JSON.stringify(tasks)); }
 
         function renderTasks() {
             const list = document.getElementById('task-list');
@@ -422,29 +431,36 @@
 
         function handleKeyPress(e) { if (e.key === 'Enter') addTask(); }
 
-        function toggleTask(index) {
-            tasks[index].completed = !tasks[index].completed;
-            saveTasks();
-            renderTasks();
-        }
+        function toggleTask(index) { tasks[index].completed = !tasks[index].completed; saveTasks(); renderTasks(); }
+        function deleteTask(index) { tasks.splice(index, 1); saveTasks(); renderTasks(); }
 
-        function deleteTask(index) {
-            tasks.splice(index, 1);
-            saveTasks();
-            renderTasks();
-        }
-
-        // === EXPORTAR PARA TXT ===
+        // === EXPORTAÇÃO PROFISSIONAL PARA TXT ===
         function exportTasks() {
-            if (tasks.length === 0) return alert("Nenhuma tarefa para exportar!");
+            if (tasks.length === 0) return alert("Adicione tarefas antes de exportar o relatório.");
+            
             const dataAtual = new Date().toLocaleDateString('pt-BR');
-            let txtContent = `=== RELATÓRIO DE FOCO BITTO (${dataAtual}) ===\n\n`;
-            txtContent += `Resumo: ${tasks.filter(t => t.completed).length}/${tasks.length} tarefas concluídas.\n\nLista:\n`;
-            tasks.forEach(t => txtContent += `${t.completed ? '[x]' : '[ ]'} ${t.text}\n`);
+            const concluidas = tasks.filter(t => t.completed).length;
+            const total = tasks.length;
+            
+            let txtContent = `=================================================\n`;
+            txtContent += `             RELATÓRIO DE FOCO - BITTO           \n`;
+            txtContent += `=================================================\n`;
+            txtContent += `Data: ${dataAtual}\n`;
+            txtContent += `Ciclos de Foco Concluídos: ${focusCycles} 🔥\n`;
+            txtContent += `Progresso das Metas: ${concluidas} de ${total} concluídas.\n`;
+            txtContent += `-------------------------------------------------\n\n`;
+            txtContent += `[ CHECKLIST DO DIA ]\n\n`;
+            
+            tasks.forEach(t => {
+                txtContent += `${t.completed ? '[ x ]' : '[   ]'} ${t.text}\n`;
+            });
+            
+            txtContent += `\n=================================================\n`;
+            txtContent += `Gerado via Workspace Bitto | usebitto.com\n`;
 
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([txtContent], { type: "text/plain;charset=utf-8" }));
-            a.download = `Relatorio_Bitto_${dataAtual.replace(/\//g, '-')}.txt`;
+            a.download = `Bitto_Relatorio_${dataAtual.replace(/\//g, '-')}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
