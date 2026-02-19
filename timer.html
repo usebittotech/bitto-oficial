@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Focus Workspace</title>
+    <style>
+        /* Estilos Globais inspirados na identidade moderna da Bitto */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #e5e5e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .workspace-container {
+            display: flex;
+            width: 95vw;
+            max-width: 1200px;
+            height: 90vh;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: #fff;
+        }
+
+        /* LADO ESQUERDO: O Tablet (Timer) */
+        .timer-panel {
+            flex: 1;
+            background-color: #09090b; /* Fundo bem escuro */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .quote {
+            font-size: 0.9rem;
+            color: #a1a1aa;
+            margin-bottom: 20px;
+            font-style: italic;
+            max-width: 80%;
+        }
+
+        .timer-display {
+            font-size: 8rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: #dbeafe; /* Azul bem clarinho, como os números da foto */
+            margin-bottom: 30px;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-controls button, .timer-modes button {
+            background: transparent;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .timer-controls button:hover, .timer-modes button:hover {
+            background: #27272a;
+        }
+
+        .timer-controls .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .timer-controls .btn-primary:hover {
+            background: #e4e4e7;
+        }
+
+        .timer-modes {
+            margin-bottom: 20px;
+        }
+
+        .timer-modes .active {
+            border-color: #dbeafe;
+            color: #dbeafe;
+        }
+
+        /* LADO DIREITO: O Livro/Anotações */
+        .tasks-panel {
+            flex: 1;
+            background-color: #faf9f6; /* Fundo "off-white" de papel */
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tasks-header {
+            margin-bottom: 30px;
+        }
+
+        .tasks-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #18181b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-bottom: 2px solid #e4e4e7;
+            background: transparent;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-bottom-color: #fde047; /* Amarelo do marca-texto */
+        }
+
+        .input-group button {
+            background: #fde047; /* Amarelo */
+            border: none;
+            padding: 0 20px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-left: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .input-group button:hover {
+            background: #facc15;
+        }
+
+        .task-list {
+            list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+
+        /* Scrollbar customizada */
+        .task-list::-webkit-scrollbar { width: 6px; }
+        .task-list::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 10px; }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+            accent-color: #18181b;
+            cursor: pointer;
+        }
+
+        .task-item span {
+            flex: 1;
+            font-size: 1.05rem;
+            color: #3f3f46;
+            transition: all 0.3s ease;
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            color: #a1a1aa;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .export-btn {
+            background: transparent;
+            border: 1px solid #d4d4d8;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #52525b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            background: #f4f4f5;
+            color: #18181b;
+        }
+
+        /* Responsividade para Mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .workspace-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 95vh;
+                width: 100%;
+            }
+            .timer-panel {
+                padding: 40px 20px;
+            }
+            .timer-display {
+                font-size: 5rem;
+            }
+            .tasks-panel {
+                padding: 30px 20px;
+            }
+            .task-item .delete-btn {
+                opacity: 1; /* Sempre visível no mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="workspace-container">
+        <div class="timer-panel">
+            <p class="quote">"Os velhos métodos não abrirão novas portas. Trabalhar até tarde ou começar agora?"</p>
+            
+            <div class="timer-modes">
+                <button id="mode-pomodoro" class="active" onclick="setMode('pomodoro')">Foco</button>
+                <button id="mode-short" onclick="setMode('short')">Pausa Curta</button>
+                <button id="mode-long" onclick="setMode('long')">Pausa Longa</button>
+            </div>
+
+            <div class="timer-display" id="timer">25:00</div>
+            
+            <div class="timer-controls">
+                <button id="btn-start" class="btn-primary" onclick="toggleTimer()">Iniciar</button>
+                <button id="btn-reset" onclick="resetTimer()">Resetar</button>
+            </div>
+        </div>
+
+        <div class="tasks-panel">
+            <div class="tasks-header">
+                <h2>O que fazer hoje?</h2>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="task-input" placeholder="Digite uma nova tarefa..." onkeypress="handleKeyPress(event)">
+                <button onclick="addTask()">Add</button>
+            </div>
+
+            <ul class="task-list" id="task-list">
+                </ul>
+
+            <button class="export-btn" onclick="exportTasks()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Exportar Relatório (.txt)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // === LÓGICA DO POMODORO ===
+        let timer;
+        let minutes = 25;
+        let seconds = 0;
+        let isRunning = false;
+        let currentMode = 'pomodoro'; // pomodoro, short, long
+
+        const times = {
+            pomodoro: 25,
+            short: 5,
+            long: 15
+        };
+
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('btn-start');
+
+        function updateDisplay() {
+            const m = minutes.toString().padStart(2, '0');
+            const s = seconds.toString().padStart(2, '0');
+            timerDisplay.textContent = `${m}:${s}`;
+            document.title = `${m}:${s} - SaaS Workspace`;
+        }
+
+        function setMode(mode) {
+            clearInterval(timer);
+            isRunning = false;
+            startBtn.textContent = "Iniciar";
+            currentMode = mode;
+            minutes = times[mode];
+            seconds = 0;
+            updateDisplay();
+
+            // Atualiza botões ativos
+            document.querySelectorAll('.timer-modes button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`mode-${mode}`).classList.add('active');
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                startBtn.textContent = "Continuar";
+            } else {
+                timer = setInterval(() => {
+                    if (seconds === 0) {
+                        if (minutes === 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            startBtn.textContent = "Iniciar";
+                            alert("Tempo esgotado! Hora de trocar o foco.");
+                            return;
+                        }
+                        minutes--;
+                        seconds = 59;
+                    } else {
+                        seconds--;
+                    }
+                    updateDisplay();
+                }, 1000);
+                startBtn.textContent = "Pausar";
+            }
+            isRunning = !isRunning;
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            minutes = times[currentMode];
+            seconds = 0;
+            startBtn.textContent = "Iniciar";
+            updateDisplay();
+        }
+
+        // === LÓGICA DAS TAREFAS ===
+        let tasks = JSON.parse(localStorage.getItem('saas_tasks')) || [];
+
+        function saveTasks() {
+            localStorage.setItem('saas_tasks', JSON.stringify(tasks));
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('task-list');
+            list.innerHTML = '';
+            
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                
+                li.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
+                    <span>${task.text}</span>
+                    <button class="delete-btn" onclick="deleteTask(${index})">&times;</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function addTask() {
+            const input = document.getElementById('task-input');
+            const text = input.value.trim();
+            
+            if (text) {
+                tasks.push({ text: text, completed: false });
+                input.value = '';
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') addTask();
+        }
+
+        function toggleTask(index) {
+            tasks[index].completed = !tasks[index].completed;
+            saveTasks();
+            renderTasks();
+        }
+
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        }
+
+        // === EXPORTAR PARA TXT ===
+        function exportTasks() {
+            if (tasks.length === 0) {
+                alert("Nenhuma tarefa para exportar!");
+                return;
+            }
+
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            let txtContent = `=== RELATÓRIO DE TAREFAS SAAS (${dataAtual}) ===\n\n`;
+
+            const concluidas = tasks.filter(t => t.completed).length;
+            const total = tasks.length;
+            
+            txtContent += `Resumo: ${concluidas}/${total} tarefas concluídas.\n\n`;
+            txtContent += `Lista:\n`;
+
+            tasks.forEach(task => {
+                const status = task.completed ? '[x]' : '[ ]';
+                txtContent += `${status} ${task.text}\n`;
+            });
+
+            // Criando o arquivo e fazendo download
+            const blob = new Date();
+            const blobData = new Blob([txtContent], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blobData);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Relatorio_Saas_${dataAtual.replace(/\//g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Iniciar
+        updateDisplay();
+        renderTasks();
+    </script>
+</body>
+</html>
