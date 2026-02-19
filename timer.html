@@ -42,7 +42,7 @@
         position: relative;
       }
 
-      /* === BACKGROUND ANIMADO (Da Bio) === */
+      /* === BACKGROUND ANIMADO === */
       .nebula {
         position: fixed;
         top: 0;
@@ -201,15 +201,17 @@
         margin-bottom: 40px;
       }
 
+      /* Timer com proteção contra cortes (clamp, line-height e padding) */
       .timer-display {
         font-family: var(--font-display);
-        font-size: 14vw;
+        font-size: clamp(5rem, 14vw, 12rem);
         font-weight: 900;
-        letter-spacing: -6px;
+        letter-spacing: -2px;
         background: linear-gradient(to bottom, #ffffff 30%, var(--text-sec));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1;
+        line-height: 1.2;
+        padding: 10px 20px;
         font-variant-numeric: tabular-nums;
         margin-bottom: 15px;
         filter: drop-shadow(0px 10px 30px rgba(0, 53, 255, 0.2));
@@ -283,7 +285,7 @@
         background: var(--glass) !important;
       }
 
-      /* === PAINEL DE TAREFAS (GLASSMORPHISM) === */
+      /* === PAINEL DE TAREFAS === */
       .task-panel {
         position: fixed;
         top: 20px;
