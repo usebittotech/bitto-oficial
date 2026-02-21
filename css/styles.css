@@ -1026,7 +1026,6 @@ button,
     height: auto;
   }
 }
-
 @media (max-width: 768px) {
   .container {
     padding: 0 1rem;
@@ -1048,6 +1047,7 @@ button,
 
   .content-column {
     gap: 1.5rem;
+    min-width: 100%; /* Garante que não estoure a tela */
   }
 
   /* 1. STATS COMPACTOS (Grid 2x2) */
@@ -1061,19 +1061,26 @@ button,
   }
   .stat-card {
     padding: 0.8rem;
-    min-width: unset;
+    min-width: 0; /* Evita que o texto quebre o card */
   }
   .stat-value {
     font-size: 1rem;
   }
 
-  /* 2. FERRAMENTAS EM CARROSSEL (Arrastar pro lado) */
+  /* 2. CORREÇÃO DO CARROSSEL (Evita visual cortado) */
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 1rem;
-    padding-bottom: 0.5rem;
+
+    /* Mágica para o scroll ir até a borda do celular sem cortar seco */
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
+
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1083,17 +1090,17 @@ button,
     display: none;
   }
   .feature-card {
-    min-width: 260px;
+    min-width: 280px; /* Pouquinho maior para caber bem o texto */
     min-height: 220px;
     scroll-snap-align: center;
     flex-shrink: 0;
-    padding: 1.2rem;
+    padding: 1.5rem;
   }
 
-  /* 3. CHATBOT COM ALTURA PROPORCIONAL */
+  /* 3. CORREÇÃO DO CHATBOT (Altura segura) */
   .chatbot-card {
-    height: 65vh;
-    min-height: 450px;
+    height: 550px; /* Usar altura fixa no celular é mais seguro para não cortar o input */
+    min-height: unset;
     border-radius: 20px;
   }
   .chatbot-messages {
