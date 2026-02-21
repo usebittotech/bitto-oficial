@@ -1115,6 +1115,7 @@ button,
    EXPORTAR STORY PREMIUM E MODAL DE PRÉVIA
    ========================================================================== */
 
+/* Botão na UI */
 .btn-share-story {
   display: inline-flex;
   align-items: center;
@@ -1193,16 +1194,14 @@ button,
   border-color: var(--primary-blue);
 }
 
-/* TEMPLATE OCULTO (1080x1920) - Solução Anti-Corte */
+/* TEMPLATE OCULTO (1080x1920) - Solução Definitiva Anti-Corte e Imagem Escura */
 .story-export-box {
   position: absolute;
   top: 0;
-  left: 0;
+  left: -9999px; /* Escondido fora da tela */
   width: 1080px;
   height: 1920px;
-  z-index: -9999;
-  opacity: 0.01;
-  pointer-events: none;
+  z-index: -9999; /* Fica atrás de tudo */
   background: #050505;
   color: #fff;
   font-family: "DM Sans", sans-serif;

@@ -197,9 +197,29 @@ if (btnShareStory) {
 
       // 2. Atualizar Dados
       const valTotal = document.getElementById("valTotal").innerText;
-      document.getElementById("st-month").innerText = document.getElementById(
-        "currentMonthDisplay",
-      ).innerText;
+
+      // Corrige o bug do "Carregando..."
+      let monthText = document.getElementById("currentMonthDisplay").innerText;
+      if (monthText === "Carregando...") {
+        const date = new Date();
+        const monthNames = [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ];
+        monthText = `${monthNames[date.getMonth()]} de ${date.getFullYear()}`;
+      }
+
+      document.getElementById("st-month").innerText = monthText;
       document.getElementById("st-total").innerText = valTotal;
       document.getElementById("st-flashcards").innerText =
         document.getElementById("valFlashcards").innerText;
@@ -208,15 +228,17 @@ if (btnShareStory) {
       document.getElementById("st-review").innerText =
         document.getElementById("valReview").innerText;
 
-      // Atualiza a legenda com a quantidade real
       document.getElementById("suggestedCaption").innerText =
         `"Acabei de gerar ${valTotal} materiais de estudo com IA na @bitto.app! 🚀🧠 O link tá na bio pra quem quiser acelerar os estudos também."`;
 
+      // Pequeno delay para imagens e fontes carregarem
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // SOLUÇÃO ANTI-CORTE: Guarda a posição atual e vai pro topo
       const scrollPos = window.scrollY;
       window.scrollTo(0, 0);
+
+      // TRUQUE ANTI-CORTE: Puxa o template para trás do body na hora de renderizar
+      storyTemplate.style.left = "0px";
 
       // 3. Renderizar com dimensões estritas
       const canvas = await window.html2canvas(storyTemplate, {
@@ -226,15 +248,14 @@ if (btnShareStory) {
         backgroundColor: "#050505",
         width: 1080,
         height: 1920,
-        windowWidth: 1080,
-        windowHeight: 1920,
         x: 0,
         y: 0,
         scrollY: 0,
         logging: false,
       });
 
-      // Restaura o scroll do usuário
+      // TRUQUE ANTI-CORTE: Esconde o template de novo
+      storyTemplate.style.left = "-9999px";
       window.scrollTo(0, scrollPos);
 
       // 4. Salvar imagem gerada e abrir modal
@@ -254,6 +275,7 @@ if (btnShareStory) {
       btnShareStory.disabled = false;
     } catch (error) {
       console.error("Erro ao gerar a imagem: ", error);
+      storyTemplate.style.left = "-9999px"; // Garante que esconda se der erro
       btnShareStory.innerHTML = "❌ Erro ao gerar. Tente novamente.";
       setTimeout(() => {
         btnShareStory.innerHTML = "📸 Gerar Story do Mês";
@@ -291,7 +313,6 @@ if (btnDownloadStory) {
 if (btnCopyCaption) {
   btnCopyCaption.addEventListener("click", () => {
     const captionText = document.getElementById("suggestedCaption").innerText;
-    // Tira as aspas do começo e do fim para ficar limpo pro usuário colar
     navigator.clipboard.writeText(captionText.replace(/^"|"$/g, ""));
 
     const originalText = btnCopyCaption.innerHTML;
