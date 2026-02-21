@@ -61,6 +61,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
@@ -83,6 +84,7 @@ body {
   margin-left: 1rem;
   padding: 5px;
 }
+
 .mobile-menu-overlay {
   position: fixed;
   top: 0;
@@ -100,6 +102,7 @@ body {
   opacity: 1;
   pointer-events: auto;
 }
+
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -118,6 +121,7 @@ body {
 .mobile-menu.active {
   right: 0;
 }
+
 .mobile-header {
   display: flex;
   justify-content: space-between;
@@ -210,6 +214,7 @@ body {
   }
 }
 
+/* --- EFEITOS E TIPOGRAFIA --- */
 .crt-overlay {
   display: none;
   position: fixed;
@@ -226,6 +231,7 @@ body {
 [data-theme="dark"] .crt-overlay {
   display: block;
 }
+
 .tilt-element {
   transition: transform 0.1s;
   transform-style: preserve-3d;
@@ -251,6 +257,7 @@ button,
   font-weight: 500;
 }
 
+/* --- NAVBAR E CONTAINER --- */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -332,6 +339,7 @@ button,
   color: var(--text-main);
 }
 
+/* --- PERFIL --- */
 .user-profile-container {
   position: relative;
 }
@@ -351,6 +359,7 @@ button,
     display: block;
   }
 }
+
 .avatar-circle {
   width: 32px;
   height: 32px;
@@ -445,6 +454,7 @@ button,
 .dropdown-menu .logout {
   color: #ff4b4b;
 }
+
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -456,7 +466,7 @@ button,
   }
 }
 
-/* --- ESTRUTURA GERAL DO DASHBOARD --- */
+/* --- ESTRUTURA GERAL DO DASHBOARD (GRID) --- */
 .main-wrapper {
   padding-top: 2rem;
   padding-bottom: 4rem;
@@ -476,7 +486,7 @@ button,
 /* GRID PRINCIPAL (Layout Desktop) */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 380px; /* Esquerda flexível, Direita Fixa */
+  grid-template-columns: 1fr 380px; /* Esquerda flexível, Direita com Chatbot Fixo */
   gap: 2rem;
   align-items: start;
 }
@@ -485,7 +495,7 @@ button,
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  min-width: 0; /* Impede overflow em grids aninhados */
+  min-width: 0;
 }
 
 /* SIDEBAR (Chatbot Fixo no Desktop) */
@@ -498,7 +508,7 @@ button,
 /* --- STATS ROW --- */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 Colunas iguais no desktop */
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 .stat-card {
@@ -842,6 +852,7 @@ button,
   transition: 0.2s;
   border-top: 1px solid;
 }
+
 .feature-card[data-color="blue"] {
   background: var(--primary-blue);
   color: white;
@@ -979,7 +990,7 @@ button,
   cursor: pointer;
 }
 
-/* PLANO VISUAL */
+/* --- PLANO VISUAL --- */
 .plan-tag {
   background: var(--accent-green);
   color: var(--primary-blue);
@@ -1002,81 +1013,99 @@ button,
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE (MOBILE & TABLET)
-   Este bloco corrige a visualização em telas pequenas
+   RESPONSIVIDADE PREMIUM (MOBILE & TABLET) - Estilo App Nativo
    ========================================================================== */
 
 @media (max-width: 1024px) {
-  .container {
-    padding: 0 1rem; /* Margem lateral menor no mobile */
-  }
-
-  /* Transforma o Grid Lateral em Coluna Única Empilhada */
   .dashboard-grid {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 2rem;
   }
-
-  /* Conteúdo Principal fica em cima */
-  .content-column {
-    order: 1;
-    width: 100%;
-  }
-
-  /* Chatbot fica embaixo */
   .sidebar-column {
-    position: static; /* Remove o Sticky */
+    position: static;
     height: auto;
-    width: 100%;
-    order: 2;
-    margin-bottom: 2rem;
-  }
-
-  /* Altura fixa para o chat não ficar infinito no mobile */
-  .chatbot-card {
-    height: 550px;
-  }
-
-  /* Cards de Stats um embaixo do outro */
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-
-  /* Cards de Ferramentas um embaixo do outro */
-  .features-grid {
-    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .nav-links {
-    display: none;
+  .container {
+    padding: 0 1rem;
   }
-  .hamburger-btn {
-    display: block;
-  }
-  .user-name {
-    display: none;
-  }
+
+  .nav-links,
+  .user-name,
   .plan-tag {
     display: none;
+  }
+
+  .hamburger-btn {
+    display: block;
   }
 
   .welcome-text h1 {
     font-size: 1.5rem;
   }
 
-  /* Ajustes finos no chat mobile */
+  .content-column {
+    gap: 1.5rem;
+  }
+
+  /* 1. STATS COMPACTOS (Grid 2x2) */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .mascot-card-layout {
+    grid-column: span 2;
+  }
+  .stat-card {
+    padding: 0.8rem;
+    min-width: unset;
+  }
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  /* 2. FERRAMENTAS EM CARROSSEL (Arrastar pro lado) */
+  .features-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .features-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .feature-card {
+    min-width: 260px;
+    min-height: 220px;
+    scroll-snap-align: center;
+    flex-shrink: 0;
+    padding: 1.2rem;
+  }
+
+  /* 3. CHATBOT COM ALTURA PROPORCIONAL */
   .chatbot-card {
-    height: 500px;
-    border-radius: 16px;
+    height: 65vh;
+    min-height: 450px;
+    border-radius: 20px;
   }
   .chatbot-messages {
     padding: 1rem;
   }
   .message-bubble {
     font-size: 0.9rem;
-    max-width: 85%;
+    max-width: 90%;
+  }
+
+  .chat-chips {
+    justify-content: flex-start;
+    padding-bottom: 8px;
   }
 }
