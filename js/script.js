@@ -525,3 +525,18 @@ function showToast(message, type = "success") {
     toast.remove();
   }, 3000);
 }
+// ==========================================
+// 7. ATIVADORES DO BOTÃO E TECLA ENTER
+// ==========================================
+if (sendBtn) {
+  sendBtn.addEventListener("click", handleSend);
+}
+
+if (chatInput) {
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Evita quebra de linha
+      handleSend();
+    }
+  });
+}

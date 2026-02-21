@@ -90,7 +90,6 @@ body {
   margin-left: 1rem;
   padding: 5px;
 }
-
 .mobile-menu-overlay {
   position: fixed;
   top: 0;
@@ -108,7 +107,6 @@ body {
   opacity: 1;
   pointer-events: auto;
 }
-
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -127,7 +125,6 @@ body {
 .mobile-menu.active {
   right: 0;
 }
-
 .mobile-header {
   display: flex;
   justify-content: space-between;
@@ -264,7 +261,7 @@ button,
 
 /* --- NAVBAR E CONTAINER --- */
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -364,7 +361,6 @@ button,
     display: block;
   }
 }
-
 .avatar-circle {
   width: 32px;
   height: 32px;
@@ -459,7 +455,6 @@ button,
 .dropdown-menu .logout {
   color: #ff4b4b;
 }
-
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -471,45 +466,63 @@ button,
   }
 }
 
-/* --- ESTRUTURA GERAL DO DASHBOARD --- */
+/* ==========================================================================
+   O NOVO GRID (DESKTOP) - SEPARA FERRAMENTAS DO CHATBOT COM PERFEIÇÃO
+   ========================================================================== */
 .main-wrapper {
   padding-top: 2rem;
   padding-bottom: 4rem;
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 380px; /* Coluna 1 flexível, Coluna 2 (Chat) 380px */
+  grid-template-areas:
+    "header header"
+    "features sidebar";
+  gap: 2rem 3rem; /* 2rem de espaço vertical, 3rem de espaço entre chat e ferramentas */
+  align-items: start;
 }
+
+/* Onde cada bloco entra no Grid */
 .dash-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  grid-area: header;
+  text-align: left; /* Alinhado à esquerda no PC fica mais moderno */
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 1.5rem;
 }
+.features-section {
+  grid-area: features;
+  margin-top: 0;
+}
+.chatbot-section {
+  grid-area: sidebar;
+  position: sticky; /* Fica fixo na tela enquanto o resto rola */
+  top: 85px;
+  height: calc(100vh - 120px);
+}
+
 .welcome-text h1 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 0.5rem;
   color: var(--text-main);
 }
 .welcome-text p {
   color: var(--text-muted);
+  font-size: 1.1rem;
 }
 
 /* --- STATS ROW --- */
 .stats-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
   width: 100%;
 }
 .stat-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 1.5rem;
   border-radius: var(--radius-md);
-  min-width: 120px;
   box-shadow: var(--shadow-soft);
-  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -520,7 +533,7 @@ button,
   align-items: center;
   gap: 1rem;
   text-align: left;
-  padding: 0.5rem 1rem;
+  padding: 0.8rem 1rem;
   border: 2px solid var(--accent-green);
   box-shadow: 0 0 15px rgba(204, 255, 0, 0.1);
 }
@@ -566,16 +579,12 @@ button,
   color: #00b884;
 }
 
-/* --- CHATBOT --- */
-.chatbot-section {
-  margin-bottom: 3rem;
-  width: 100%;
-}
+/* --- CHATBOT (ESTRUTURA BLINDADA) --- */
 .chatbot-card {
   background: var(--card-bg);
   border: 2px solid var(--border-highlight);
   border-radius: var(--radius-lg);
-  height: 550px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -643,6 +652,7 @@ button,
   font-family: var(--font-body);
 }
 
+/* A área de mensagens cresce e encolhe, mas nunca esmaga o footer */
 .chatbot-messages {
   flex: 1 1 auto;
   min-height: 0;
@@ -708,7 +718,7 @@ button,
   flex-direction: column;
   gap: 0.8rem;
   z-index: 2;
-  flex-shrink: 0;
+  flex-shrink: 0; /* IMPEDE O CORTE DO INPUT */
 }
 .chat-chips {
   display: flex;
@@ -777,9 +787,6 @@ button,
 }
 
 /* --- FEATURES GRID --- */
-.features-section {
-  width: 100%;
-}
 .section-title {
   font-size: 1.2rem;
   color: var(--text-main);
@@ -1025,8 +1032,30 @@ button,
 }
 
 /* ==========================================================================
-   MOBILE EXCLUSIVO (A MÁGICA DOS ESPAÇOS E ORDEM)
+   MOBILE E TABLET 
    ========================================================================== */
+
+@media (max-width: 1024px) {
+  /* Desmonta o Grid do Desktop e volta a ser um bloco só flexível */
+  .main-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  .dash-header {
+    order: 1;
+    margin-bottom: 0;
+    text-align: center;
+  }
+  .features-section {
+    order: 2;
+  }
+  .chatbot-section {
+    order: 3;
+    position: static;
+    height: auto;
+  }
+}
 
 @media (max-width: 768px) {
   .container {
@@ -1044,46 +1073,18 @@ button,
     display: block;
   }
 
-  /* ORGANIZADOR GLOBAL PARA ESPAÇAR E ORDENAR AS SEÇÕES */
-  .main-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem; /* UM RESPIRO GIGANTE ENTRE CADA PARTE DO APP */
-  }
-
-  /* FORÇA A ORDEM: Título > Ferramentas > Chatbot */
   .dash-header {
-    order: 1;
-    margin-bottom: 0;
-  }
-  .features-section {
-    order: 2;
-    margin-top: 0;
-    width: 100%;
-    overflow: hidden;
-  }
-  .chatbot-section {
-    order: 3;
-    margin-bottom: 0;
-    width: 100%;
-  }
-
-  /* 1. CABEÇALHO E ESTATÍSTICAS (Mais espaço para não amontoar) */
-  .dash-header {
-    gap: 2rem; /* Afasta o "Boa Noite" dos quadradinhos */
+    gap: 2rem;
   }
   .welcome-text h1 {
     font-size: 1.6rem;
     margin-bottom: 0.3rem;
   }
-  .welcome-text p {
-    font-size: 0.95rem;
-  }
 
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem; /* Afasta o card de XP do card de Estudos */
+    gap: 1rem;
     width: 100%;
   }
   .mascot-card-layout {
@@ -1091,10 +1092,9 @@ button,
     padding: 1rem 1.2rem;
   }
   .stat-card {
-    padding: 1.2rem 1rem; /* Aumenta o espaço dentro do card */
+    padding: 1.2rem 1rem;
   }
 
-  /* 2. CARROSSEL DE FERRAMENTAS */
   .section-title {
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
@@ -1104,7 +1104,7 @@ button,
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    gap: 1.2rem; /* Mais espaço entre os cards azuis */
+    gap: 1.2rem;
     margin-left: -1.2rem;
     margin-right: -1.2rem;
     padding-left: 1.2rem;
@@ -1124,17 +1124,19 @@ button,
     max-width: 320px;
     scroll-snap-align: center;
     min-height: 200px;
-    padding: 1.8rem; /* Respiro interno generoso para o texto caber bem */
+    padding: 1.8rem;
   }
   .features-grid::after {
     content: "";
     flex: 0 0 1px;
   }
 
-  /* 3. CHATBOT COM RESPIRO DENTRO */
+  /* CHATBOT COM DVH (DYNAMIC VIEWPORT HEIGHT) - Adeus cortes! */
   .chatbot-card {
     height: 550px;
-    max-height: 75vh;
+    max-height: calc(
+      100dvh - 120px
+    ); /* Usa a medida dinâmica real da tela visível do celular */
     min-height: unset;
     border-radius: 18px;
     box-sizing: border-box;
@@ -1146,7 +1148,6 @@ button,
     font-size: 0.95rem;
     padding: 0.8rem 1rem;
   }
-
   .chatbot-footer {
     padding: 1.2rem;
     gap: 1rem;
