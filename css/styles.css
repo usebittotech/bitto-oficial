@@ -486,7 +486,7 @@ button,
 /* GRID PRINCIPAL (Layout Desktop) */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 380px; /* Esquerda flexível, Direita com Chatbot Fixo */
+  grid-template-columns: 1fr 380px;
   gap: 2rem;
   align-items: start;
 }
@@ -644,8 +644,10 @@ button,
   font-weight: 600;
   font-family: var(--font-body);
 }
+
 .chatbot-messages {
-  flex: 1;
+  flex: 1 1 0; /* Regra de Ouro: Garante que as mensagens nunca empurrem o footer para fora */
+  min-height: 0; /* Impede o bug de transbordamento do Flexbox */
   padding: 1.5rem;
   overflow-y: auto;
   background-color: var(--chat-bg-color);
@@ -656,6 +658,7 @@ button,
   gap: 1rem;
   z-index: 1;
 }
+
 .message {
   display: flex;
   gap: 0.8rem;
@@ -672,6 +675,7 @@ button,
   position: relative;
   backdrop-filter: blur(4px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  word-break: break-word;
 }
 .message-bot .message-bubble {
   background: rgba(255, 255, 255, 0.9);
@@ -695,6 +699,7 @@ button,
   opacity: 0.7;
   text-align: right;
 }
+
 .chatbot-footer {
   padding: 1rem 1.5rem;
   background: var(--card-bg);
@@ -713,6 +718,10 @@ button,
   padding-bottom: 5px;
   justify-content: center;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.chat-chips::-webkit-scrollbar {
+  display: none;
 }
 .chip {
   background: transparent;
@@ -733,9 +742,11 @@ button,
 .input-wrapper {
   display: flex;
   gap: 0.8rem;
+  width: 100%;
 }
 .chat-input {
   flex: 1;
+  min-width: 0; /* Impede que o input quebre o layout no mobile */
   background: var(--input-bg);
   border: 1px solid transparent;
   color: var(--text-main);
@@ -762,6 +773,7 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 /* --- FEATURES GRID --- */
@@ -1013,7 +1025,8 @@ button,
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE PREMIUM (MOBILE & TABLET) - Estilo App Nativo
+   RESPONSIVIDADE (MOBILE & TABLET)
+   CÓDIGO 100% BLINDADO CONTRA CORTES
    ========================================================================== */
 
 @media (max-width: 1024px) {
@@ -1026,6 +1039,7 @@ button,
     height: auto;
   }
 }
+
 @media (max-width: 768px) {
   .container {
     padding: 0 1rem;
@@ -1047,61 +1061,55 @@ button,
 
   .content-column {
     gap: 1.5rem;
-    min-width: 100%; /* Garante que não estoure a tela */
+    min-width: 100%;
   }
 
-  /* 1. STATS COMPACTOS (Grid 2x2) */
+  /* 1. STATS COMPACTOS */
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.8rem;
   }
   .mascot-card-layout {
-    grid-column: span 2;
+    grid-column: span 2; /* Garante que o mascote ocupe tudo sem estourar */
   }
   .stat-card {
-    padding: 0.8rem;
-    min-width: 0; /* Evita que o texto quebre o card */
+    padding: 1rem;
+    min-width: 0; /* Previne que o card estique além da tela */
   }
   .stat-value {
     font-size: 1rem;
+    word-break: break-word; /* Se o número for gigante, ele não quebra a tela */
   }
 
-  /* 2. CORREÇÃO DO CARROSSEL (Evita visual cortado) */
+  /* 2. CARROSSEL DE FERRAMENTAS SEGURO */
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 1rem;
-
-    /* Mágica para o scroll ir até a borda do celular sem cortar seco */
-    margin-left: -1rem;
-    margin-right: -1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
     padding-bottom: 1rem;
-
+    width: 100%; /* Respeita o container */
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .features-grid::-webkit-scrollbar {
-    display: none;
   }
   .feature-card {
-    min-width: 280px; /* Pouquinho maior para caber bem o texto */
-    min-height: 220px;
-    scroll-snap-align: center;
+    width: 85%; /* Usa 85% da tela, deixando um pedaço do próximo visível sem cortar */
     flex-shrink: 0;
+    scroll-snap-align: center;
+    min-height: 220px;
     padding: 1.5rem;
   }
 
-  /* 3. CORREÇÃO DO CHATBOT (Altura segura) */
+  /* 3. CHATBOT COM ALTURA FIXA E SEGURA */
   .chatbot-card {
-    height: 550px; /* Usar altura fixa no celular é mais seguro para não cortar o input */
+    height: 500px; /* Altura exata previne bugs quando o teclado do celular abre */
     min-height: unset;
-    border-radius: 20px;
+    max-height: calc(
+      100vh - 100px
+    ); /* Nunca vai ser maior que a tela do celular */
+    border-radius: 16px;
   }
   .chatbot-messages {
     padding: 1rem;
