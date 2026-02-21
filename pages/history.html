@@ -1,207 +1,621 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bitto - Histórico Mensal</title>
-    <link rel="icon" type="image/png" href="/imagens/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="../css/styles.css">
-    
+    <link rel="icon" type="image/png" href="/imagens/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="stylesheet" href="../css/styles.css" />
+
     <style>
-        /* --- ESTILO DO BOTÃO VOLTAR (Igual ao Quiz/Flashcards) --- */
-        .nav-grid {
-            display: flex; justify-content: space-between; align-items: center; width: 100%;
-        }
-        .back-pill {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--input-bg);
-            padding: 8px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-        .back-pill:hover {
-            background: var(--card-bg);
-            color: var(--text-main);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transform: translateX(-3px);
-            border-color: var(--border-color);
-        }
-        .back-pill .icon { font-size: 1.1rem; line-height: 0; padding-bottom: 2px; }
+      /* --- ESTILO DO BOTÃO VOLTAR --- */
+      .nav-grid {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+      .back-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--input-bg);
+        padding: 8px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+      }
+      .back-pill:hover {
+        background: var(--card-bg);
+        color: var(--text-main);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transform: translateX(-3px);
+        border-color: var(--border-color);
+      }
+      .back-pill .icon {
+        font-size: 1.1rem;
+        line-height: 0;
+        padding-bottom: 2px;
+      }
 
-        /* --- ESTILOS DO HISTÓRICO --- */
-        .month-header {
-            text-align: center; margin-bottom: 2.5rem; padding: 3rem 2rem;
-            background: linear-gradient(135deg, #0035FF 0%, #0020A0 100%);
-            border-radius: 24px; color: white; position: relative; overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 53, 255, 0.3);
+      /* --- ESTILOS DO HISTÓRICO --- */
+      .month-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding: 3rem 2rem;
+        background: linear-gradient(135deg, #0035ff 0%, #0020a0 100%);
+        border-radius: 24px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 53, 255, 0.3);
+      }
+      .month-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 60%
+        );
+        animation: rotateBg 20s linear infinite;
+      }
+      @keyframes rotateBg {
+        from {
+          transform: rotate(0deg);
         }
-        .month-header::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            animation: rotateBg 20s linear infinite;
+        to {
+          transform: rotate(360deg);
         }
-        @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      }
 
-        .header-content { position: relative; z-index: 2; }
-        .month-title { font-size: 2.2rem; margin-bottom: 0.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .month-desc { opacity: 0.9; font-size: 1rem; max-width: 600px; margin: 0 auto; }
+      .header-content {
+        position: relative;
+        z-index: 2;
+      }
+      .month-title {
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .month-desc {
+        opacity: 0.9;
+        font-size: 1rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
 
-        .time-wrapper {
-            background: rgba(255,255,255,0.15); backdrop-filter: blur(5px);
-            border-radius: 50px; padding: 5px; margin: 20px auto 0; max-width: 400px;
+      .time-wrapper {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(5px);
+        border-radius: 50px;
+        padding: 5px;
+        margin: 20px auto 0;
+        max-width: 400px;
+      }
+      .time-bar {
+        height: 8px;
+        background: #ccff00;
+        border-radius: 50px;
+        width: 0%;
+        transition: width 1s ease;
+        box-shadow: 0 0 15px rgba(204, 255, 0, 0.6);
+      }
+      .time-text {
+        font-size: 0.8rem;
+        margin-top: 8px;
+        font-weight: 600;
+        color: #ccff00;
+      }
+
+      .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .stat-box {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.5rem;
+        position: relative;
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 220px;
+      }
+      .stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        border-color: var(--primary-blue);
+      }
+
+      .icon-bg {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .theme-blue .icon-bg {
+        background: rgba(0, 53, 255, 0.1);
+        color: #0035ff;
+      }
+      .theme-green .icon-bg {
+        background: rgba(0, 184, 132, 0.1);
+        color: #00b884;
+      }
+      .theme-purple .icon-bg {
+        background: rgba(138, 43, 226, 0.1);
+        color: blueviolet;
+      }
+      .theme-gold .icon-bg {
+        background: rgba(255, 215, 0, 0.15);
+        color: #d4af37;
+      }
+
+      .stat-number {
+        font-family: var(--font-display);
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-main);
+        line-height: 1;
+      }
+      .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .stat-sub {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        opacity: 0.8;
+      }
+
+      .quick-action {
+        margin-top: 1.5rem;
+        padding: 0.8rem;
+        border-radius: 12px;
+        background: var(--input-bg);
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: center;
+        transition: 0.2s;
+        border: 1px solid transparent;
+      }
+      .quick-action:hover {
+        background: var(--text-main);
+        color: var(--card-bg);
+      }
+
+      .total-card {
+        grid-column: 1 / -1;
+        background: var(--card-bg);
+        border: 2px solid var(--accent-green);
+        flex-direction: row;
+        align-items: center;
+        min-height: 120px;
+      }
+      .total-info {
+        flex: 1;
+      }
+
+      @media (max-width: 768px) {
+        .month-title {
+          font-size: 1.5rem;
         }
-        .time-bar {
-            height: 8px; background: #CCFF00; border-radius: 50px; width: 0%;
-            transition: width 1s ease; box-shadow: 0 0 15px rgba(204, 255, 0, 0.6);
-        }
-        .time-text { font-size: 0.8rem; margin-top: 8px; font-weight: 600; color: #CCFF00; }
-
-        .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-
-        .stat-box {
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 1.5rem; position: relative;
-            transition: transform 0.3s, box-shadow 0.3s; display: flex;
-            flex-direction: column; justify-content: space-between; min-height: 220px;
-        }
-        .stat-box:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: var(--primary-blue); }
-
-        .icon-bg {
-            width: 50px; height: 50px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; margin-bottom: 1rem;
-        }
-        .theme-blue .icon-bg { background: rgba(0, 53, 255, 0.1); color: #0035FF; }
-        .theme-green .icon-bg { background: rgba(0, 184, 132, 0.1); color: #00B884; }
-        .theme-purple .icon-bg { background: rgba(138, 43, 226, 0.1); color: blueviolet; }
-        .theme-gold .icon-bg { background: rgba(255, 215, 0, 0.15); color: #D4AF37; }
-
-        .stat-number { font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--text-main); line-height: 1; }
-        .stat-label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-sub { font-size: 0.8rem; color: var(--text-muted); opacity: 0.8; }
-
-        .quick-action {
-            margin-top: 1.5rem; padding: 0.8rem; border-radius: 12px;
-            background: var(--input-bg); color: var(--text-main); text-decoration: none;
-            font-weight: 600; font-size: 0.9rem; text-align: center; transition: 0.2s;
-            border: 1px solid transparent;
-        }
-        .quick-action:hover { background: var(--text-main); color: var(--card-bg); }
-        
         .total-card {
-            grid-column: 1 / -1; background: var(--card-bg);
-            border: 2px solid var(--accent-green); flex-direction: row; align-items: center;
-            min-height: 120px;
+          flex-direction: column;
+          text-align: center;
+          gap: 1rem;
         }
-        .total-info { flex: 1; }
-        
-        @media(max-width: 768px) {
-            .month-title { font-size: 1.5rem; }
-            .total-card { flex-direction: column; text-align: center; gap: 1rem; }
-        }
-    </style>
-</head>
-<body>
+      }
 
+      /* --- ESTILOS DO STORY EXPORT --- */
+      .btn-share-story {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: transparent;
+        color: var(--text-main);
+        border: 2px solid var(--primary-blue);
+        padding: 15px 35px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-family: var(--font-display);
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 53, 255, 0.1);
+      }
+      .btn-share-story:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 53, 255, 0.3);
+      }
+
+      .story-export-box {
+        position: fixed;
+        left: -9999px;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        background: #050505;
+        background-image: radial-gradient(
+          circle at center,
+          rgba(0, 53, 255, 0.15) 0%,
+          transparent 70%
+        );
+        color: #fff;
+        font-family: "DM Sans", sans-serif;
+        display: flex;
+        flex-direction: column;
+        padding: 180px 100px;
+        box-sizing: border-box;
+        z-index: -1;
+      }
+      .story-header-box {
+        text-align: center;
+        margin-bottom: 120px;
+      }
+      .story-user-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 70px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 25px 50px 25px 25px;
+        border-radius: 100px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+      }
+      .story-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 6px solid #ccff00;
+        background: #0035ff;
+      }
+      .story-user-text {
+        text-align: left;
+      }
+      .story-user-name {
+        font-family: "Unbounded", sans-serif;
+        font-size: 55px;
+        color: white;
+        font-weight: 800;
+        margin-bottom: 5px;
+        line-height: 1;
+      }
+      .story-user-badge {
+        font-size: 32px;
+        color: #aaa;
+        margin: 0;
+        font-weight: 500;
+      }
+      .story-title {
+        font-family: "Unbounded", sans-serif;
+        font-size: 85px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .story-subtitle {
+        font-size: 45px;
+        color: #ccff00;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+      }
+
+      .story-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        flex-grow: 1;
+      }
+      .story-card {
+        background: #111;
+        border-radius: 50px;
+        padding: 70px 40px;
+        text-align: center;
+        border: 4px solid #333;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .story-icon-bg {
+        font-size: 110px;
+        margin-bottom: 40px;
+      }
+      .story-num {
+        font-family: "Unbounded", sans-serif;
+        font-size: 130px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        line-height: 1;
+      }
+      .story-label {
+        font-size: 38px;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 600;
+      }
+      .sc-gold {
+        border-color: #d4af37;
+        box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
+      }
+      .sc-gold .story-num {
+        color: #d4af37;
+      }
+      .sc-blue {
+        border-color: #0035ff;
+        box-shadow: 0 0 50px rgba(0, 53, 255, 0.1);
+      }
+      .sc-blue .story-num {
+        color: #0035ff;
+      }
+      .sc-green {
+        border-color: #ccff00;
+        box-shadow: 0 0 50px rgba(204, 255, 0, 0.1);
+      }
+      .sc-green .story-num {
+        color: #ccff00;
+      }
+      .sc-purple {
+        border-color: blueviolet;
+        box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
+      }
+      .sc-purple .story-num {
+        color: blueviolet;
+      }
+
+      .story-footer-branding {
+        text-align: center;
+        margin-top: 100px;
+        border-top: 2px solid #333;
+        padding-top: 60px;
+      }
+      .story-footer-branding h3 {
+        font-size: 70px;
+        color: #0035ff;
+        margin-bottom: 15px;
+        letter-spacing: -2px;
+      }
+      .story-footer-branding p {
+        font-size: 40px;
+        color: #888;
+      }
+      .story-footer-branding strong {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
     <div class="crt-overlay"></div>
     <div id="toast-container"></div>
 
     <nav class="navbar">
-        <div class="container nav-grid">
-            <div class="nav-left">
-                <a href="dashboard.html" class="back-pill">
-                    <span class="icon">←</span> Voltar
-                </a>
-            </div>
-            
-            <div class="nav-center">
-                <span class="page-title">HISTÓRICO</span>
-            </div>
-            
-            <div class="nav-right">
-                <button class="icon-button" id="themeToggle">
-                    <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-                <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
-                    <span class="user-name" id="navUserName">...</span>
-                    <div class="avatar-circle"></div>
-                </div>
-            </div>
+      <div class="container nav-grid">
+        <div class="nav-left">
+          <a href="dashboard.html" class="back-pill">
+            <span class="icon">←</span> Voltar
+          </a>
         </div>
+
+        <div class="nav-center">
+          <span class="page-title">HISTÓRICO</span>
+        </div>
+
+        <div class="nav-right">
+          <button class="icon-button" id="themeToggle">
+            <svg
+              class="icon-sun"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg
+              class="icon-moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="display: none"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <div
+            class="user-profile"
+            style="display: flex; align-items: center; gap: 10px"
+          >
+            <span class="user-name" id="navUserName">...</span>
+            <div class="avatar-circle"></div>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <div class="container main-wrapper">
-        
-        <div class="month-header tilt-element">
-            <div class="header-content">
-                <h1 class="month-title" id="currentMonthDisplay">Carregando...</h1>
-                <p class="month-desc">Seu desempenho é resetado todo dia 1º para manter o foco.</p>
-                
-                <div class="time-wrapper">
-                    <div class="time-bar" id="monthProgressBar"></div>
-                </div>
-                <div class="time-text" id="daysLeftText">Calculando dias restantes...</div>
-            </div>
+      <div class="month-header tilt-element">
+        <div class="header-content">
+          <h1 class="month-title" id="currentMonthDisplay">Carregando...</h1>
+          <p class="month-desc">
+            Seu desempenho é resetado todo dia 1º para manter o foco.
+          </p>
+
+          <div class="time-wrapper">
+            <div class="time-bar" id="monthProgressBar"></div>
+          </div>
+          <div class="time-text" id="daysLeftText">
+            Calculando dias restantes...
+          </div>
+        </div>
+      </div>
+
+      <div class="history-grid">
+        <div class="stat-box total-card theme-gold tilt-element">
+          <div
+            class="icon-bg"
+            style="width: 70px; height: 70px; font-size: 2rem"
+          >
+            ⚡
+          </div>
+          <div class="total-info">
+            <span class="stat-label" style="color: #d4af37"
+              >Produção Total</span
+            >
+            <div class="stat-number" id="valTotal">0</div>
+            <span class="stat-sub">Materiais gerados este mês</span>
+          </div>
+          <div style="text-align: right">
+            <span style="font-size: 3rem">🏆</span>
+          </div>
         </div>
 
-        <div class="history-grid">
-            
-            <div class="stat-box total-card theme-gold tilt-element">
-                <div class="icon-bg" style="width: 70px; height: 70px; font-size: 2rem;">⚡</div>
-                <div class="total-info">
-                    <span class="stat-label" style="color: #D4AF37;">Produção Total</span>
-                    <div class="stat-number" id="valTotal">0</div>
-                    <span class="stat-sub">Materiais gerados este mês</span>
-                </div>
-                <div style="text-align: right;">
-                    <span style="font-size: 3rem;">🏆</span>
-                </div>
-            </div>
-
-            <div class="stat-box theme-blue tilt-element">
-                <div>
-                    <div class="icon-bg">🗂️</div>
-                    <span class="stat-label">Flashcards</span>
-                    <div class="stat-number" id="valFlashcards">0</div>
-                    <span class="stat-sub">Cards criados</span>
-                </div>
-                <a href="flashcards.html" class="quick-action">Criar Novo Deck →</a>
-            </div>
-
-            <div class="stat-box theme-green tilt-element">
-                <div>
-                    <div class="icon-bg">🎮</div>
-                    <span class="stat-label">Quizzes</span>
-                    <div class="stat-number" id="valQuiz">0</div>
-                    <span class="stat-sub">Partidas jogadas</span>
-                </div>
-                <a href="quiz.html" class="quick-action">Jogar Agora →</a>
-            </div>
-
-            <div class="stat-box theme-purple tilt-element">
-                <div>
-                    <div class="icon-bg">📝</div>
-                    <span class="stat-label">Resumos</span>
-                    <div class="stat-number" id="valReview">0</div>
-                    <span class="stat-sub">Guias gerados</span>
-                </div>
-                <a href="review.html" class="quick-action">Gerar Guia →</a>
-            </div>
-
+        <div class="stat-box theme-blue tilt-element">
+          <div>
+            <div class="icon-bg">🗂️</div>
+            <span class="stat-label">Flashcards</span>
+            <div class="stat-number" id="valFlashcards">0</div>
+            <span class="stat-sub">Cards criados</span>
+          </div>
+          <a href="flashcards.html" class="quick-action">Criar Novo Deck →</a>
         </div>
 
+        <div class="stat-box theme-green tilt-element">
+          <div>
+            <div class="icon-bg">🎮</div>
+            <span class="stat-label">Quizzes</span>
+            <div class="stat-number" id="valQuiz">0</div>
+            <span class="stat-sub">Partidas jogadas</span>
+          </div>
+          <a href="quiz.html" class="quick-action">Jogar Agora →</a>
+        </div>
+
+        <div class="stat-box theme-purple tilt-element">
+          <div>
+            <div class="icon-bg">📝</div>
+            <span class="stat-label">Resumos</span>
+            <div class="stat-number" id="valReview">0</div>
+            <span class="stat-sub">Guias gerados</span>
+          </div>
+          <a href="review.html" class="quick-action">Gerar Guia →</a>
+        </div>
+      </div>
+
+      <div
+        style="
+          text-align: center;
+          display: flex;
+          justify-content: center;
+          margin-top: 4rem;
+        "
+      >
+        <button id="btnShareStory" class="btn-share-story tilt-element">
+          📸 Baixar Story para Instagram
+        </button>
+      </div>
+
+      <div id="story-template" class="story-export-box">
+        <div class="story-header-box">
+          <div class="story-user-info">
+            <img
+              id="st-avatar"
+              class="story-avatar"
+              src=""
+              crossorigin="anonymous"
+              alt="Avatar"
+            />
+            <div class="story-user-text">
+              <h3 id="st-name" class="story-user-name">Estudante</h3>
+              <p class="story-user-badge">Top Aluno(a) na Bitto</p>
+            </div>
+          </div>
+          <h2 class="story-title">MEU MÊS</h2>
+          <p class="story-subtitle" id="st-month">Mês de 2026</p>
+        </div>
+
+        <div class="story-grid">
+          <div class="story-card sc-gold">
+            <div class="story-icon-bg">⚡</div>
+            <div class="story-num" id="st-total">0</div>
+            <div class="story-label">Materiais<br />Totais</div>
+          </div>
+          <div class="story-card sc-blue">
+            <div class="story-icon-bg">🗂️</div>
+            <div class="story-num" id="st-flashcards">0</div>
+            <div class="story-label">Flashcards</div>
+          </div>
+          <div class="story-card sc-green">
+            <div class="story-icon-bg">🎮</div>
+            <div class="story-num" id="st-quiz">0</div>
+            <div class="story-label">Quizzes</div>
+          </div>
+          <div class="story-card sc-purple">
+            <div class="story-icon-bg">📝</div>
+            <div class="story-num" id="st-review">0</div>
+            <div class="story-label">Resumos</div>
+          </div>
+        </div>
+
+        <div class="story-footer-branding">
+          <h3 style="font-family: &quot;Unbounded&quot;, sans-serif">Bitto</h3>
+          <p>Acelere seus estudos com IA em <strong>bitto.app</strong></p>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="../js/history.js"></script>
-</body>
+  </body>
 </html>

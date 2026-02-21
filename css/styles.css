@@ -1111,3 +1111,199 @@ button,
     box-sizing: border-box;
   }
 }
+/* ==========================================================================
+   EXPORTAR STORY (HISTÓRICO)
+   ========================================================================== */
+
+/* Botão de Compartilhar na UI */
+.btn-share-story {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: transparent;
+  color: var(--text-main);
+  border: 2px solid var(--primary-blue);
+  padding: 15px 35px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 53, 255, 0.1);
+}
+.btn-share-story:hover {
+  background: var(--primary-blue);
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 53, 255, 0.3);
+}
+
+/* Template Oculto (Proporção 9:16) */
+.story-export-box {
+  position: fixed;
+  left: -9999px; /* Mantém fora da tela */
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  background: #050505;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(0, 53, 255, 0.15) 0%,
+    transparent 70%
+  );
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  display: flex;
+  flex-direction: column;
+  padding: 180px 100px;
+  box-sizing: border-box;
+  z-index: -1;
+}
+
+/* Header e Perfil do Usuário no Story */
+.story-header-box {
+  text-align: center;
+  margin-bottom: 120px;
+}
+
+.story-user-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px 50px 25px 25px;
+  border-radius: 100px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+.story-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid #ccff00;
+  background: #0035ff;
+}
+.story-user-text {
+  text-align: left;
+}
+.story-user-name {
+  font-family: "Unbounded", sans-serif;
+  font-size: 55px;
+  color: white;
+  font-weight: 800;
+  margin-bottom: 5px;
+  line-height: 1;
+}
+.story-user-badge {
+  font-size: 32px;
+  color: #aaa;
+  margin: 0;
+  font-weight: 500;
+}
+
+.story-title {
+  font-family: "Unbounded", sans-serif;
+  font-size: 85px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.story-subtitle {
+  font-size: 45px;
+  color: #ccff00;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+
+/* Grid de Status no Story */
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  flex-grow: 1;
+}
+.story-card {
+  background: #111;
+  border-radius: 50px;
+  padding: 70px 40px;
+  text-align: center;
+  border: 4px solid #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.story-icon-bg {
+  font-size: 110px;
+  margin-bottom: 40px;
+}
+.story-num {
+  font-family: "Unbounded", sans-serif;
+  font-size: 130px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+.story-label {
+  font-size: 38px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+/* Cores dos Cards no Story */
+.sc-gold {
+  border-color: #d4af37;
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
+}
+.sc-gold .story-num {
+  color: #d4af37;
+}
+.sc-blue {
+  border-color: #0035ff;
+  box-shadow: 0 0 50px rgba(0, 53, 255, 0.1);
+}
+.sc-blue .story-num {
+  color: #0035ff;
+}
+.sc-green {
+  border-color: #ccff00;
+  box-shadow: 0 0 50px rgba(204, 255, 0, 0.1);
+}
+.sc-green .story-num {
+  color: #ccff00;
+}
+.sc-purple {
+  border-color: blueviolet;
+  box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
+}
+.sc-purple .story-num {
+  color: blueviolet;
+}
+
+/* Rodapé Branding */
+.story-footer-branding {
+  text-align: center;
+  margin-top: 100px;
+  border-top: 2px solid #333;
+  padding-top: 60px;
+}
+.story-footer-branding h3 {
+  font-size: 70px;
+  color: #0035ff;
+  margin-bottom: 15px;
+  letter-spacing: -2px;
+}
+.story-footer-branding p {
+  font-size: 40px;
+  color: #888;
+}
+.story-footer-branding strong {
+  color: #fff;
+}
