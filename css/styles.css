@@ -255,7 +255,7 @@ button,
   font-weight: 500;
 }
 
-/* --- NAVBAR DESKTOP --- */
+/* --- NAVBAR E CONTAINER --- */
 .container {
   max-width: 1000px;
   margin: 0 auto;
@@ -596,7 +596,6 @@ button,
   }
 }
 
-/* Trava no Header (Evita Corte) */
 .chatbot-header {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
@@ -637,7 +636,6 @@ button,
   font-family: var(--font-body);
 }
 
-/* min-height 0 garante que as mensagens nunca empurrem o input para fora */
 .chatbot-messages {
   flex: 1 1 auto;
   min-height: 0;
@@ -695,7 +693,6 @@ button,
   text-align: right;
 }
 
-/* Trava no Footer (Evita Corte) */
 .chatbot-footer {
   padding: 1rem 1.5rem;
   background: var(--card-bg);
@@ -1025,33 +1022,8 @@ button,
    ========================================================================== */
 
 @media (max-width: 768px) {
-  /* CORREÇÃO 1: Flex colunado com GAP resolve o "Amontoado" */
-  .main-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem; /* Respiro entre Header, Chat e Ferramentas */
-  }
-
-  /* Muda a ordem para o celular (Header > Ferramentas > Chat) */
-  .dash-header {
-    order: 1;
-    gap: 1.5rem;
-    margin-bottom: 0;
-  }
-  .features-section {
-    order: 2;
-    width: 100%;
-    overflow: hidden;
-    margin-top: 0;
-  }
-  .chatbot-section {
-    order: 3;
-    width: 100%;
-    margin-bottom: 0;
-  }
-
   .container {
-    padding: 0 1.5rem;
+    padding: 0 1.2rem;
     width: 100%;
     max-width: 100vw;
   }
@@ -1065,47 +1037,66 @@ button,
     display: block;
   }
 
-  .welcome-text h1 {
-    font-size: 1.6rem;
+  /* AFASTANDO OS BLOCOS PRINCIPAIS (Mais respiro vertical) */
+  .dash-header {
+    margin-bottom: 3rem;
+  }
+  .features-section {
+    margin-bottom: 3rem;
   }
 
-  /* STATS COMPACTOS E PROTEGIDOS CONTRA CORTES */
+  /* TEXTOS MAIS ESPAÇADOS (Evita o amontoamento) */
+  .welcome-text h1 {
+    font-size: 1.7rem;
+    margin-bottom: 0.8rem;
+  }
+  .welcome-text p {
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* 1. STATS COMPACTOS MAIS ABERTOS */
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.2rem; /* Mais distância entre os blocos de stat */
     width: 100%;
+    max-width: 100%;
   }
   .mascot-card-layout {
     grid-column: span 2;
+    padding: 1.5rem;
   }
   .stat-card {
-    padding: 1rem;
-    min-width: 0;
+    padding: 1.5rem 1.2rem;
+    width: 100%;
+    box-sizing: border-box;
   }
-  /* Previne que textos grandes (ex: 7 Cards) estourem o card branco */
-  .stat-value {
-    font-size: 1.1rem;
-    white-space: nowrap;
+  .stat-label {
+    margin-bottom: 0.5rem;
+  } /* Desgruda texto de dentro do card */
+
+  /* 2. CARROSSEL DE FERRAMENTAS COM MAIS ESPAÇO */
+  .features-section {
+    width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
+  }
+  .section-title {
+    margin-bottom: 2rem;
+    font-size: 1.4rem;
   }
 
-  /* CORREÇÃO 2: CARROSSEL DE FERRAMENTAS SEM CORTAR SECO */
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    gap: 1rem;
-
-    /* A mágica do "Full Bleed": Margem negativa que anula o padding da tela */
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    padding-bottom: 1rem;
-
-    width: auto; /* Deixa o flex cuidar da largura real */
+    gap: 1.5rem; /* Mais espaço entre os cards do carrossel */
+    margin-left: -1.2rem;
+    margin-right: -1.2rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    padding-bottom: 2rem;
+    width: calc(100% + 2.4rem);
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1115,21 +1106,45 @@ button,
   }
 
   .feature-card {
-    flex: 0 0 85%; /* Usa 85% da tela para deixar a ponta do outro card visível */
-    max-width: 300px;
+    flex: 0 0 85%;
+    max-width: 320px;
     scroll-snap-align: center;
     min-height: 220px;
+    padding: 2rem 1.8rem; /* Mais espaço interno no card para os textos */
+  }
+  .feature-title {
+    margin-bottom: 0.8rem;
+  }
+  .features-grid::after {
+    content: "";
+    flex: 0 0 1px;
   }
 
-  /* CORREÇÃO 3: CHATBOT - ALTURA SEGURA E ADAPTÁVEL */
+  /* 3. CHATBOT COM MAIS ESPAÇO NA BORDA DE BAIXO */
   .chatbot-card {
-    height: calc(
-      100vh - 120px
-    ); /* Usa o tamanho exato da tela sem transbordar */
-    max-height: 550px; /* Limite máximo para não ficar gigante */
-    min-height: 450px;
-    border-radius: 16px;
+    height: 550px;
+    max-height: 80vh;
+    min-height: unset;
+    border-radius: 20px;
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
+    margin-bottom: 2rem; /* Evita que o chat cole no fundo absoluto da página */
+  }
+
+  .chatbot-messages {
+    padding: 1.5rem;
+    gap: 1.5rem; /* Desgruda os balões de conversa uns dos outros */
+  }
+
+  /* AQUI ESTÁ A CORREÇÃO DA BORDA INFERIOR DO ASSISTENTE */
+  .chatbot-footer {
+    /* O "2.5rem" abaixo cria exatamente a borda/espaço maior embaixo do input que você pediu */
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    gap: 1.2rem;
+  }
+  .chat-chips {
+    gap: 1rem;
+    padding-bottom: 0.8rem;
   }
 }
