@@ -264,7 +264,7 @@ button,
 
 /* --- NAVBAR E CONTAINER --- */
 .container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -471,14 +471,19 @@ button,
   }
 }
 
-/* --- ESTRUTURA GERAL DO DASHBOARD (GRID) --- */
+/* --- ESTRUTURA GERAL DO DASHBOARD --- */
 .main-wrapper {
   padding-top: 2rem;
   padding-bottom: 4rem;
   width: 100%;
 }
-.welcome-section {
-  margin-bottom: 1.5rem;
+.dash-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 .welcome-text h1 {
   font-size: 2rem;
@@ -489,53 +494,33 @@ button,
   color: var(--text-muted);
 }
 
-/* GRID PRINCIPAL (Layout Desktop) */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 2rem;
-  align-items: start;
-  width: 100%;
-}
-
-.content-column {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  min-width: 0;
-}
-
-/* SIDEBAR (Chatbot Fixo no Desktop) */
-.sidebar-column {
-  position: sticky;
-  top: 85px;
-  height: calc(100vh - 120px);
-}
-
 /* --- STATS ROW --- */
 .stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
 }
 .stat-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   border-radius: var(--radius-md);
+  min-width: 120px;
   box-shadow: var(--shadow-soft);
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden; /* Evita que o conteúdo estique o card */
+  overflow: hidden;
 }
 .mascot-card-layout {
   flex-direction: row;
   align-items: center;
   gap: 1rem;
   text-align: left;
-  padding: 0.8rem 1rem;
+  padding: 0.5rem 1rem;
   border: 2px solid var(--accent-green);
   box-shadow: 0 0 15px rgba(204, 255, 0, 0.1);
 }
@@ -583,15 +568,14 @@ button,
 
 /* --- CHATBOT --- */
 .chatbot-section {
-  height: 100%;
+  margin-bottom: 3rem;
   width: 100%;
 }
 .chatbot-card {
   background: var(--card-bg);
   border: 2px solid var(--border-highlight);
   border-radius: var(--radius-lg);
-  height: 100%;
-  min-height: 500px;
+  height: 550px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -627,8 +611,7 @@ button,
   gap: 1rem;
   background: var(--card-bg);
   z-index: 2;
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
+  flex-shrink: 0; /* TRAVA PARA NÃO CORTAR O HEADER */
 }
 .header-avatar {
   width: 40px;
@@ -661,8 +644,8 @@ button,
 }
 
 .chatbot-messages {
-  flex: 1 1 0;
-  min-height: 0;
+  flex: 1 1 auto; /* Permite que cresça mas ceda espaço */
+  min-height: 0; /* Previne o bug do flexbox que empurra os outros elementos */
   padding: 1.5rem;
   overflow-y: auto;
   background-color: var(--chat-bg-color);
@@ -692,7 +675,7 @@ button,
   position: relative;
   backdrop-filter: blur(4px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-  word-break: break-word; /* Impede textos longos de estourar a tela */
+  word-break: break-word;
 }
 .message-bot .message-bubble {
   background: rgba(255, 255, 255, 0.9);
@@ -725,8 +708,7 @@ button,
   flex-direction: column;
   gap: 0.8rem;
   z-index: 2;
-  border-bottom-left-radius: var(--radius-lg);
-  border-bottom-right-radius: var(--radius-lg);
+  flex-shrink: 0; /* TRAVA PARA NÃO CORTAR A BARRA DE DIGITAR */
 }
 .chat-chips {
   display: flex;
@@ -750,6 +732,7 @@ button,
   cursor: pointer;
   white-space: nowrap;
   transition: 0.2s;
+  flex-shrink: 0;
 }
 .chip:hover {
   background: var(--primary-blue);
@@ -795,7 +778,6 @@ button,
 
 /* --- FEATURES GRID --- */
 .features-section {
-  margin-top: 0;
   width: 100%;
 }
 .section-title {
@@ -1043,27 +1025,8 @@ button,
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE (MOBILE & TABLET) - TRAVA DE ESTOURO ATIVADA
+   RESPONSIVIDADE (MOBILE & TABLET)
    ========================================================================== */
-
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    display: flex; /* Mudando de grid para flex no tablet/mobile */
-    flex-direction: column;
-    gap: 2rem;
-    width: 100%;
-    max-width: 100%;
-  }
-  .content-column,
-  .sidebar-column {
-    width: 100%;
-    max-width: 100%;
-  }
-  .sidebar-column {
-    position: static;
-    height: auto;
-  }
-}
 
 @media (max-width: 768px) {
   .container {
@@ -1085,7 +1048,7 @@ button,
     font-size: 1.5rem;
   }
 
-  /* 1. STATS COMPACTOS - BLINDADOS CONTRA VAZAMENTO */
+  /* 1. STATS COMPACTOS */
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1102,20 +1065,22 @@ button,
     box-sizing: border-box;
   }
 
-  /* 2. CARROSSEL DE FERRAMENTAS */
+  /* 2. CARROSSEL DE FERRAMENTAS (Mantido o design aprovado) */
+  .features-section {
+    width: 100%;
+    overflow: hidden;
+  }
+
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 1rem;
-
-    /* A mágica do carrossel para não quebrar a tela: */
     margin-left: -1rem;
     margin-right: -1rem;
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 1rem;
-
     width: calc(100% + 2rem);
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
@@ -1126,16 +1091,21 @@ button,
   }
 
   .feature-card {
-    flex: 0 0 85%; /* 85% para aparecer o próximo card */
+    flex: 0 0 85%;
     max-width: 300px;
     scroll-snap-align: center;
     min-height: 220px;
     padding: 1.5rem;
   }
+  .features-grid::after {
+    content: "";
+    flex: 0 0 1px;
+  }
 
-  /* 3. CHATBOT - FORÇANDO A FICAR DENTRO DA TELA */
+  /* 3. CHATBOT - CORREÇÃO DA PARTE DE BAIXO */
   .chatbot-card {
-    height: 500px;
+    height: 550px; /* Um tamanho bacana */
+    max-height: 80vh; /* Nunca será maior que 80% da tela do celular */
     min-height: unset;
     border-radius: 16px;
     width: 100%;
