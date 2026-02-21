@@ -464,39 +464,20 @@ button,
   }
 }
 
-/* ==========================================================================
-   ESTRUTURA GERAL DO DASHBOARD E CORREÇÃO DE ESPAÇAMENTOS (AMONTOADOS)
-   ========================================================================== */
-
+/* --- ESTRUTURA GERAL DO DASHBOARD --- */
 .main-wrapper {
   padding-top: 2rem;
   padding-bottom: 4rem;
   width: 100%;
-
-  /* A MÁGICA DO RESPIRO AQUI: Separa as grandes áreas independentemente do dispositivo */
-  display: flex;
-  flex-direction: column;
-  gap: 3.5rem;
 }
-
-/* ORDENAÇÃO FORÇADA: Header(1) > Ferramentas(2) > Chat(3) */
 .dash-header {
-  order: 1;
   text-align: center;
+  margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
 }
-.features-section {
-  order: 2;
-  width: 100%;
-}
-.chatbot-section {
-  order: 3;
-  width: 100%;
-}
-
 .welcome-text h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
@@ -579,6 +560,10 @@ button,
 }
 
 /* --- CHATBOT --- */
+.chatbot-section {
+  margin-bottom: 3rem;
+  width: 100%;
+}
 .chatbot-card {
   background: var(--card-bg);
   border: 2px solid var(--border-highlight);
@@ -611,7 +596,6 @@ button,
   }
 }
 
-/* TRAVAS DE FLEX-SHRINK AQUI EVITAM CORTES */
 .chatbot-header {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
@@ -652,7 +636,6 @@ button,
   font-family: var(--font-body);
 }
 
-/* Área das mensagens cresce mas se submete ao pai */
 .chatbot-messages {
   flex: 1 1 auto;
   min-height: 0;
@@ -710,7 +693,6 @@ button,
   text-align: right;
 }
 
-/* TRAVA DE CORTES NO RODAPÉ: flex-shrink: 0 garante que a barra NUNCA suma */
 .chatbot-footer {
   padding: 1rem 1.5rem;
   background: var(--card-bg);
@@ -788,6 +770,11 @@ button,
 }
 
 /* --- FEATURES GRID --- */
+/* SOLUÇÃO PARA O PC: margin-bottom gigante afasta as ferramentas do chatbot */
+.features-section {
+  width: 100%;
+  margin-bottom: 4rem;
+}
 .section-title {
   font-size: 1.2rem;
   color: var(--text-main);
@@ -1073,12 +1060,15 @@ button,
     box-sizing: border-box;
   }
 
-  /* 2. CARROSSEL DE FERRAMENTAS */
+  /* SOLUÇÃO MOBILE 1: AFASTA O TÍTULO "FERRAMENTAS" DA ESTATÍSTICA ACIMA */
   .features-section {
     width: 100%;
     overflow: hidden;
+    margin-top: 2.5rem; /* <-- Esse é o respiro que faltava */
+    margin-bottom: 2.5rem; /* Também afasta do chat lá embaixo */
   }
 
+  /* 2. CARROSSEL DE FERRAMENTAS */
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
@@ -1119,10 +1109,5 @@ button,
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-  }
-
-  /* === MÁGICA FINAL: O ESPAÇAMENTO DA BORDA INFERIOR === */
-  .chatbot-footer {
-    padding: 1rem 1.5rem 2.5rem 1.5rem; /* 2.5rem cria a borda bem grossa/espaçosa embaixo do input */
   }
 }
