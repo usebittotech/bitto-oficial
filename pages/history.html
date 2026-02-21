@@ -239,190 +239,6 @@
           gap: 1rem;
         }
       }
-
-      /* --- ESTILOS DO STORY EXPORT --- */
-      .btn-share-story {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        background: transparent;
-        color: var(--text-main);
-        border: 2px solid var(--primary-blue);
-        padding: 15px 35px;
-        border-radius: 50px;
-        font-size: 1.1rem;
-        font-family: var(--font-display);
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 30px rgba(0, 53, 255, 0.1);
-      }
-      .btn-share-story:hover {
-        background: var(--primary-blue);
-        color: white;
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0, 53, 255, 0.3);
-      }
-
-      .story-export-box {
-        position: fixed;
-        left: -9999px;
-        top: 0;
-        width: 1080px;
-        height: 1920px;
-        background: #050505;
-        background-image: radial-gradient(
-          circle at center,
-          rgba(0, 53, 255, 0.15) 0%,
-          transparent 70%
-        );
-        color: #fff;
-        font-family: "DM Sans", sans-serif;
-        display: flex;
-        flex-direction: column;
-        padding: 180px 100px;
-        box-sizing: border-box;
-        z-index: -1;
-      }
-      .story-header-box {
-        text-align: center;
-        margin-bottom: 120px;
-      }
-      .story-user-info {
-        display: inline-flex;
-        align-items: center;
-        gap: 30px;
-        margin-bottom: 70px;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 25px 50px 25px 25px;
-        border-radius: 100px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-      }
-      .story-avatar {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 6px solid #ccff00;
-        background: #0035ff;
-      }
-      .story-user-text {
-        text-align: left;
-      }
-      .story-user-name {
-        font-family: "Unbounded", sans-serif;
-        font-size: 55px;
-        color: white;
-        font-weight: 800;
-        margin-bottom: 5px;
-        line-height: 1;
-      }
-      .story-user-badge {
-        font-size: 32px;
-        color: #aaa;
-        margin: 0;
-        font-weight: 500;
-      }
-      .story-title {
-        font-family: "Unbounded", sans-serif;
-        font-size: 85px;
-        font-weight: 800;
-        margin-bottom: 20px;
-        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      }
-      .story-subtitle {
-        font-size: 45px;
-        color: #ccff00;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 5px;
-      }
-
-      .story-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 50px;
-        flex-grow: 1;
-      }
-      .story-card {
-        background: #111;
-        border-radius: 50px;
-        padding: 70px 40px;
-        text-align: center;
-        border: 4px solid #333;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-      .story-icon-bg {
-        font-size: 110px;
-        margin-bottom: 40px;
-      }
-      .story-num {
-        font-family: "Unbounded", sans-serif;
-        font-size: 130px;
-        font-weight: 800;
-        margin-bottom: 20px;
-        line-height: 1;
-      }
-      .story-label {
-        font-size: 38px;
-        color: #aaa;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-weight: 600;
-      }
-      .sc-gold {
-        border-color: #d4af37;
-        box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
-      }
-      .sc-gold .story-num {
-        color: #d4af37;
-      }
-      .sc-blue {
-        border-color: #0035ff;
-        box-shadow: 0 0 50px rgba(0, 53, 255, 0.1);
-      }
-      .sc-blue .story-num {
-        color: #0035ff;
-      }
-      .sc-green {
-        border-color: #ccff00;
-        box-shadow: 0 0 50px rgba(204, 255, 0, 0.1);
-      }
-      .sc-green .story-num {
-        color: #ccff00;
-      }
-      .sc-purple {
-        border-color: blueviolet;
-        box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
-      }
-      .sc-purple .story-num {
-        color: blueviolet;
-      }
-
-      .story-footer-branding {
-        text-align: center;
-        margin-top: 100px;
-        border-top: 2px solid #333;
-        padding-top: 60px;
-      }
-      .story-footer-branding h3 {
-        font-size: 70px;
-        color: #0035ff;
-        margin-bottom: 15px;
-        letter-spacing: -2px;
-      }
-      .story-footer-branding p {
-        font-size: 40px;
-        color: #888;
-      }
-      .story-footer-branding strong {
-        color: #fff;
-      }
     </style>
   </head>
   <body>
@@ -504,120 +320,170 @@
       </div>
 
       <div class="history-grid">
-        <div
-          style="
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            margin-top: 4rem;
-          "
-        >
-          <button id="btnShareStory" class="btn-share-story tilt-element">
-            📸 Gerar Story do Mês
-          </button>
-        </div>
-
-        <div id="storyPreviewModal" class="modal-overlay">
-          <div class="modal-card story-preview-card">
-            <div class="modal-header">
-              <h2 style="font-size: 1.2rem">Sua Retrospectiva</h2>
-              <button class="close-modal" id="btnClosePreview">✖</button>
-            </div>
-            <div class="modal-body preview-body">
-              <div class="preview-img-container">
-                <img id="previewImage" src="" alt="Prévia do Story" />
-              </div>
-
-              <div class="caption-box">
-                <span
-                  style="
-                    font-size: 0.8rem;
-                    font-weight: 700;
-                    color: var(--primary-blue);
-                    display: block;
-                    margin-bottom: 5px;
-                  "
-                  >DICA DE LEGENDA</span
-                >
-                <p id="suggestedCaption">
-                  "Acabei de gerar materiais de estudo com IA na @bitto.app!
-                  🚀🧠 O link tá na bio pra quem quiser acelerar os estudos
-                  também."
-                </p>
-                <button id="btnCopyCaption" class="btn-copy">
-                  Copiar Legenda
-                </button>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                id="btnDownloadStory"
-                class="btn-save"
-                style="width: 100%; font-size: 1.1rem; padding: 1rem"
-              >
-                ⬇️ Baixar Imagem (Story)
-              </button>
-            </div>
+        <div class="stat-box total-card theme-gold tilt-element">
+          <div
+            class="icon-bg"
+            style="width: 70px; height: 70px; font-size: 2rem"
+          >
+            ⚡
+          </div>
+          <div class="total-info">
+            <span class="stat-label" style="color: #d4af37"
+              >Produção Total</span
+            >
+            <div class="stat-number" id="valTotal">0</div>
+            <span class="stat-sub">Materiais gerados este mês</span>
+          </div>
+          <div style="text-align: right">
+            <span style="font-size: 3rem">🏆</span>
           </div>
         </div>
 
-        <div id="story-template" class="story-export-box">
-          <div class="story-bg-glow glow-blue"></div>
-          <div class="story-bg-glow glow-green"></div>
+        <div class="stat-box theme-blue tilt-element">
+          <div>
+            <div class="icon-bg">🗂️</div>
+            <span class="stat-label">Flashcards</span>
+            <div class="stat-number" id="valFlashcards">0</div>
+            <span class="stat-sub">Cards criados</span>
+          </div>
+          <a href="flashcards.html" class="quick-action">Criar Novo Deck →</a>
+        </div>
 
-          <div class="story-content">
-            <div class="story-header-box">
-              <h2 class="story-title">MEU DESEMPENHO</h2>
-              <p class="story-subtitle" id="st-month">Mês de 2026</p>
+        <div class="stat-box theme-green tilt-element">
+          <div>
+            <div class="icon-bg">🎮</div>
+            <span class="stat-label">Quizzes</span>
+            <div class="stat-number" id="valQuiz">0</div>
+            <span class="stat-sub">Partidas jogadas</span>
+          </div>
+          <a href="quiz.html" class="quick-action">Jogar Agora →</a>
+        </div>
+
+        <div class="stat-box theme-purple tilt-element">
+          <div>
+            <div class="icon-bg">📝</div>
+            <span class="stat-label">Resumos</span>
+            <div class="stat-number" id="valReview">0</div>
+            <span class="stat-sub">Guias gerados</span>
+          </div>
+          <a href="review.html" class="quick-action">Gerar Guia →</a>
+        </div>
+      </div>
+
+      <div
+        style="
+          text-align: center;
+          display: flex;
+          justify-content: center;
+          margin-top: 4rem;
+        "
+      >
+        <button id="btnShareStory" class="btn-share-story tilt-element">
+          📸 Gerar Story do Mês
+        </button>
+      </div>
+
+      <div id="storyPreviewModal" class="modal-overlay">
+        <div class="modal-card story-preview-card">
+          <div class="modal-header">
+            <h2 style="font-size: 1.2rem">Sua Retrospectiva</h2>
+            <button class="close-modal" id="btnClosePreview">✖</button>
+          </div>
+          <div class="modal-body preview-body">
+            <div class="preview-img-container">
+              <img id="previewImage" src="" alt="Prévia do Story" />
             </div>
 
-            <div class="story-user-info">
-              <img
-                id="st-avatar"
-                class="story-avatar"
-                src=""
-                crossorigin="anonymous"
-                alt="Avatar"
-              />
-              <div class="story-user-text">
-                <h3 id="st-name" class="story-user-name">Estudante</h3>
-                <p class="story-user-badge">Top Aluno(a) na Bitto</p>
-              </div>
+            <div class="caption-box">
+              <span
+                style="
+                  font-size: 0.8rem;
+                  font-weight: 700;
+                  color: var(--primary-blue);
+                  display: block;
+                  margin-bottom: 5px;
+                "
+                >DICA DE LEGENDA</span
+              >
+              <p id="suggestedCaption">
+                "Acabei de gerar materiais de estudo com IA na @bitto.app! 🚀🧠
+                O link tá na bio pra quem quiser acelerar os estudos também."
+              </p>
+              <button id="btnCopyCaption" class="btn-copy">
+                Copiar Legenda
+              </button>
             </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              id="btnDownloadStory"
+              class="btn-save"
+              style="width: 100%; font-size: 1.1rem; padding: 1rem"
+            >
+              ⬇️ Baixar Imagem (Story)
+            </button>
+          </div>
+        </div>
+      </div>
 
-            <div class="story-grid">
-              <div class="story-card sc-gold">
-                <div class="story-icon-bg">⚡</div>
-                <div class="story-num" id="st-total">0</div>
-                <div class="story-label">Materiais<br />Totais</div>
-              </div>
-              <div class="story-card sc-blue">
-                <div class="story-icon-bg">🗂️</div>
-                <div class="story-num" id="st-flashcards">0</div>
-                <div class="story-label">Flashcards</div>
-              </div>
-              <div class="story-card sc-green">
-                <div class="story-icon-bg">🎮</div>
-                <div class="story-num" id="st-quiz">0</div>
-                <div class="story-label">Quizzes</div>
-              </div>
-              <div class="story-card sc-purple">
-                <div class="story-icon-bg">📝</div>
-                <div class="story-num" id="st-review">0</div>
-                <div class="story-label">Resumos</div>
-              </div>
+      <div id="story-template" class="story-export-box">
+        <div class="story-bg-glow glow-blue"></div>
+        <div class="story-bg-glow glow-green"></div>
+
+        <div class="story-content">
+          <div class="story-header-box">
+            <h2 class="story-title">MEU DESEMPENHO</h2>
+            <p class="story-subtitle" id="st-month">Mês de 2026</p>
+          </div>
+
+          <div class="story-user-info">
+            <img
+              id="st-avatar"
+              class="story-avatar"
+              src=""
+              crossorigin="anonymous"
+              alt="Avatar"
+            />
+            <div class="story-user-text">
+              <h3 id="st-name" class="story-user-name">Estudante</h3>
+              <p class="story-user-badge">Top Aluno(a) na Bitto</p>
             </div>
+          </div>
 
-            <div class="story-footer-branding">
-              <div class="brand-logo">B</div>
-              <div>
-                <h3>bitto.app</h3>
-                <p>Estudos acelerados por IA</p>
-              </div>
+          <div class="story-grid">
+            <div class="story-card sc-gold">
+              <div class="story-icon-bg">⚡</div>
+              <div class="story-num" id="st-total">0</div>
+              <div class="story-label">Materiais<br />Totais</div>
+            </div>
+            <div class="story-card sc-blue">
+              <div class="story-icon-bg">🗂️</div>
+              <div class="story-num" id="st-flashcards">0</div>
+              <div class="story-label">Flashcards</div>
+            </div>
+            <div class="story-card sc-green">
+              <div class="story-icon-bg">🎮</div>
+              <div class="story-num" id="st-quiz">0</div>
+              <div class="story-label">Quizzes</div>
+            </div>
+            <div class="story-card sc-purple">
+              <div class="story-icon-bg">📝</div>
+              <div class="story-num" id="st-review">0</div>
+              <div class="story-label">Resumos</div>
+            </div>
+          </div>
+
+          <div class="story-footer-branding">
+            <div class="brand-logo">B</div>
+            <div>
+              <h3>bitto.app</h3>
+              <p>Estudos acelerados por IA</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <script type="module" src="../js/history.js"></script>
   </body>
 </html>
