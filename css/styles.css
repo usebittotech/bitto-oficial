@@ -464,20 +464,39 @@ button,
   }
 }
 
-/* --- ESTRUTURA GERAL DO DASHBOARD --- */
+/* ==========================================================================
+   ESTRUTURA GERAL DO DASHBOARD E CORREÇÃO DE ESPAÇAMENTOS (AMONTOADOS)
+   ========================================================================== */
+
 .main-wrapper {
   padding-top: 2rem;
   padding-bottom: 4rem;
   width: 100%;
+
+  /* A MÁGICA DO RESPIRO AQUI: Separa as grandes áreas independentemente do dispositivo */
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
 }
+
+/* ORDENAÇÃO FORÇADA: Header(1) > Ferramentas(2) > Chat(3) */
 .dash-header {
+  order: 1;
   text-align: center;
-  margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
 }
+.features-section {
+  order: 2;
+  width: 100%;
+}
+.chatbot-section {
+  order: 3;
+  width: 100%;
+}
+
 .welcome-text h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
@@ -560,10 +579,6 @@ button,
 }
 
 /* --- CHATBOT --- */
-.chatbot-section {
-  margin-bottom: 3rem;
-  width: 100%;
-}
 .chatbot-card {
   background: var(--card-bg);
   border: 2px solid var(--border-highlight);
@@ -596,6 +611,7 @@ button,
   }
 }
 
+/* TRAVAS DE FLEX-SHRINK AQUI EVITAM CORTES */
 .chatbot-header {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
@@ -636,6 +652,7 @@ button,
   font-family: var(--font-body);
 }
 
+/* Área das mensagens cresce mas se submete ao pai */
 .chatbot-messages {
   flex: 1 1 auto;
   min-height: 0;
@@ -693,6 +710,7 @@ button,
   text-align: right;
 }
 
+/* TRAVA DE CORTES NO RODAPÉ: flex-shrink: 0 garante que a barra NUNCA suma */
 .chatbot-footer {
   padding: 1rem 1.5rem;
   background: var(--card-bg);
@@ -770,9 +788,6 @@ button,
 }
 
 /* --- FEATURES GRID --- */
-.features-section {
-  width: 100%;
-}
 .section-title {
   font-size: 1.2rem;
   color: var(--text-main);
@@ -1023,7 +1038,7 @@ button,
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 1.2rem;
+    padding: 0 1rem;
     width: 100%;
     max-width: 100vw;
   }
@@ -1037,66 +1052,44 @@ button,
     display: block;
   }
 
-  /* AFASTANDO OS BLOCOS PRINCIPAIS (Mais respiro vertical) */
-  .dash-header {
-    margin-bottom: 3rem;
-  }
-  .features-section {
-    margin-bottom: 3rem;
-  }
-
-  /* TEXTOS MAIS ESPAÇADOS (Evita o amontoamento) */
   .welcome-text h1 {
-    font-size: 1.7rem;
-    margin-bottom: 0.8rem;
-  }
-  .welcome-text p {
-    font-size: 1.05rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
   }
 
-  /* 1. STATS COMPACTOS MAIS ABERTOS */
+  /* 1. STATS COMPACTOS */
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.2rem; /* Mais distância entre os blocos de stat */
+    gap: 0.8rem;
     width: 100%;
     max-width: 100%;
   }
   .mascot-card-layout {
     grid-column: span 2;
-    padding: 1.5rem;
   }
   .stat-card {
-    padding: 1.5rem 1.2rem;
+    padding: 1rem;
     width: 100%;
     box-sizing: border-box;
   }
-  .stat-label {
-    margin-bottom: 0.5rem;
-  } /* Desgruda texto de dentro do card */
 
-  /* 2. CARROSSEL DE FERRAMENTAS COM MAIS ESPAÇO */
+  /* 2. CARROSSEL DE FERRAMENTAS */
   .features-section {
     width: 100%;
     overflow: hidden;
-  }
-  .section-title {
-    margin-bottom: 2rem;
-    font-size: 1.4rem;
   }
 
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    gap: 1.5rem; /* Mais espaço entre os cards do carrossel */
-    margin-left: -1.2rem;
-    margin-right: -1.2rem;
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
-    padding-bottom: 2rem;
-    width: calc(100% + 2.4rem);
+    gap: 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
+    width: calc(100% + 2rem);
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1107,44 +1100,29 @@ button,
 
   .feature-card {
     flex: 0 0 85%;
-    max-width: 320px;
+    max-width: 300px;
     scroll-snap-align: center;
     min-height: 220px;
-    padding: 2rem 1.8rem; /* Mais espaço interno no card para os textos */
-  }
-  .feature-title {
-    margin-bottom: 0.8rem;
+    padding: 1.5rem;
   }
   .features-grid::after {
     content: "";
     flex: 0 0 1px;
   }
 
-  /* 3. CHATBOT COM MAIS ESPAÇO NA BORDA DE BAIXO */
+  /* 3. CHATBOT - CORREÇÃO DA PARTE DE BAIXO */
   .chatbot-card {
     height: 550px;
     max-height: 80vh;
     min-height: unset;
-    border-radius: 20px;
+    border-radius: 16px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    margin-bottom: 2rem; /* Evita que o chat cole no fundo absoluto da página */
   }
 
-  .chatbot-messages {
-    padding: 1.5rem;
-    gap: 1.5rem; /* Desgruda os balões de conversa uns dos outros */
-  }
-
-  /* AQUI ESTÁ A CORREÇÃO DA BORDA INFERIOR DO ASSISTENTE */
+  /* === MÁGICA FINAL: O ESPAÇAMENTO DA BORDA INFERIOR === */
   .chatbot-footer {
-    /* O "2.5rem" abaixo cria exatamente a borda/espaço maior embaixo do input que você pediu */
-    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
-    gap: 1.2rem;
-  }
-  .chat-chips {
-    gap: 1rem;
-    padding-bottom: 0.8rem;
+    padding: 1rem 1.5rem 2.5rem 1.5rem; /* 2.5rem cria a borda bem grossa/espaçosa embaixo do input */
   }
 }
