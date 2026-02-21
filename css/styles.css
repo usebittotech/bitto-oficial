@@ -1112,7 +1112,7 @@ button,
   }
 }
 /* ==========================================================================
-   EXPORTAR STORY PREMIUM E MODAL DE PRÉVIA
+   EXPORTAR STORY CYBER-PREMIUM E MODAL
    ========================================================================== */
 
 /* Botão na UI */
@@ -1143,6 +1143,7 @@ button,
 /* Modal de Prévia */
 .story-preview-card {
   max-width: 400px;
+  background: var(--card-bg);
 }
 .preview-body {
   padding: 1.5rem;
@@ -1177,16 +1178,18 @@ button,
   color: var(--text-main);
   font-style: italic;
   margin-bottom: 10px;
+  line-height: 1.4;
 }
 .btn-copy {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   color: var(--text-main);
-  padding: 5px 12px;
+  padding: 8px 15px;
   border-radius: 8px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
+  transition: 0.2s;
 }
 .btn-copy:hover {
   background: var(--primary-blue);
@@ -1194,40 +1197,53 @@ button,
   border-color: var(--primary-blue);
 }
 
-/* TEMPLATE OCULTO (1080x1920) - Solução Definitiva Anti-Corte e Imagem Escura */
+/* --- TEMPLATE OCULTO PREMIUM (1080x1920) --- */
+/* CORREÇÃO DO BUG: position: fixed tira ele do fluxo da página */
 .story-export-box {
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: -9999px; /* Escondido fora da tela */
+  left: -10000px; /* Bem longe da tela */
   width: 1080px;
   height: 1920px;
-  z-index: -9999; /* Fica atrás de tudo */
-  background: #050505;
+  z-index: -9999;
+  background: #020205; /* Preto quase azulado */
   color: #fff;
   font-family: "DM Sans", sans-serif;
   overflow: hidden;
 }
 
-/* Efeitos de Luz no Fundo */
+/* Fundo com Textura Cyber */
+.story-bg-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  z-index: 0;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 40px 40px; /* Cria um grid sutil */
+}
 .story-bg-glow {
   position: absolute;
   border-radius: 50%;
-  filter: blur(150px);
+  filter: blur(200px);
   z-index: 1;
+  opacity: 0.5;
 }
-.glow-blue {
-  top: -10%;
-  right: -20%;
+.glow-top {
+  top: -20%;
+  right: -10%;
+  width: 1200px;
+  height: 1200px;
+  background: linear-gradient(45deg, #0035ff, #8a2be2);
+}
+.glow-bottom {
+  bottom: -20%;
+  left: -10%;
   width: 1000px;
   height: 1000px;
-  background: rgba(0, 53, 255, 0.4);
-}
-.glow-green {
-  bottom: -10%;
-  left: -20%;
-  width: 800px;
-  height: 800px;
-  background: rgba(204, 255, 0, 0.2);
+  background: linear-gradient(45deg, #ccff00, #00b884);
 }
 
 .story-content {
@@ -1236,126 +1252,175 @@ button,
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 140px 100px;
+  padding: 120px 80px;
   box-sizing: border-box;
   justify-content: space-between;
 }
 
+/* Header e Perfil */
 .story-header-box {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 60px;
 }
 .story-title {
   font-family: "Unbounded", sans-serif;
-  font-size: 75px;
+  font-size: 65px;
   font-weight: 800;
   margin-bottom: 10px;
-  letter-spacing: -2px;
+  letter-spacing: -1px;
 }
 .story-subtitle {
-  font-size: 40px;
+  font-size: 35px;
   color: #ccff00;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 5px;
+  letter-spacing: 4px;
 }
 
-/* Perfil Glassmorphism */
 .story-user-info {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 35px;
   margin: 0 auto 80px auto;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 30px 60px 30px 30px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 25px 40px 25px 25px;
   border-radius: 100px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 .story-avatar {
-  width: 160px;
-  height: 160px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   object-fit: cover;
-  border: 6px solid #ccff00;
+  border: 5px solid #ccff00;
   background: #0035ff;
 }
 .story-user-name {
   font-family: "Unbounded", sans-serif;
-  font-size: 60px;
+  font-size: 50px;
   color: white;
   font-weight: 800;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
-.story-user-badge {
-  font-size: 35px;
-  color: #aaa;
-  margin: 0;
+.story-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(204, 255, 0, 0.2);
+  color: #ccff00;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 24px;
+  border: 2px solid rgba(204, 255, 0, 0.3);
 }
 
-/* Cards Translúcidos */
-.story-grid {
+/* Grid Premium (1 Grande + 3 Pequenos) */
+.story-grid-premium {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 50px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
   flex-grow: 1;
   align-content: center;
 }
-.story-card {
-  background: rgba(20, 20, 20, 0.6);
+/* Card Hero (Destaque Total) */
+.story-card-hero {
+  grid-column: 1 / -1; /* Ocupa as 3 colunas */
+  background: rgba(20, 20, 20, 0.5);
   border-radius: 60px;
-  padding: 70px 40px;
+  padding: 60px;
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  border: 3px solid;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+}
+.hero-icon {
+  font-size: 120px;
+}
+.story-num-hero {
+  font-family: "Unbounded", sans-serif;
+  font-size: 150px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 15px;
+}
+.story-label-hero {
+  font-size: 32px;
+  color: #ccc;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Cards Mini */
+.story-card-mini {
+  background: rgba(20, 20, 20, 0.5);
+  border-radius: 50px;
+  padding: 50px 30px;
   text-align: center;
-  border: 2px solid rgba(255, 255, 255, 0.05);
+  border: 3px solid;
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
-.story-icon-bg {
-  font-size: 110px;
-  margin-bottom: 30px;
+.mini-icon {
+  font-size: 70px;
+  margin-bottom: 20px;
 }
-.story-num {
+.story-num-mini {
   font-family: "Unbounded", sans-serif;
-  font-size: 140px;
+  font-size: 80px;
   font-weight: 800;
-  margin-bottom: 15px;
   line-height: 1;
+  margin-bottom: 10px;
 }
-.story-label {
-  font-size: 35px;
+.story-label-mini {
+  font-size: 24px;
   color: #aaa;
   text-transform: uppercase;
-  letter-spacing: 2px;
   font-weight: 600;
 }
 
-.sc-gold .story-num {
-  color: #d4af37;
+/* Textos com Gradiente (O toque de luxo) */
+.gradient-text-gold {
+  background: linear-gradient(to right, #d4af37, #fce205);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+.gradient-text-blue {
+  background: linear-gradient(to right, #0035ff, #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-text-green {
+  background: linear-gradient(to right, #ccff00, #00b884);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-text-purple {
+  background: linear-gradient(to right, #8a2be2, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Bordas coloridas */
 .sc-gold {
-  border-top-color: #d4af37;
-}
-.sc-blue .story-num {
-  color: #0035ff;
+  border-color: rgba(212, 175, 55, 0.5);
 }
 .sc-blue {
-  border-top-color: #0035ff;
-}
-.sc-green .story-num {
-  color: #ccff00;
+  border-color: rgba(0, 53, 255, 0.5);
 }
 .sc-green {
-  border-top-color: #ccff00;
-}
-.sc-purple .story-num {
-  color: blueviolet;
+  border-color: rgba(204, 255, 0, 0.5);
 }
 .sc-purple {
-  border-top-color: blueviolet;
+  border-color: rgba(138, 43, 226, 0.5);
 }
 
 /* Footer Watermark */
@@ -1363,34 +1428,21 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px;
-  margin-top: 80px;
+  margin-top: 50px;
   padding-top: 50px;
-  border-top: 2px solid rgba(255, 255, 255, 0.1);
 }
-.brand-logo {
-  width: 100px;
-  height: 100px;
-  background: #0035ff;
-  color: white;
-  border-radius: 25px;
+.brand-pill {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px 40px;
+  border-radius: 50px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: "Unbounded", sans-serif;
-  font-size: 60px;
-  font-weight: 800;
+  gap: 15px;
+  font-size: 30px;
+  color: #aaa;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
-.story-footer-branding h3 {
-  font-family: "Unbounded", sans-serif;
-  font-size: 50px;
+.brand-pill strong {
   color: #fff;
-  margin-bottom: 5px;
-  line-height: 1;
-}
-.story-footer-branding p {
-  font-size: 35px;
-  color: #ccff00;
-  margin: 0;
-  font-weight: 600;
+  font-family: "Unbounded", sans-serif;
 }

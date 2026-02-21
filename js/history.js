@@ -162,7 +162,7 @@ if (themeToggle) {
   });
 }
 // ==========================================================================
-//   GERAÇÃO, PRÉVIA E EXPORTAÇÃO DO STORY
+//   GERAÇÃO, PRÉVIA E EXPORTAÇÃO DO STORY (CORRIGIDO)
 // ==========================================================================
 const btnShareStory = document.getElementById("btnShareStory");
 const storyTemplate = document.getElementById("story-template");
@@ -179,10 +179,10 @@ if (btnShareStory) {
   btnShareStory.addEventListener("click", async () => {
     try {
       const originalText = btnShareStory.innerHTML;
-      btnShareStory.innerHTML = "⏳ Preparando Retrospectiva...";
+      btnShareStory.innerHTML = "⏳ Criando Design Premium...";
       btnShareStory.disabled = true;
 
-      // 1. Puxar Nome e Foto
+      // 1. Puxar Dados do Usuário e Data
       const navNameText = document.getElementById("navUserName").innerText;
       document.getElementById("st-name").innerText =
         navNameText !== "..." ? navNameText : "Estudante";
@@ -195,12 +195,9 @@ if (btnShareStory) {
         stAvatar.src = `https://ui-avatars.com/api/?name=${navNameText}&background=0035FF&color=fff&size=256`;
       }
 
-      // 2. Atualizar Dados
-      const valTotal = document.getElementById("valTotal").innerText;
-
-      // Corrige o bug do "Carregando..."
+      // Garante que o mês não seja "Carregando..."
       let monthText = document.getElementById("currentMonthDisplay").innerText;
-      if (monthText === "Carregando...") {
+      if (monthText === "Carregando..." || !monthText) {
         const date = new Date();
         const monthNames = [
           "Janeiro",
@@ -218,8 +215,10 @@ if (btnShareStory) {
         ];
         monthText = `${monthNames[date.getMonth()]} de ${date.getFullYear()}`;
       }
-
       document.getElementById("st-month").innerText = monthText;
+
+      // 2. Atualizar Números
+      const valTotal = document.getElementById("valTotal").innerText;
       document.getElementById("st-total").innerText = valTotal;
       document.getElementById("st-flashcards").innerText =
         document.getElementById("valFlashcards").innerText;
@@ -228,37 +227,33 @@ if (btnShareStory) {
       document.getElementById("st-review").innerText =
         document.getElementById("valReview").innerText;
 
+      // Atualiza legenda
+      const emojis = ["🔥", "🚀", "🧠", "⚡"];
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
       document.getElementById("suggestedCaption").innerText =
-        `"Acabei de gerar ${valTotal} materiais de estudo com IA na @bitto.app! 🚀🧠 O link tá na bio pra quem quiser acelerar os estudos também."`;
+        `"Meu mês na @bitto.app: ${valTotal} materiais gerados com Inteligência Artificial! ${randomEmoji} Acelerando os estudos pro próximo nível."`;
 
-      // Pequeno delay para imagens e fontes carregarem
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Delay para garantir carregamento de fontes e imagens no template oculto
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      const scrollPos = window.scrollY;
-      window.scrollTo(0, 0);
-
-      // TRUQUE ANTI-CORTE: Puxa o template para trás do body na hora de renderizar
-      storyTemplate.style.left = "0px";
-
-      // 3. Renderizar com dimensões estritas
+      // 3. Renderizar (SEM BUG DE BACKGROUND)
+      // O segredo é que o elemento já está com position:fixed e left:-10000px no CSS.
+      // Não precisamos movê-lo. O html2canvas vai buscar ele lá.
       const canvas = await window.html2canvas(storyTemplate, {
-        scale: 1,
+        scale: 1, // Mantém 1080x1920
         useCORS: true,
         allowTaint: false,
-        backgroundColor: "#050505",
+        backgroundColor: "#020205", // Cor de fundo de segurança
         width: 1080,
         height: 1920,
-        x: 0,
+        x: 0, // Coordenadas relativas ao próprio elemento fixo
         y: 0,
+        scrollX: 0, // Impede que o scroll da página afete o print
         scrollY: 0,
         logging: false,
       });
 
-      // TRUQUE ANTI-CORTE: Esconde o template de novo
-      storyTemplate.style.left = "-9999px";
-      window.scrollTo(0, scrollPos);
-
-      // 4. Salvar imagem gerada e abrir modal
+      // 4. Mostrar Prévia
       currentStoryDataUrl = canvas.toDataURL("image/png");
       previewImage.src = currentStoryDataUrl;
 
@@ -266,19 +261,18 @@ if (btnShareStory) {
         navNameText !== "..."
           ? navNameText.toLowerCase().replace(/\s+/g, "-")
           : "estudante";
-      currentFileName = `bitto-stats-${safeName}.png`;
+      currentFileName = `bitto-story-${safeName}.png`;
 
       previewModal.classList.add("active");
 
-      // 5. Resetar botão inicial
+      // 5. Resetar botão
       btnShareStory.innerHTML = originalText;
       btnShareStory.disabled = false;
     } catch (error) {
-      console.error("Erro ao gerar a imagem: ", error);
-      storyTemplate.style.left = "-9999px"; // Garante que esconda se der erro
-      btnShareStory.innerHTML = "❌ Erro ao gerar. Tente novamente.";
+      console.error("Erro ao gerar o Story: ", error);
+      btnShareStory.innerHTML = "❌ Erro. Tente novamente.";
       setTimeout(() => {
-        btnShareStory.innerHTML = "📸 Gerar Story do Mês";
+        btnShareStory.innerHTML = originalText;
         btnShareStory.disabled = false;
       }, 3000);
     }
@@ -292,7 +286,7 @@ if (btnClosePreview) {
   });
 }
 
-// Fazer o Download pelo botão do Modal
+// Download da Imagem
 if (btnDownloadStory) {
   btnDownloadStory.addEventListener("click", () => {
     const link = document.createElement("a");
@@ -302,9 +296,14 @@ if (btnDownloadStory) {
     link.click();
     document.body.removeChild(link);
 
-    btnDownloadStory.innerHTML = "✅ Download Concluído!";
+    const originalText = btnDownloadStory.innerHTML;
+    btnDownloadStory.innerHTML = "✅ Imagem Salva!";
+    btnDownloadStory.style.background = "var(--accent-green)";
+    btnDownloadStory.style.color = "var(--primary-blue)";
     setTimeout(() => {
-      btnDownloadStory.innerHTML = "⬇️ Baixar Imagem (Story)";
+      btnDownloadStory.innerHTML = originalText;
+      btnDownloadStory.style.background = "";
+      btnDownloadStory.style.color = "";
     }, 2500);
   });
 }
@@ -316,14 +315,16 @@ if (btnCopyCaption) {
     navigator.clipboard.writeText(captionText.replace(/^"|"$/g, ""));
 
     const originalText = btnCopyCaption.innerHTML;
-    btnCopyCaption.innerHTML = "Copiado! ✓";
+    btnCopyCaption.innerHTML = "Copiado!";
     btnCopyCaption.style.background = "var(--accent-green)";
     btnCopyCaption.style.color = "var(--primary-blue)";
+    btnCopyCaption.style.borderColor = "transparent";
 
     setTimeout(() => {
       btnCopyCaption.innerHTML = originalText;
       btnCopyCaption.style.background = "";
       btnCopyCaption.style.color = "";
+      btnCopyCaption.style.borderColor = "";
     }, 2000);
   });
 }

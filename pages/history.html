@@ -386,7 +386,7 @@
       <div id="storyPreviewModal" class="modal-overlay">
         <div class="modal-card story-preview-card">
           <div class="modal-header">
-            <h2 style="font-size: 1.2rem">Sua Retrospectiva</h2>
+            <h2 style="font-size: 1.2rem">Prévia do Story</h2>
             <button class="close-modal" id="btnClosePreview">✖</button>
           </div>
           <div class="modal-body preview-body">
@@ -403,15 +403,10 @@
                   display: block;
                   margin-bottom: 5px;
                 "
-                >DICA DE LEGENDA</span
+                >SUGESTÃO DE LEGENDA</span
               >
-              <p id="suggestedCaption">
-                "Acabei de gerar materiais de estudo com IA na @bitto.app! 🚀🧠
-                O link tá na bio pra quem quiser acelerar os estudos também."
-              </p>
-              <button id="btnCopyCaption" class="btn-copy">
-                Copiar Legenda
-              </button>
+              <p id="suggestedCaption">...</p>
+              <button id="btnCopyCaption" class="btn-copy">Copiar Texto</button>
             </div>
           </div>
           <div class="modal-footer">
@@ -420,20 +415,21 @@
               class="btn-save"
               style="width: 100%; font-size: 1.1rem; padding: 1rem"
             >
-              ⬇️ Baixar Imagem (Story)
+              ⬇️ Baixar Imagem HD
             </button>
           </div>
         </div>
       </div>
 
       <div id="story-template" class="story-export-box">
-        <div class="story-bg-glow glow-blue"></div>
-        <div class="story-bg-glow glow-green"></div>
+        <div class="story-bg-texture"></div>
+        <div class="story-bg-glow glow-top"></div>
+        <div class="story-bg-glow glow-bottom"></div>
 
         <div class="story-content">
           <div class="story-header-box">
-            <h2 class="story-title">MEU DESEMPENHO</h2>
-            <p class="story-subtitle" id="st-month">Mês de 2026</p>
+            <h2 class="story-title">RESUMO DO MÊS</h2>
+            <p class="story-subtitle" id="st-month">Janeiro de 2026</p>
           </div>
 
           <div class="story-user-info">
@@ -446,38 +442,48 @@
             />
             <div class="story-user-text">
               <h3 id="st-name" class="story-user-name">Estudante</h3>
-              <p class="story-user-badge">Top Aluno(a) na Bitto</p>
+              <div class="story-badge"><span>🚀</span> Membro Bitto Pro</div>
             </div>
           </div>
 
-          <div class="story-grid">
-            <div class="story-card sc-gold">
-              <div class="story-icon-bg">⚡</div>
-              <div class="story-num" id="st-total">0</div>
-              <div class="story-label">Materiais<br />Totais</div>
+          <div class="story-grid-premium">
+            <div class="story-card-hero sc-gold">
+              <div class="hero-icon">⚡</div>
+              <div class="hero-data">
+                <div class="story-num-hero gradient-text-gold" id="st-total">
+                  0
+                </div>
+                <div class="story-label-hero">Materiais Gerados com IA</div>
+              </div>
             </div>
-            <div class="story-card sc-blue">
-              <div class="story-icon-bg">🗂️</div>
-              <div class="story-num" id="st-flashcards">0</div>
-              <div class="story-label">Flashcards</div>
+
+            <div class="story-card-mini sc-blue">
+              <div class="mini-icon">🗂️</div>
+              <div class="story-num-mini gradient-text-blue" id="st-flashcards">
+                0
+              </div>
+              <div class="story-label-mini">Flashcards</div>
             </div>
-            <div class="story-card sc-green">
-              <div class="story-icon-bg">🎮</div>
-              <div class="story-num" id="st-quiz">0</div>
-              <div class="story-label">Quizzes</div>
+            <div class="story-card-mini sc-green">
+              <div class="mini-icon">🎮</div>
+              <div class="story-num-mini gradient-text-green" id="st-quiz">
+                0
+              </div>
+              <div class="story-label-mini">Quizzes</div>
             </div>
-            <div class="story-card sc-purple">
-              <div class="story-icon-bg">📝</div>
-              <div class="story-num" id="st-review">0</div>
-              <div class="story-label">Resumos</div>
+            <div class="story-card-mini sc-purple">
+              <div class="mini-icon">📝</div>
+              <div class="story-num-mini gradient-text-purple" id="st-review">
+                0
+              </div>
+              <div class="story-label-mini">Resumos</div>
             </div>
           </div>
 
           <div class="story-footer-branding">
-            <div class="brand-logo">B</div>
-            <div>
-              <h3>bitto.app</h3>
-              <p>Estudos acelerados por IA</p>
+            <div class="brand-pill">
+              <span style="font-size: 1.5rem">🤖</span>
+              Potencializado por <strong>bitto.app</strong>
             </div>
           </div>
         </div>
