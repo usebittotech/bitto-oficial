@@ -1,267 +1,435 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bitto - Central de Estudo</title>
-    <link rel="icon" type="image/png" href="/imagens/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="../css/styles.css">
-</head>
-<body>
+    <link rel="icon" type="image/png" href="/imagens/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
 
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body>
     <div class="crt-overlay"></div>
     <div id="toast-container"></div>
 
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
     <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-header">
-            <div style="display: flex; flex-direction: column;">
-                <span class="logo-text">MENU</span>
-                <span class="plan-tag-mobile" id="userPlanMobile">Carregando...</span>
-            </div>
-            <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+      <div class="mobile-header">
+        <div style="display: flex; flex-direction: column">
+          <span class="logo-text">MENU</span>
+          <span class="plan-tag-mobile" id="userPlanMobile">Carregando...</span>
         </div>
-        <div class="mobile-links">
-            <a href="#" class="mobile-link active">Dashboard</a>
-            <a href="history.html" class="mobile-link">Histórico</a>
-            <a href="#" class="mobile-link" id="mobileConfigBtn">Configurações</a>
-            <div class="mobile-divider"></div>
-            <button class="mobile-link logout-link" id="mobileLogoutBtn">Sair</button>
-        </div>
+        <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+      </div>
+      <div class="mobile-links">
+        <a href="#" class="mobile-link active">Dashboard</a>
+        <a href="history.html" class="mobile-link">Histórico</a>
+        <a href="#" class="mobile-link" id="mobileConfigBtn">Configurações</a>
+        <div class="mobile-divider"></div>
+        <button class="mobile-link logout-link" id="mobileLogoutBtn">
+          Sair
+        </button>
+      </div>
     </div>
 
     <nav class="navbar">
-        <div class="container nav-content">
-            <div class="nav-left">
-                <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <img src="../imagens/bittoofc.png" alt="Bitto Logo">
-                    </div>
-                    <span class="logo-text">BITTO</span>
-                </a>
-                <div class="nav-links">
-                    <a href="#" class="nav-link active">Dashboard</a>
-                    <a href="history.html" class="nav-link">Histórico</a>
-                    <a href="#" class="nav-link" id="navConfigBtn">Configurações</a>
-                </div>
+      <div class="container nav-content">
+        <div class="nav-left">
+          <a href="#" class="logo">
+            <div class="logo-icon">
+              <img src="../imagens/bittoofc.png" alt="Bitto Logo" />
             </div>
-
-            <div class="nav-right">
-                <button class="icon-button" id="themeToggle" title="Alternar Tema">
-                    <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-
-                <div class="user-profile-container" id="profileBtn">
-                    <div class="user-profile">
-                        <span class="plan-tag" id="userPlanNav">...</span>
-                        <span class="user-name" id="navUserName">Aluno</span>
-                        <div class="avatar-circle">D</div>
-                    </div>
-                    
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="dropdown-header">
-                            <p class="dd-name" id="ddUserName">Dev Junior</p>
-                            <p class="dd-level" id="ddLevel">Nível 1</p>
-                        </div>
-                        <div class="xp-container">
-                            <div class="xp-bar-bg">
-                                <div class="xp-bar-fill" id="xpBarFill" style="width: 0%"></div>
-                            </div>
-                            <p class="xp-text" id="xpText">0 / 100 XP</p>
-                        </div>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" id="ddAccountBtn">👤 Minha Conta</a></li>
-                            <li><a href="#">⚙️ Preferências</a></li>
-                            <li class="separator"></li>
-                            <li><a href="#" class="logout" id="logoutBtn">Sair</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <button class="hamburger-btn" id="hamburgerBtn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
+            <span class="logo-text">BITTO</span>
+          </a>
+          <div class="nav-links">
+            <a href="#" class="nav-link active">Dashboard</a>
+            <a href="history.html" class="nav-link">Histórico</a>
+            <a href="#" class="nav-link" id="navConfigBtn">Configurações</a>
+          </div>
         </div>
+
+        <div class="nav-right">
+          <button class="icon-button" id="themeToggle" title="Alternar Tema">
+            <svg
+              class="icon-sun"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg
+              class="icon-moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="display: none"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <div class="user-profile-container" id="profileBtn">
+            <div class="user-profile">
+              <span class="plan-tag" id="userPlanNav">...</span>
+              <span class="user-name" id="navUserName">Aluno</span>
+              <div class="avatar-circle">D</div>
+            </div>
+
+            <div class="profile-dropdown" id="profileDropdown">
+              <div class="dropdown-header">
+                <p class="dd-name" id="ddUserName">Dev Junior</p>
+                <p class="dd-level" id="ddLevel">Nível 1</p>
+              </div>
+              <div class="xp-container">
+                <div class="xp-bar-bg">
+                  <div
+                    class="xp-bar-fill"
+                    id="xpBarFill"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <p class="xp-text" id="xpText">0 / 100 XP</p>
+              </div>
+              <ul class="dropdown-menu">
+                <li><a href="#" id="ddAccountBtn">👤 Minha Conta</a></li>
+                <li><a href="#">⚙️ Preferências</a></li>
+                <li class="separator"></li>
+                <li><a href="#" class="logout" id="logoutBtn">Sair</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <button class="hamburger-btn" id="hamburgerBtn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
     </nav>
 
     <div class="container main-wrapper">
-        
-        <header class="dash-header">
-            <div class="welcome-text">
-                <h1 id="greetingText">Olá, Dev! 👋</h1>
-                <p>Vamos evoluir o Bittinho hoje?</p>
+      <header class="welcome-section">
+        <div class="welcome-text">
+          <h1 id="greetingText">Olá, Dev! 👋</h1>
+          <p>Vamos evoluir o Bittinho hoje?</p>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+        <div class="content-column">
+          <div class="stats-row">
+            <div class="stat-card mascot-card-layout tilt-element">
+              <div class="mascot-thumb">
+                <img
+                  id="mascotImage"
+                  src="../bittinhos/bittinho-0.png"
+                  alt="Mascote"
+                />
+              </div>
+              <div class="mascot-info">
+                <span class="stat-label">Evolução</span>
+                <span class="stat-value highlight-blue" id="mascotLevelText"
+                  >Nível 1</span
+                >
+              </div>
             </div>
-            
-            <div class="stats-row">
-                <div class="stat-card mascot-card-layout tilt-element">
-                    <div class="mascot-thumb">
-                        <img id="mascotImage" src="../bittinhos/bittinho-0.png" alt="Mascote">
-                    </div>
-                    <div class="mascot-info">
-                        <span class="stat-label">Evolução</span>
-                        <span class="stat-value highlight-blue" id="mascotLevelText">Nível 1</span>
-                    </div>
-                </div>
 
-                <div class="stat-card tilt-element">
-                    <span class="stat-label">XP Total</span>
-                    <div class="stat-value highlight-green" id="userXP">0</div> 
-                </div>
-
-                <div class="stat-card tilt-element" onclick="window.location.href='flashcards.html'" style="cursor: pointer;">
-                    <span class="stat-label">Estudos</span>
-                    <div class="stat-value" id="generatedCount">0 Usos</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;" id="generatedDetails">
-                        Carregando...
-                    </div>
-                </div>
+            <div class="stat-card tilt-element">
+              <span class="stat-label">XP Total</span>
+              <div class="stat-value highlight-green" id="userXP">0</div>
             </div>
-        </header>
 
-        <section class="chatbot-section">
-            <div class="chatbot-card energy-border tilt-element">
-                <div class="chatbot-header">
-                    <div class="header-avatar">
-                        <img src="../imagens/bittochat.png" alt="Assistente Bitto">
-                    </div>
-                    <div>
-                        <div class="chatbot-title">ASSISTENTE BITTO</div>
-                        <div class="chatbot-status">● Online</div>
-                    </div>
-                </div>
-
-                <div class="chatbot-messages" id="chatMessages">
-                </div>
-
-                <div class="chatbot-footer">
-                    <div class="chat-chips">
-                        <button class="chip" onclick="sendChip('Resumir código')">📝 Resumir Código</button>
-                        <button class="chip" onclick="sendChip('Criar Quiz')">🎮 Criar Quiz</button>
-                        <button class="chip" onclick="sendChip('Explicar Conceito')">💡 Explicar Conceito</button>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem...">
-                        <button class="send-button" id="sendBtn">→</button>
-                    </div>
-                </div>
+            <div
+              class="stat-card tilt-element"
+              onclick="window.location.href = 'flashcards.html'"
+              style="cursor: pointer"
+            >
+              <span class="stat-label">Estudos</span>
+              <div class="stat-value" id="generatedCount">0 Usos</div>
+              <div
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-muted);
+                  margin-top: 5px;
+                "
+                id="generatedDetails"
+              >
+                Carregando...
+              </div>
             </div>
-        </section>
+          </div>
 
-        <section class="features-section">
+          <section class="features-section">
             <h2 class="section-title">Ferramentas de Estudo</h2>
-            
+
             <div class="features-grid">
-                
-                <div class="feature-card tilt-element" data-color="blue" onclick="window.location.href='flashcards.html'">
-                    <div class="feature-top">
-                        <div class="feature-icon-box">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M2 7l10-5 10 5-10 5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                            </svg>
-                        </div>
-                        <span class="arrow-icon">↗</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3 class="feature-title">FLASHCARDS</h3>
-                        <p class="feature-description">Memorização ativa com repetição espaçada.</p>
-                    </div>
-                    <button class="feature-btn">ACESSAR</button>
+              <div
+                class="feature-card tilt-element"
+                data-color="blue"
+                onclick="window.location.href = 'flashcards.html'"
+              >
+                <div class="feature-top">
+                  <div class="feature-icon-box">
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M2 7l10-5 10 5-10 5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                      ></path>
+                    </svg>
+                  </div>
+                  <span class="arrow-icon">↗</span>
                 </div>
-
-                <div class="feature-card tilt-element" data-color="blue" onclick="window.location.href='review.html'">
-                    <div class="feature-top">
-                        <div class="feature-icon-box">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                            </svg>
-                        </div>
-                        <span class="arrow-icon">↗</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3 class="feature-title">GERADOR AI</h3>
-                        <p class="feature-description">Crie resumos automáticos dos seus estudos.</p>
-                    </div>
-                    <button class="feature-btn">ACESSAR</button>
+                <div class="feature-content">
+                  <h3 class="feature-title">FLASHCARDS</h3>
+                  <p class="feature-description">
+                    Memorização ativa com repetição espaçada.
+                  </p>
                 </div>
+                <button class="feature-btn">ACESSAR</button>
+              </div>
 
-                <div class="feature-card tilt-element" data-color="blue" onclick="window.location.href='quiz.html'">
-                    <div class="feature-top">
-                        <div class="feature-icon-box">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                                <path d="M6 12h4m-2-2v4m10-4h2m-2 4h2"></path>
-                            </svg>
-                        </div>
-                        <span class="arrow-icon">↗</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3 class="feature-title">QUIZ GAME</h3>
-                        <p class="feature-description">Pratique e suba de nivél.</p>
-                    </div>
-                    <button class="feature-btn">ACESSAR</button>
+              <div
+                class="feature-card tilt-element"
+                data-color="blue"
+                onclick="window.location.href = 'review.html'"
+              >
+                <div class="feature-top">
+                  <div class="feature-icon-box">
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polygon
+                        points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+                      ></polygon>
+                    </svg>
+                  </div>
+                  <span class="arrow-icon">↗</span>
                 </div>
+                <div class="feature-content">
+                  <h3 class="feature-title">GERADOR AI</h3>
+                  <p class="feature-description">
+                    Crie resumos automáticos dos seus estudos.
+                  </p>
+                </div>
+                <button class="feature-btn">ACESSAR</button>
+              </div>
 
+              <div
+                class="feature-card tilt-element"
+                data-color="blue"
+                onclick="window.location.href = 'quiz.html'"
+              >
+                <div class="feature-top">
+                  <div class="feature-icon-box">
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                      <path d="M6 12h4m-2-2v4m10-4h2m-2 4h2"></path>
+                    </svg>
+                  </div>
+                  <span class="arrow-icon">↗</span>
+                </div>
+                <div class="feature-content">
+                  <h3 class="feature-title">QUIZ GAME</h3>
+                  <p class="feature-description">Pratique e suba de nivél.</p>
+                </div>
+                <button class="feature-btn">ACESSAR</button>
+              </div>
             </div>
-        </section>
+          </section>
+        </div>
 
+        <aside class="sidebar-column">
+          <section class="chatbot-section">
+            <div class="chatbot-card energy-border tilt-element">
+              <div class="chatbot-header">
+                <div class="header-avatar">
+                  <img src="../imagens/bittochat.png" alt="Assistente Bitto" />
+                </div>
+                <div>
+                  <div class="chatbot-title">ASSISTENTE BITTO</div>
+                  <div class="chatbot-status">● Online</div>
+                </div>
+              </div>
+
+              <div class="chatbot-messages" id="chatMessages"></div>
+
+              <div class="chatbot-footer">
+                <div class="chat-chips">
+                  <button class="chip" onclick="sendChip('Resumir código')">
+                    📝 Resumir Código
+                  </button>
+                  <button class="chip" onclick="sendChip('Criar Quiz')">
+                    🎮 Criar Quiz
+                  </button>
+                  <button class="chip" onclick="sendChip('Explicar Conceito')">
+                    💡 Explicar Conceito
+                  </button>
+                </div>
+                <div class="input-wrapper">
+                  <input
+                    type="text"
+                    class="chat-input"
+                    id="chatInput"
+                    placeholder="Digite sua mensagem..."
+                  />
+                  <button class="send-button" id="sendBtn">→</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
     </div>
 
     <div class="modal-overlay" id="settingsModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2>Minha Conta</h2>
-                <button class="close-modal" id="closeSettingsBtn">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="profile-edit-section">
-                    <div class="profile-picture-large" onclick="document.getElementById('avatarInput').click()" style="cursor: pointer;" title="Alterar Foto">
-                        <img id="settingsAvatarPreview" src="" alt="Avatar" style="display:none;">
-                        <div id="settingsAvatarPlaceholder" class="avatar-placeholder-large">D</div>
-                        <input type="file" id="avatarInput" accept="image/*" hidden>
-                        <button class="edit-avatar-btn">📷</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Aluno</label>
-                    <input type="text" id="settingsNameInput" class="modal-input" placeholder="Seu nome">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="settingsEmailInput" value="Carregando..." class="modal-input" disabled style="opacity:0.6;">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-logout" id="modalLogoutBtn">Sair</button>
-                <button class="btn-save" id="saveSettingsBtn">Salvar</button>
-            </div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Minha Conta</h2>
+          <button class="close-modal" id="closeSettingsBtn">✕</button>
         </div>
+        <div class="modal-body">
+          <div class="profile-edit-section">
+            <div
+              class="profile-picture-large"
+              onclick="document.getElementById('avatarInput').click()"
+              style="cursor: pointer"
+              title="Alterar Foto"
+            >
+              <img
+                id="settingsAvatarPreview"
+                src=""
+                alt="Avatar"
+                style="display: none"
+              />
+              <div
+                id="settingsAvatarPlaceholder"
+                class="avatar-placeholder-large"
+              >
+                D
+              </div>
+              <input type="file" id="avatarInput" accept="image/*" hidden />
+              <button class="edit-avatar-btn">📷</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Aluno</label>
+            <input
+              type="text"
+              id="settingsNameInput"
+              class="modal-input"
+              placeholder="Seu nome"
+            />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              id="settingsEmailInput"
+              value="Carregando..."
+              class="modal-input"
+              disabled
+              style="opacity: 0.6"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-logout" id="modalLogoutBtn">Sair</button>
+          <button class="btn-save" id="saveSettingsBtn">Salvar</button>
+        </div>
+      </div>
     </div>
 
     <div class="modal-overlay" id="confirmModal">
-        <div class="modal-card" style="max-width: 350px;">
-            <div class="modal-header" style="border:none; padding-bottom: 0.5rem;">
-                <h2>⚠️ Tem certeza?</h2>
-            </div>
-            <div class="modal-body" style="padding-top: 0; padding-bottom: 1.5rem;">
-                <p style="color: var(--text-muted);">Você será desconectado da sua conta Bitto.</p>
-            </div>
-            <div class="modal-footer" style="background: transparent; border:none; justify-content: flex-end; gap: 10px;">
-                <button class="btn-logout" id="cancelConfirmBtn" style="color: var(--text-main); border-color: var(--border-color);">Cancelar</button>
-                <button class="btn-save" id="acceptConfirmBtn" style="background: #FF4B4B; color: white; border: none; box-shadow: none;">Sair</button>
-            </div>
+      <div class="modal-card" style="max-width: 350px">
+        <div class="modal-header" style="border: none; padding-bottom: 0.5rem">
+          <h2>⚠️ Tem certeza?</h2>
         </div>
+        <div class="modal-body" style="padding-top: 0; padding-bottom: 1.5rem">
+          <p style="color: var(--text-muted)">
+            Você será desconectado da sua conta Bitto.
+          </p>
+        </div>
+        <div
+          class="modal-footer"
+          style="
+            background: transparent;
+            border: none;
+            justify-content: flex-end;
+            gap: 10px;
+          "
+        >
+          <button
+            class="btn-logout"
+            id="cancelConfirmBtn"
+            style="color: var(--text-main); border-color: var(--border-color)"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn-save"
+            id="acceptConfirmBtn"
+            style="
+              background: #ff4b4b;
+              color: white;
+              border: none;
+              box-shadow: none;
+            "
+          >
+            Sair
+          </button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="../js/script.js"></script>
-</body>
+  </body>
 </html>
