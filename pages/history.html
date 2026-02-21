@@ -504,118 +504,120 @@
       </div>
 
       <div class="history-grid">
-        <div class="stat-box total-card theme-gold tilt-element">
-          <div
-            class="icon-bg"
-            style="width: 70px; height: 70px; font-size: 2rem"
-          >
-            ⚡
-          </div>
-          <div class="total-info">
-            <span class="stat-label" style="color: #d4af37"
-              >Produção Total</span
-            >
-            <div class="stat-number" id="valTotal">0</div>
-            <span class="stat-sub">Materiais gerados este mês</span>
-          </div>
-          <div style="text-align: right">
-            <span style="font-size: 3rem">🏆</span>
-          </div>
+        <div
+          style="
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            margin-top: 4rem;
+          "
+        >
+          <button id="btnShareStory" class="btn-share-story tilt-element">
+            📸 Gerar Story do Mês
+          </button>
         </div>
 
-        <div class="stat-box theme-blue tilt-element">
-          <div>
-            <div class="icon-bg">🗂️</div>
-            <span class="stat-label">Flashcards</span>
-            <div class="stat-number" id="valFlashcards">0</div>
-            <span class="stat-sub">Cards criados</span>
-          </div>
-          <a href="flashcards.html" class="quick-action">Criar Novo Deck →</a>
-        </div>
+        <div id="storyPreviewModal" class="modal-overlay">
+          <div class="modal-card story-preview-card">
+            <div class="modal-header">
+              <h2 style="font-size: 1.2rem">Sua Retrospectiva</h2>
+              <button class="close-modal" id="btnClosePreview">✖</button>
+            </div>
+            <div class="modal-body preview-body">
+              <div class="preview-img-container">
+                <img id="previewImage" src="" alt="Prévia do Story" />
+              </div>
 
-        <div class="stat-box theme-green tilt-element">
-          <div>
-            <div class="icon-bg">🎮</div>
-            <span class="stat-label">Quizzes</span>
-            <div class="stat-number" id="valQuiz">0</div>
-            <span class="stat-sub">Partidas jogadas</span>
-          </div>
-          <a href="quiz.html" class="quick-action">Jogar Agora →</a>
-        </div>
-
-        <div class="stat-box theme-purple tilt-element">
-          <div>
-            <div class="icon-bg">📝</div>
-            <span class="stat-label">Resumos</span>
-            <div class="stat-number" id="valReview">0</div>
-            <span class="stat-sub">Guias gerados</span>
-          </div>
-          <a href="review.html" class="quick-action">Gerar Guia →</a>
-        </div>
-      </div>
-
-      <div
-        style="
-          text-align: center;
-          display: flex;
-          justify-content: center;
-          margin-top: 4rem;
-        "
-      >
-        <button id="btnShareStory" class="btn-share-story tilt-element">
-          📸 Baixar Story para Instagram
-        </button>
-      </div>
-
-      <div id="story-template" class="story-export-box">
-        <div class="story-header-box">
-          <div class="story-user-info">
-            <img
-              id="st-avatar"
-              class="story-avatar"
-              src=""
-              crossorigin="anonymous"
-              alt="Avatar"
-            />
-            <div class="story-user-text">
-              <h3 id="st-name" class="story-user-name">Estudante</h3>
-              <p class="story-user-badge">Top Aluno(a) na Bitto</p>
+              <div class="caption-box">
+                <span
+                  style="
+                    font-size: 0.8rem;
+                    font-weight: 700;
+                    color: var(--primary-blue);
+                    display: block;
+                    margin-bottom: 5px;
+                  "
+                  >DICA DE LEGENDA</span
+                >
+                <p id="suggestedCaption">
+                  "Acabei de gerar materiais de estudo com IA na @bitto.app!
+                  🚀🧠 O link tá na bio pra quem quiser acelerar os estudos
+                  também."
+                </p>
+                <button id="btnCopyCaption" class="btn-copy">
+                  Copiar Legenda
+                </button>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                id="btnDownloadStory"
+                class="btn-save"
+                style="width: 100%; font-size: 1.1rem; padding: 1rem"
+              >
+                ⬇️ Baixar Imagem (Story)
+              </button>
             </div>
           </div>
-          <h2 class="story-title">MEU MÊS</h2>
-          <p class="story-subtitle" id="st-month">Mês de 2026</p>
         </div>
 
-        <div class="story-grid">
-          <div class="story-card sc-gold">
-            <div class="story-icon-bg">⚡</div>
-            <div class="story-num" id="st-total">0</div>
-            <div class="story-label">Materiais<br />Totais</div>
-          </div>
-          <div class="story-card sc-blue">
-            <div class="story-icon-bg">🗂️</div>
-            <div class="story-num" id="st-flashcards">0</div>
-            <div class="story-label">Flashcards</div>
-          </div>
-          <div class="story-card sc-green">
-            <div class="story-icon-bg">🎮</div>
-            <div class="story-num" id="st-quiz">0</div>
-            <div class="story-label">Quizzes</div>
-          </div>
-          <div class="story-card sc-purple">
-            <div class="story-icon-bg">📝</div>
-            <div class="story-num" id="st-review">0</div>
-            <div class="story-label">Resumos</div>
-          </div>
-        </div>
+        <div id="story-template" class="story-export-box">
+          <div class="story-bg-glow glow-blue"></div>
+          <div class="story-bg-glow glow-green"></div>
 
-        <div class="story-footer-branding">
-          <h3 style="font-family: &quot;Unbounded&quot;, sans-serif">Bitto</h3>
-          <p>Acelere seus estudos com IA em <strong>bitto.app</strong></p>
+          <div class="story-content">
+            <div class="story-header-box">
+              <h2 class="story-title">MEU DESEMPENHO</h2>
+              <p class="story-subtitle" id="st-month">Mês de 2026</p>
+            </div>
+
+            <div class="story-user-info">
+              <img
+                id="st-avatar"
+                class="story-avatar"
+                src=""
+                crossorigin="anonymous"
+                alt="Avatar"
+              />
+              <div class="story-user-text">
+                <h3 id="st-name" class="story-user-name">Estudante</h3>
+                <p class="story-user-badge">Top Aluno(a) na Bitto</p>
+              </div>
+            </div>
+
+            <div class="story-grid">
+              <div class="story-card sc-gold">
+                <div class="story-icon-bg">⚡</div>
+                <div class="story-num" id="st-total">0</div>
+                <div class="story-label">Materiais<br />Totais</div>
+              </div>
+              <div class="story-card sc-blue">
+                <div class="story-icon-bg">🗂️</div>
+                <div class="story-num" id="st-flashcards">0</div>
+                <div class="story-label">Flashcards</div>
+              </div>
+              <div class="story-card sc-green">
+                <div class="story-icon-bg">🎮</div>
+                <div class="story-num" id="st-quiz">0</div>
+                <div class="story-label">Quizzes</div>
+              </div>
+              <div class="story-card sc-purple">
+                <div class="story-icon-bg">📝</div>
+                <div class="story-num" id="st-review">0</div>
+                <div class="story-label">Resumos</div>
+              </div>
+            </div>
+
+            <div class="story-footer-branding">
+              <div class="brand-logo">B</div>
+              <div>
+                <h3>bitto.app</h3>
+                <p>Estudos acelerados por IA</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <script type="module" src="../js/history.js"></script>
   </body>
 </html>

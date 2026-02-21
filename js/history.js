@@ -162,41 +162,45 @@ if (themeToggle) {
   });
 }
 // ==========================================================================
-//   GERAÇÃO E EXPORTAÇÃO DO STORY (html2canvas)
+//   GERAÇÃO, PRÉVIA E EXPORTAÇÃO DO STORY
 // ==========================================================================
 const btnShareStory = document.getElementById("btnShareStory");
 const storyTemplate = document.getElementById("story-template");
+const previewModal = document.getElementById("storyPreviewModal");
+const btnClosePreview = document.getElementById("btnClosePreview");
+const btnDownloadStory = document.getElementById("btnDownloadStory");
+const previewImage = document.getElementById("previewImage");
+const btnCopyCaption = document.getElementById("btnCopyCaption");
+
+let currentStoryDataUrl = "";
+let currentFileName = "";
 
 if (btnShareStory) {
   btnShareStory.addEventListener("click", async () => {
     try {
-      // Feedback visual no botão
       const originalText = btnShareStory.innerHTML;
-      btnShareStory.innerHTML = "⏳ Preparando Imagem...";
+      btnShareStory.innerHTML = "⏳ Preparando Retrospectiva...";
       btnShareStory.disabled = true;
 
-      // 1. Puxar Nome do Usuário
+      // 1. Puxar Nome e Foto
       const navNameText = document.getElementById("navUserName").innerText;
       document.getElementById("st-name").innerText =
         navNameText !== "..." ? navNameText : "Estudante";
 
-      // 2. Puxar Foto de Perfil (da navbar)
       const avatarImg = document.querySelector(".avatar-circle img");
       const stAvatar = document.getElementById("st-avatar");
-
       if (avatarImg && avatarImg.src) {
         stAvatar.src = avatarImg.src;
       } else {
-        // Se o usuário não tiver foto, gera uma com a inicial do nome usando uma API gratuita
         stAvatar.src = `https://ui-avatars.com/api/?name=${navNameText}&background=0035FF&color=fff&size=256`;
       }
 
-      // 3. Atualizar os números e o mês no template
+      // 2. Atualizar Dados
+      const valTotal = document.getElementById("valTotal").innerText;
       document.getElementById("st-month").innerText = document.getElementById(
         "currentMonthDisplay",
       ).innerText;
-      document.getElementById("st-total").innerText =
-        document.getElementById("valTotal").innerText;
+      document.getElementById("st-total").innerText = valTotal;
       document.getElementById("st-flashcards").innerText =
         document.getElementById("valFlashcards").innerText;
       document.getElementById("st-quiz").innerText =
@@ -204,47 +208,101 @@ if (btnShareStory) {
       document.getElementById("st-review").innerText =
         document.getElementById("valReview").innerText;
 
-      // 4. Pequeno delay para garantir que a imagem de perfil e as fontes carregaram no template oculto
+      // Atualiza a legenda com a quantidade real
+      document.getElementById("suggestedCaption").innerText =
+        `"Acabei de gerar ${valTotal} materiais de estudo com IA na @bitto.app! 🚀🧠 O link tá na bio pra quem quiser acelerar os estudos também."`;
+
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // 5. Renderizar a div oculta com html2canvas
+      // SOLUÇÃO ANTI-CORTE: Guarda a posição atual e vai pro topo
+      const scrollPos = window.scrollY;
+      window.scrollTo(0, 0);
+
+      // 3. Renderizar com dimensões estritas
       const canvas = await window.html2canvas(storyTemplate, {
-        scale: 1, // Mantém a proporção exata de 1080x1920
-        useCORS: true, // Crucial para não bloquear a imagem do perfil (Firebase/Google)
+        scale: 1,
+        useCORS: true,
         allowTaint: false,
-        backgroundColor: "#050505", // Garante o fundo escuro do Story
+        backgroundColor: "#050505",
+        width: 1080,
+        height: 1920,
+        windowWidth: 1080,
+        windowHeight: 1920,
+        x: 0,
+        y: 0,
+        scrollY: 0,
         logging: false,
       });
 
-      // 6. Converter o canvas para imagem PNG e forçar o download
-      const imageURI = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
+      // Restaura o scroll do usuário
+      window.scrollTo(0, scrollPos);
 
-      // Cria um nome de arquivo amigável: bitto-stats-nome.png
+      // 4. Salvar imagem gerada e abrir modal
+      currentStoryDataUrl = canvas.toDataURL("image/png");
+      previewImage.src = currentStoryDataUrl;
+
       const safeName =
         navNameText !== "..."
           ? navNameText.toLowerCase().replace(/\s+/g, "-")
           : "estudante";
-      link.download = `bitto-stats-${safeName}.png`;
+      currentFileName = `bitto-stats-${safeName}.png`;
 
-      link.href = imageURI;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      previewModal.classList.add("active");
 
-      // 7. Retornar botão ao estado normal com mensagem de sucesso
-      btnShareStory.innerHTML = "✅ Baixado com sucesso!";
-      setTimeout(() => {
-        btnShareStory.innerHTML = originalText;
-        btnShareStory.disabled = false;
-      }, 3000);
+      // 5. Resetar botão inicial
+      btnShareStory.innerHTML = originalText;
+      btnShareStory.disabled = false;
     } catch (error) {
-      console.error("Erro ao gerar o Story: ", error);
-      btnShareStory.innerHTML = "❌ Erro ao baixar";
+      console.error("Erro ao gerar a imagem: ", error);
+      btnShareStory.innerHTML = "❌ Erro ao gerar. Tente novamente.";
       setTimeout(() => {
-        btnShareStory.innerHTML = "📸 Baixar Story para Instagram";
+        btnShareStory.innerHTML = "📸 Gerar Story do Mês";
         btnShareStory.disabled = false;
       }, 3000);
     }
+  });
+}
+
+// Fechar Modal
+if (btnClosePreview) {
+  btnClosePreview.addEventListener("click", () => {
+    previewModal.classList.remove("active");
+  });
+}
+
+// Fazer o Download pelo botão do Modal
+if (btnDownloadStory) {
+  btnDownloadStory.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = currentFileName;
+    link.href = currentStoryDataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    btnDownloadStory.innerHTML = "✅ Download Concluído!";
+    setTimeout(() => {
+      btnDownloadStory.innerHTML = "⬇️ Baixar Imagem (Story)";
+    }, 2500);
+  });
+}
+
+// Copiar Legenda
+if (btnCopyCaption) {
+  btnCopyCaption.addEventListener("click", () => {
+    const captionText = document.getElementById("suggestedCaption").innerText;
+    // Tira as aspas do começo e do fim para ficar limpo pro usuário colar
+    navigator.clipboard.writeText(captionText.replace(/^"|"$/g, ""));
+
+    const originalText = btnCopyCaption.innerHTML;
+    btnCopyCaption.innerHTML = "Copiado! ✓";
+    btnCopyCaption.style.background = "var(--accent-green)";
+    btnCopyCaption.style.color = "var(--primary-blue)";
+
+    setTimeout(() => {
+      btnCopyCaption.innerHTML = originalText;
+      btnCopyCaption.style.background = "";
+      btnCopyCaption.style.color = "";
+    }, 2000);
   });
 }

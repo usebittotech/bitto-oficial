@@ -1112,10 +1112,9 @@ button,
   }
 }
 /* ==========================================================================
-   EXPORTAR STORY (HISTÓRICO)
+   EXPORTAR STORY PREMIUM E MODAL DE PRÉVIA
    ========================================================================== */
 
-/* Botão de Compartilhar na UI */
 .btn-share-story {
   display: inline-flex;
   align-items: center;
@@ -1140,99 +1139,177 @@ button,
   box-shadow: 0 15px 40px rgba(0, 53, 255, 0.3);
 }
 
-/* Template Oculto (Proporção 9:16) */
-.story-export-box {
-  position: fixed;
-  left: -9999px; /* Mantém fora da tela */
-  top: 0;
-  width: 1080px;
-  height: 1920px;
-  background: #050505;
-  background-image: radial-gradient(
-    circle at center,
-    rgba(0, 53, 255, 0.15) 0%,
-    transparent 70%
-  );
-  color: #fff;
-  font-family: "DM Sans", sans-serif;
+/* Modal de Prévia */
+.story-preview-card {
+  max-width: 400px;
+}
+.preview-body {
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  padding: 180px 100px;
-  box-sizing: border-box;
-  z-index: -1;
+  gap: 1.5rem;
+  align-items: center;
+}
+.preview-img-container {
+  width: 100%;
+  max-width: 250px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--border-color);
+}
+.preview-img-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.caption-box {
+  background: var(--input-bg);
+  padding: 15px;
+  border-radius: 12px;
+  width: 100%;
+  border: 1px dashed var(--border-color);
+  position: relative;
+}
+.caption-box p {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+.btn-copy {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-copy:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
 }
 
-/* Header e Perfil do Usuário no Story */
+/* TEMPLATE OCULTO (1080x1920) - Solução Anti-Corte */
+.story-export-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  z-index: -9999;
+  opacity: 0.01;
+  pointer-events: none;
+  background: #050505;
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  overflow: hidden;
+}
+
+/* Efeitos de Luz no Fundo */
+.story-bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(150px);
+  z-index: 1;
+}
+.glow-blue {
+  top: -10%;
+  right: -20%;
+  width: 1000px;
+  height: 1000px;
+  background: rgba(0, 53, 255, 0.4);
+}
+.glow-green {
+  bottom: -10%;
+  left: -20%;
+  width: 800px;
+  height: 800px;
+  background: rgba(204, 255, 0, 0.2);
+}
+
+.story-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 140px 100px;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
 .story-header-box {
   text-align: center;
-  margin-bottom: 120px;
+  margin-bottom: 50px;
 }
-
-.story-user-info {
-  display: inline-flex;
-  align-items: center;
-  gap: 30px;
-  margin-bottom: 70px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 25px 50px 25px 25px;
-  border-radius: 100px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-.story-avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 6px solid #ccff00;
-  background: #0035ff;
-}
-.story-user-text {
-  text-align: left;
-}
-.story-user-name {
-  font-family: "Unbounded", sans-serif;
-  font-size: 55px;
-  color: white;
-  font-weight: 800;
-  margin-bottom: 5px;
-  line-height: 1;
-}
-.story-user-badge {
-  font-size: 32px;
-  color: #aaa;
-  margin: 0;
-  font-weight: 500;
-}
-
 .story-title {
   font-family: "Unbounded", sans-serif;
-  font-size: 85px;
+  font-size: 75px;
   font-weight: 800;
-  margin-bottom: 20px;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 10px;
+  letter-spacing: -2px;
 }
 .story-subtitle {
-  font-size: 45px;
+  font-size: 40px;
   color: #ccff00;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 5px;
 }
 
-/* Grid de Status no Story */
+/* Perfil Glassmorphism */
+.story-user-info {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin: 0 auto 80px auto;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 30px 60px 30px 30px;
+  border-radius: 100px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+.story-avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid #ccff00;
+  background: #0035ff;
+}
+.story-user-name {
+  font-family: "Unbounded", sans-serif;
+  font-size: 60px;
+  color: white;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+.story-user-badge {
+  font-size: 35px;
+  color: #aaa;
+  margin: 0;
+}
+
+/* Cards Translúcidos */
 .story-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 50px;
   flex-grow: 1;
+  align-content: center;
 }
 .story-card {
-  background: #111;
-  border-radius: 50px;
+  background: rgba(20, 20, 20, 0.6);
+  border-radius: 60px;
   padding: 70px 40px;
   text-align: center;
-  border: 4px solid #333;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1240,70 +1317,81 @@ button,
 }
 .story-icon-bg {
   font-size: 110px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 .story-num {
   font-family: "Unbounded", sans-serif;
-  font-size: 130px;
+  font-size: 140px;
   font-weight: 800;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   line-height: 1;
 }
 .story-label {
-  font-size: 38px;
+  font-size: 35px;
   color: #aaa;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 600;
 }
 
-/* Cores dos Cards no Story */
-.sc-gold {
-  border-color: #d4af37;
-  box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
-}
 .sc-gold .story-num {
   color: #d4af37;
 }
-.sc-blue {
-  border-color: #0035ff;
-  box-shadow: 0 0 50px rgba(0, 53, 255, 0.1);
+.sc-gold {
+  border-top-color: #d4af37;
 }
 .sc-blue .story-num {
   color: #0035ff;
 }
-.sc-green {
-  border-color: #ccff00;
-  box-shadow: 0 0 50px rgba(204, 255, 0, 0.1);
+.sc-blue {
+  border-top-color: #0035ff;
 }
 .sc-green .story-num {
   color: #ccff00;
 }
-.sc-purple {
-  border-color: blueviolet;
-  box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
+.sc-green {
+  border-top-color: #ccff00;
 }
 .sc-purple .story-num {
   color: blueviolet;
 }
+.sc-purple {
+  border-top-color: blueviolet;
+}
 
-/* Rodapé Branding */
+/* Footer Watermark */
 .story-footer-branding {
-  text-align: center;
-  margin-top: 100px;
-  border-top: 2px solid #333;
-  padding-top: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 80px;
+  padding-top: 50px;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+.brand-logo {
+  width: 100px;
+  height: 100px;
+  background: #0035ff;
+  color: white;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Unbounded", sans-serif;
+  font-size: 60px;
+  font-weight: 800;
 }
 .story-footer-branding h3 {
-  font-size: 70px;
-  color: #0035ff;
-  margin-bottom: 15px;
-  letter-spacing: -2px;
+  font-family: "Unbounded", sans-serif;
+  font-size: 50px;
+  color: #fff;
+  margin-bottom: 5px;
+  line-height: 1;
 }
 .story-footer-branding p {
-  font-size: 40px;
-  color: #888;
-}
-.story-footer-branding strong {
-  color: #fff;
+  font-size: 35px;
+  color: #ccff00;
+  margin: 0;
+  font-weight: 600;
 }
