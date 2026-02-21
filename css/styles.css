@@ -56,6 +56,13 @@
   cursor: pointer;
 }
 
+/* Trava global de overflow para impedir cortes na tela */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -68,7 +75,6 @@ body {
   font-family: var(--font-body);
   line-height: 1.5;
   min-height: 100vh;
-  overflow-x: hidden;
   transition:
     background 0.4s ease,
     color 0.3s ease;
@@ -646,8 +652,8 @@ button,
 }
 
 .chatbot-messages {
-  flex: 1 1 0; /* Regra de Ouro: Garante que as mensagens nunca empurrem o footer para fora */
-  min-height: 0; /* Impede o bug de transbordamento do Flexbox */
+  flex: 1 1 0;
+  min-height: 0;
   padding: 1.5rem;
   overflow-y: auto;
   background-color: var(--chat-bg-color);
@@ -746,7 +752,7 @@ button,
 }
 .chat-input {
   flex: 1;
-  min-width: 0; /* Impede que o input quebre o layout no mobile */
+  min-width: 0;
   background: var(--input-bg);
   border: 1px solid transparent;
   color: var(--text-main);
@@ -1025,8 +1031,7 @@ button,
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE (MOBILE & TABLET)
-   CÓDIGO 100% BLINDADO CONTRA CORTES
+   RESPONSIVIDADE (MOBILE & TABLET) - 100% BLINDADO CONTRA CORTES
    ========================================================================== */
 
 @media (max-width: 1024px) {
@@ -1042,7 +1047,7 @@ button,
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 1rem;
+    padding: 0 1.2rem; /* Margem ajustada para não apertar demais */
   }
 
   .nav-links,
@@ -1061,7 +1066,7 @@ button,
 
   .content-column {
     gap: 1.5rem;
-    min-width: 100%;
+    width: 100%; /* Resolve o vazamento lateral */
   }
 
   /* 1. STATS COMPACTOS */
@@ -1071,44 +1076,57 @@ button,
     gap: 0.8rem;
   }
   .mascot-card-layout {
-    grid-column: span 2; /* Garante que o mascote ocupe tudo sem estourar */
+    grid-column: span 2;
   }
   .stat-card {
     padding: 1rem;
-    min-width: 0; /* Previne que o card estique além da tela */
   }
   .stat-value {
     font-size: 1rem;
-    word-break: break-word; /* Se o número for gigante, ele não quebra a tela */
+    word-break: break-word;
   }
 
   /* 2. CARROSSEL DE FERRAMENTAS SEGURO */
+  .features-section {
+    width: 100%;
+    overflow: hidden; /* Corta qualquer coisa do filho que tente passar da tela */
+  }
+
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 1rem;
     padding-bottom: 1rem;
-    width: 100%; /* Respeita o container */
+    width: 100%;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
+
+  .features-grid::-webkit-scrollbar {
+    display: none;
+  }
+
   .feature-card {
-    width: 85%; /* Usa 85% da tela, deixando um pedaço do próximo visível sem cortar */
-    flex-shrink: 0;
+    /* O SEGREDO DO CORTE RESOLVIDO AQUI: */
+    flex: 0 0 85%; /* O card vai ter exatamente 85% do espaço visível, deixando 15% para o próximo aparecer */
+    max-width: 320px; /* Limite amigável para tablets pequenos */
     scroll-snap-align: center;
     min-height: 220px;
     padding: 1.5rem;
   }
 
+  /* Espaço fantasma no final do scroll para o último card não bater seco na parede */
+  .features-grid::after {
+    content: "";
+    flex: 0 0 1px;
+  }
+
   /* 3. CHATBOT COM ALTURA FIXA E SEGURA */
   .chatbot-card {
-    height: 500px; /* Altura exata previne bugs quando o teclado do celular abre */
+    height: 500px;
     min-height: unset;
-    max-height: calc(
-      100vh - 100px
-    ); /* Nunca vai ser maior que a tela do celular */
     border-radius: 16px;
   }
   .chatbot-messages {
