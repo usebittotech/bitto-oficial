@@ -477,13 +477,15 @@ button,
   padding-bottom: 4rem;
   width: 100%;
 }
+
+/* --- AQUI AUMENTAMOS O "RESPIRO" (ESPAÇAMENTO) DOS TEXTOS --- */
 .dash-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem; /* Distância generosa para os blocos de baixo */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2.5rem; /* Separou bem o texto "Boa Noite" dos blocos de XP/Mascote */
 }
 .welcome-text h1 {
   font-size: 2rem;
@@ -611,7 +613,7 @@ button,
   gap: 1rem;
   background: var(--card-bg);
   z-index: 2;
-  flex-shrink: 0; /* TRAVA PARA NÃO CORTAR O HEADER */
+  flex-shrink: 0;
 }
 .header-avatar {
   width: 40px;
@@ -644,8 +646,8 @@ button,
 }
 
 .chatbot-messages {
-  flex: 1 1 auto; /* Permite que cresça mas ceda espaço */
-  min-height: 0; /* Previne o bug do flexbox que empurra os outros elementos */
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 1.5rem;
   overflow-y: auto;
   background-color: var(--chat-bg-color);
@@ -708,7 +710,7 @@ button,
   flex-direction: column;
   gap: 0.8rem;
   z-index: 2;
-  flex-shrink: 0; /* TRAVA PARA NÃO CORTAR A BARRA DE DIGITAR */
+  flex-shrink: 0;
 }
 .chat-chips {
   display: flex;
@@ -779,15 +781,19 @@ button,
 /* --- FEATURES GRID --- */
 .features-section {
   width: 100%;
+  margin-top: 1rem;
 }
+
+/* --- MAIS UM RESPIRO AQUI NO TÍTULO DAS FERRAMENTAS --- */
 .section-title {
   font-size: 1.2rem;
   color: var(--text-main);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem; /* Distanciou bem o título dos cards azuis */
   text-align: left;
   border-left: 4px solid var(--accent-green);
   padding-left: 10px;
 }
+
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1044,9 +1050,18 @@ button,
     display: block;
   }
 
+  /* ESPAÇAMENTO REFORÇADO TAMBÉM NO CELULAR */
+  .dash-header {
+    gap: 2.2rem; /* Afasta o texto principal dos stats */
+    margin-bottom: 2.5rem;
+  }
   .welcome-text h1 {
     font-size: 1.5rem;
+    margin-bottom: 0.8rem;
   }
+  .section-title {
+    margin-bottom: 2rem;
+  } /* Afasta o título Ferramentas dos cards azuis */
 
   /* 1. STATS COMPACTOS */
   .stats-row {
@@ -1065,7 +1080,7 @@ button,
     box-sizing: border-box;
   }
 
-  /* 2. CARROSSEL DE FERRAMENTAS (Mantido o design aprovado) */
+  /* 2. CARROSSEL DE FERRAMENTAS */
   .features-section {
     width: 100%;
     overflow: hidden;
@@ -1102,10 +1117,10 @@ button,
     flex: 0 0 1px;
   }
 
-  /* 3. CHATBOT - CORREÇÃO DA PARTE DE BAIXO */
+  /* 3. CHATBOT */
   .chatbot-card {
-    height: 550px; /* Um tamanho bacana */
-    max-height: 80vh; /* Nunca será maior que 80% da tela do celular */
+    height: 550px;
+    max-height: 80vh;
     min-height: unset;
     border-radius: 16px;
     width: 100%;
