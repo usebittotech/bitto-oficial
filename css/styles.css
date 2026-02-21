@@ -477,15 +477,13 @@ button,
   padding-bottom: 4rem;
   width: 100%;
 }
-
-/* --- AQUI AUMENTAMOS O "RESPIRO" (ESPAÇAMENTO) DOS TEXTOS --- */
 .dash-header {
   text-align: center;
-  margin-bottom: 3rem; /* Distância generosa para os blocos de baixo */
+  margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.5rem; /* Separou bem o texto "Boa Noite" dos blocos de XP/Mascote */
+  gap: 1.5rem;
 }
 .welcome-text h1 {
   font-size: 2rem;
@@ -781,19 +779,15 @@ button,
 /* --- FEATURES GRID --- */
 .features-section {
   width: 100%;
-  margin-top: 1rem;
 }
-
-/* --- MAIS UM RESPIRO AQUI NO TÍTULO DAS FERRAMENTAS --- */
 .section-title {
   font-size: 1.2rem;
   color: var(--text-main);
-  margin-bottom: 2.5rem; /* Distanciou bem o título dos cards azuis */
+  margin-bottom: 1.5rem;
   text-align: left;
   border-left: 4px solid var(--accent-green);
   padding-left: 10px;
 }
-
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1031,12 +1025,12 @@ button,
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE (MOBILE & TABLET)
+   MOBILE EXCLUSIVO (A MÁGICA DOS ESPAÇOS E ORDEM)
    ========================================================================== */
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 1rem;
+    padding: 0 1.2rem;
     width: 100%;
     max-width: 100vw;
   }
@@ -1050,53 +1044,73 @@ button,
     display: block;
   }
 
-  /* ESPAÇAMENTO REFORÇADO TAMBÉM NO CELULAR */
+  /* ORGANIZADOR GLOBAL PARA ESPAÇAR E ORDENAR AS SEÇÕES */
+  .main-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem; /* UM RESPIRO GIGANTE ENTRE CADA PARTE DO APP */
+  }
+
+  /* FORÇA A ORDEM: Título > Ferramentas > Chatbot */
   .dash-header {
-    gap: 2.2rem; /* Afasta o texto principal dos stats */
-    margin-bottom: 2.5rem;
+    order: 1;
+    margin-bottom: 0;
+  }
+  .features-section {
+    order: 2;
+    margin-top: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  .chatbot-section {
+    order: 3;
+    margin-bottom: 0;
+    width: 100%;
+  }
+
+  /* 1. CABEÇALHO E ESTATÍSTICAS (Mais espaço para não amontoar) */
+  .dash-header {
+    gap: 2rem; /* Afasta o "Boa Noite" dos quadradinhos */
   }
   .welcome-text h1 {
-    font-size: 1.5rem;
-    margin-bottom: 0.8rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.3rem;
   }
-  .section-title {
-    margin-bottom: 2rem;
-  } /* Afasta o título Ferramentas dos cards azuis */
+  .welcome-text p {
+    font-size: 0.95rem;
+  }
 
-  /* 1. STATS COMPACTOS */
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.8rem;
+    gap: 1rem; /* Afasta o card de XP do card de Estudos */
     width: 100%;
-    max-width: 100%;
   }
   .mascot-card-layout {
     grid-column: span 2;
+    padding: 1rem 1.2rem;
   }
   .stat-card {
-    padding: 1rem;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 1.2rem 1rem; /* Aumenta o espaço dentro do card */
   }
 
   /* 2. CARROSSEL DE FERRAMENTAS */
-  .features-section {
-    width: 100%;
-    overflow: hidden;
+  .section-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
   }
 
   .features-grid {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    gap: 1rem;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-bottom: 1rem;
-    width: calc(100% + 2rem);
+    gap: 1.2rem; /* Mais espaço entre os cards azuis */
+    margin-left: -1.2rem;
+    margin-right: -1.2rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    padding-bottom: 1.5rem;
+    width: calc(100% + 2.4rem);
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1107,24 +1121,42 @@ button,
 
   .feature-card {
     flex: 0 0 85%;
-    max-width: 300px;
+    max-width: 320px;
     scroll-snap-align: center;
-    min-height: 220px;
-    padding: 1.5rem;
+    min-height: 200px;
+    padding: 1.8rem; /* Respiro interno generoso para o texto caber bem */
   }
   .features-grid::after {
     content: "";
     flex: 0 0 1px;
   }
 
-  /* 3. CHATBOT */
+  /* 3. CHATBOT COM RESPIRO DENTRO */
   .chatbot-card {
     height: 550px;
-    max-height: 80vh;
+    max-height: 75vh;
     min-height: unset;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 100%;
+    border-radius: 18px;
     box-sizing: border-box;
+  }
+  .chatbot-messages {
+    padding: 1.2rem;
+  }
+  .message-bubble {
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .chatbot-footer {
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  .chat-chips {
+    gap: 0.8rem;
+    padding-bottom: 0.5rem;
+  }
+  .chip {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
   }
 }
