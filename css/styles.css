@@ -1010,7 +1010,7 @@ button,
   box-shadow: 0 0 10px rgba(204, 255, 0, 0.2);
 }
 .plan-tag-mobile {
-  color: var(--accent-green);
+  color: var(--primary-blue);
   font-family: var(--font-body);
   font-size: 0.8rem;
   font-weight: 700;
