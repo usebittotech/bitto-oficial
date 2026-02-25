@@ -12,7 +12,7 @@ import {
 import { db } from "./firebase-init.js";
 import { checkMonthlyReset, calculateLevel } from "./xpSystem.js";
 
-// --- FUNÇÃO DE CORREÇÃO PARA MOBILE (ADICIONADA) ---
+// --- FUNÇÃO DE CORREÇÃO PARA MOBILE ---
 async function compressImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -22,13 +22,13 @@ async function compressImage(file) {
       img.src = event.target.result;
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 400; // Tamanho otimizado para avatar
+        const MAX_WIDTH = 400;
         const scaleSize = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scaleSize;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.7)); // Converte para JPEG leve
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
       };
       img.onerror = reject;
     };
@@ -88,7 +88,6 @@ function updateInterface(user, dbData) {
   const displayName = dbData.displayName || user.displayName || "Estudante";
   const firstName = displayName.split(" ")[0];
 
-  // --- ATUALIZAÇÃO DO PLANO (DINÂMICO) ---
   const planNav = document.getElementById("userPlanNav");
   const planMobile = document.getElementById("userPlanMobile");
   const userPlan = dbData.plan || "free";
@@ -110,7 +109,6 @@ function updateInterface(user, dbData) {
     planMobile.innerText = userPlan === "free" ? "Plano Gratuito" : "Plano Pro";
   }
 
-  // --- DADOS DO USUÁRIO ---
   document.getElementById("navUserName").innerText = firstName;
   document.getElementById("ddUserName").innerText = displayName;
   document.getElementById("userXP").innerText = currentXP;
@@ -271,6 +269,7 @@ if (avatarInput) {
   });
 }
 
+// FUNÇÃO CORRIGIDA PARA EVITAR ERRO DE URL MUITO LONGA NO AUTH
 function setupSettingsSave(user) {
   if (saveSettingsBtn) {
     const newBtn = saveSettingsBtn.cloneNode(true);
@@ -284,15 +283,21 @@ function setupSettingsSave(user) {
       const originalText = newBtn.innerText;
       newBtn.innerText = "Salvando...";
       newBtn.disabled = true;
+
       try {
         const updateData = { displayName: newName };
-        if (hasNewImage && previewSrc.startsWith("data:image"))
-          updateData.photoURL = previewSrc;
 
+        // Se houver nova imagem em Base64, salvamos apenas no Firestore
+        if (hasNewImage && previewSrc.startsWith("data:image")) {
+          updateData.photoURL = previewSrc;
+        }
+
+        // Atualizamos apenas o Nome no Firebase Auth
         await updateProfile(user, {
           displayName: newName,
-          photoURL: updateData.photoURL || user.photoURL,
         });
+
+        // O Firestore aceita o Base64 sem problemas de limite de URL
         await updateDoc(doc(db, "users", user.uid), updateData);
 
         showToast("Perfil atualizado!", "success");
@@ -343,7 +348,7 @@ document.addEventListener("click", () => {
 });
 
 // ==========================================
-// 5. VISUAIS (Tilt, Tema, Typewriter)
+// 5. VISUAIS E CHAT (Orestante do código mantido)
 // ==========================================
 const tiltElements = document.querySelectorAll(".tilt-element");
 document.addEventListener("mousemove", (e) => {
@@ -402,9 +407,7 @@ function typeWriter(text, i) {
     const target = document.getElementById("typewriterText");
     if (target) {
       target.innerHTML = text.substring(0, i + 1);
-      setTimeout(function () {
-        typeWriter(text, i + 1);
-      }, 30);
+      setTimeout(() => typeWriter(text, i + 1), 30);
     }
   }
 }
@@ -412,9 +415,6 @@ document.addEventListener("DOMContentLoaded", () => {
   typeWriter("Oi! Sou o Bitto. Vamos evoluir juntos?", 0);
 });
 
-// ==========================================
-// 6. CHATBOT IA
-// ==========================================
 window.sendChip = (text) => {
   if (chatInput) {
     chatInput.value = text;
@@ -425,14 +425,11 @@ window.sendChip = (text) => {
 async function handleSend() {
   const text = chatInput.value.trim();
   if (!text || sendBtn.disabled) return;
-
   sendBtn.disabled = true;
   chatInput.disabled = true;
   const originalBtnText = sendBtn.innerText;
-
   let timeLeft = 15;
   sendBtn.innerText = `⏳ ${timeLeft}`;
-
   const timer = setInterval(() => {
     timeLeft--;
     sendBtn.innerText = `⏳ ${timeLeft}`;
@@ -444,12 +441,10 @@ async function handleSend() {
       chatInput.focus();
     }
   }, 1000);
-
   addMessage(text, "user");
   chatHistory.push({ role: "user", parts: [{ text: text }] });
   chatInput.value = "";
   const loadingId = addLoadingMessage();
-
   try {
     const botText = await callGeminiChat(chatHistory.slice(-10));
     removeLoadingMessage(loadingId);
@@ -482,12 +477,10 @@ function addMessage(text, type) {
   const formattedText = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
   const messageDiv = document.createElement("div");
   messageDiv.className = `message message-${type}`;
-
   let contentHtml =
     type === "bot"
       ? `<div class="header-avatar" style="border:none; background: transparent; flex-shrink:0;"><div class="header-avatar" style="width:32px; height:32px;"><img src="../imagens/bittochat.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div></div><div class="message-bubble">${formattedText}<span class="message-time">${time}</span></div>`
       : `<div class="message-bubble">${formattedText}<span class="message-time">${time}</span></div>`;
-
   messageDiv.innerHTML = contentHtml;
   chatMessages.appendChild(messageDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -521,22 +514,14 @@ function showToast(message, type = "success") {
   let icon = type === "success" ? "✅" : type === "error" ? "❌" : "ℹ️";
   toast.innerHTML = `<span>${icon}</span> ${message}`;
   container.appendChild(toast);
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
-// ==========================================
-// 7. ATIVADORES DO BOTÃO E TECLA ENTER
-// ==========================================
-if (sendBtn) {
-  sendBtn.addEventListener("click", handleSend);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-if (chatInput) {
+if (sendBtn) sendBtn.addEventListener("click", handleSend);
+if (chatInput)
   chatInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Evita quebra de linha
+      e.preventDefault();
       handleSend();
     }
   });
-}
