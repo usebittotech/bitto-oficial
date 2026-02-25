@@ -138,7 +138,7 @@ if (generateBtn) {
                 Tema: "${topic}". Contexto: "${content}".
                 Crie um JSON array com ${quantity} flashcards.
                 Formato: [{"q": "Pergunta", "a": "Resposta"}]
-                Idioma: Português BR. JSON PURO.
+                Idioma: Português BR. a Resposta deve ser curta e pratica JSON PURO.
             `;
 
       const response = await fetch("../api/generate", {
