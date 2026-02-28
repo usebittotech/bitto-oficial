@@ -1,5 +1,4 @@
-// js/admin.js
-import { db, auth } from "./firebase-init.js";
+import { auth, db, onAuthStateChanged } from "./firebase-init.js"; // Importe do local correto
 import {
   collection,
   query,
@@ -9,51 +8,47 @@ import {
   updateDoc,
   Timestamp,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com"; // Altere para o seu e-mail
+const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com"; // Coloque o e-mail exato do seu login
 
-// Proteção simples: só carrega se for VOCÊ logado
+// O segredo está em observar o estado da autenticação
 onAuthStateChanged(auth, (user) => {
-  if (!user || user.email !== SEU_EMAIL_ADMIN) {
-    window.location.href = "index.html"; // Expulsa se não for o admin
+  if (user) {
+    // Se houver um utilizador, verificamos se é você
+    if (user.email === SEU_EMAIL_ADMIN) {
+      console.log("Acesso concedido ao Admin:", user.email);
+      // Opcional: mostrar o conteúdo da página que estava oculto
+      document.body.style.display = "block";
+    } else {
+      console.error("Tentativa de acesso não autorizada:", user.email);
+      window.location.href = "index.html";
+    }
+  } else {
+    // Se o Firebase confirmar que NÃO há ninguém logado, redireciona
+    console.log("Nenhum utilizador logado. Redirecionando...");
+    window.location.href = "index.html";
   }
 });
 
-document.getElementById("btnLiberar").addEventListener("click", async () => {
-  const email = document.getElementById("userEmail").value.trim();
-  const statusMsg = document.getElementById("statusMsg");
+// Lógica para liberar o influenciador (continua igual)
+async function liberarInfluenciador(emailInfluenciador) {
+  const q = query(
+    collection(db, "users"),
+    where("email", "==", emailInfluenciador),
+  );
+  const querySnapshot = await getDocs(q);
 
-  if (!email) return alert("Digite um e-mail");
-
-  try {
-    // 1. Busca o usuário pelo e-mail
-    const q = query(collection(db, "users"), where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      statusMsg.innerText = "Usuário não encontrado!";
-      return;
-    }
-
-    // 2. Calcula 90 dias a partir de hoje
-    const hoje = new Date();
-    const dataExpiracao = new Date();
-    dataExpiracao.setDate(hoje.getDate() + 90);
-
-    // 3. Atualiza o documento no Firestore
+  if (!querySnapshot.empty) {
     const userDoc = querySnapshot.docs[0];
     const userRef = doc(db, "users", userDoc.id);
 
+    const dataExpiracao = new Date();
+    dataExpiracao.setDate(dataExpiracao.getDate() + 90);
+
     await updateDoc(userRef, {
-      plan: "pro", // Ou "influencer"
+      plan: "pro",
       subscriptionEnd: Timestamp.fromDate(dataExpiracao),
     });
-
-    statusMsg.innerText = `Sucesso! Acesso liberado até ${dataExpiracao.toLocaleDateString()}`;
-    statusMsg.style.color = "green";
-  } catch (error) {
-    console.error(error);
-    statusMsg.innerText = "Erro ao atualizar.";
+    alert("Acesso liberado para " + emailInfluenciador);
   }
-});
+}
