@@ -4,7 +4,6 @@ import {
   onAuthStateChanged,
   doc,
   updateDoc,
-  serverTimestamp,
 } from "./firebase-init.js";
 import {
   collection,
@@ -14,71 +13,74 @@ import {
   Timestamp,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com"; // <--- COLOQUE SEU EMAIL AQUI
+// E-mail administrativo autorizado
+const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 
+// 1. Controle de Acesso à Página
 onAuthStateChanged(auth, (user) => {
-  if (user && user.email === SEU_EMAIL_ADMIN) {
-    document.body.style.display = "flex";
+  if (user && user.email.toLowerCase() === SEU_EMAIL_ADMIN.toLowerCase()) {
     console.log("Admin autenticado.");
+    document.body.style.display = "flex"; // Mostra o HTML
   } else {
-    window.location.href = "index.html";
+    console.warn("Acesso negado. Redirecionando...");
+    window.location.href = "index.html"; // Expulsa se não for admin
   }
 });
 
-document.getElementById("btnLiberar").addEventListener("click", async () => {
-  const emailInput = document
-    .getElementById("userEmail")
-    .value.trim()
-    .toLowerCase();
-  const statusMsg = document.getElementById("statusMsg");
-  const btn = document.getElementById("btnLiberar");
+// 2. Lógica de Upgrade do Plano
+const btnLiberar = document.getElementById("btnLiberar");
+const statusMsg = document.getElementById("statusMsg");
+const inputEmail = document.getElementById("userEmail");
 
-  if (!emailInput) {
-    statusMsg.innerText = "Por favor, digite um e-mail.";
-    statusMsg.className = "error-msg";
-    return;
-  }
+if (btnLiberar) {
+  btnLiberar.addEventListener("click", async () => {
+    const emailAlvo = inputEmail.value.trim().toLowerCase();
 
-  try {
-    btn.disabled = true;
-    btn.innerText = "PROCESSANDO...";
-    statusMsg.innerText = "Buscando usuário...";
-
-    // 1. Localiza o usuário pelo campo 'email' no Firestore
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", emailInput));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      statusMsg.innerText = "Usuário não encontrado no banco de dados.";
-      statusMsg.className = "error-msg";
-      btn.disabled = false;
-      btn.innerText = "ATIVAR 90 DIAS";
+    if (!emailAlvo) {
+      statusMsg.innerText = "Por favor, insira um e-mail.";
+      statusMsg.className = "error";
       return;
     }
 
-    // 2. Define a data de expiração (Hoje + 90 dias)
-    const dataExpiracao = new Date();
-    dataExpiracao.setDate(dataExpiracao.getDate() + 90);
+    try {
+      btnLiberar.disabled = true;
+      statusMsg.innerText = "Buscando usuário...";
+      statusMsg.className = "";
 
-    // 3. Atualiza o documento
-    const userDoc = querySnapshot.docs[0];
-    const userRef = doc(db, "users", userDoc.id);
+      // Busca o usuário na coleção 'users' pelo campo 'email'
+      const q = query(collection(db, "users"), where("email", "==", emailAlvo));
+      const querySnapshot = await getDocs(q);
 
-    await updateDoc(userRef, {
-      plan: "embaixador", // Nome do novo plano
-      subscriptionEnd: Timestamp.fromDate(dataExpiracao),
-      lastUpgrade: serverTimestamp(),
-    });
+      if (querySnapshot.empty) {
+        statusMsg.innerText = "Usuário não encontrado!";
+        statusMsg.className = "error";
+        btnLiberar.disabled = false;
+        return;
+      }
 
-    statusMsg.innerText = `Sucesso! Plano 'Embaixador' ativo até ${dataExpiracao.toLocaleDateString()}`;
-    statusMsg.className = "success-msg";
-    btn.style.background = "#00b884";
-    btn.innerText = "ATIVADO COM SUCESSO";
-  } catch (error) {
-    console.error("Erro ao atualizar:", error);
-    statusMsg.innerText = "Erro técnico. Verifique o console.";
-    statusMsg.className = "error-msg";
-    btn.disabled = false;
-  }
-});
+      // Define a validade para 90 dias a partir de agora
+      const dataExpiracao = new Date();
+      dataExpiracao.setDate(dataExpiracao.getDate() + 90);
+
+      // Pega o ID do documento encontrado
+      const userDoc = querySnapshot.docs[0];
+      const userRef = doc(db, "users", userDoc.id);
+
+      // Atualiza o plano e a data no Firestore
+      await updateDoc(userRef, {
+        plan: "embaixador",
+        subscriptionEnd: Timestamp.fromDate(dataExpiracao),
+      });
+
+      statusMsg.innerText = "Sucesso! Plano 'Embaixador' ativo por 90 dias.";
+      statusMsg.className = "success";
+      btnLiberar.innerText = "ATIVADO COM SUCESSO";
+      btnLiberar.style.background = "#00b884";
+    } catch (error) {
+      console.error("Erro ao atualizar:", error);
+      statusMsg.innerText = "Erro: " + error.message;
+      statusMsg.className = "error";
+      btnLiberar.disabled = false;
+    }
+  });
+}
