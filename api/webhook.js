@@ -1,52 +1,36 @@
-import admin from "firebase-admin";
-
-// Inicializa o Firebase apenas se não estiver inicializado
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY
-        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
-        : undefined,
-    }),
-  });
-}
-
-const db = admin.firestore();
-const auth = admin.auth();
+import { db } from "./js/firebase-init.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+  Timestamp,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
-
-  const payload = req.body;
-
-  // Detecção da estrutura de dados da Cakto (payload direto ou dentro de 'data')
-  const data = payload.data || payload;
-
-  const eventName = payload.event || data.event || "";
-  const status = data.status || data.state || "";
-
-  // Busca o email em todos os locais possíveis
-  const userEmail =
-    data.customer?.email || data.client?.email || data.payer?.email;
-  const userName = data.customer?.name || data.client?.name || "Estudante VIP";
-
-  console.log(
-    `WEBHOOK | Evento: [${eventName}] | Status: [${status}] | Email: [${userEmail}]`,
-  );
-
-  if (!userEmail) {
-    console.log("❌ Ignorado: Email não encontrado no payload.");
-    return res.json({ message: "Email missing" });
+  // A Cakto envia os dados via POST
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Método não permitido" });
   }
 
-  // --- LÓGICA DE SEGURANÇA ---
+  const body = req.body;
+
+  // Extração de dados conforme padrão da Cakto
+  const eventName = body.event; // pix_gerado, purchase_approved, etc.
+  const status = body.data?.status;
+  const email = body.data?.email?.toLowerCase();
+  const productName = body.data?.product_name || "";
+
+  console.log(`Evento recebido: ${eventName} | Usuário: ${email}`);
+
+  // --- LÓGICA DE SEGURANÇA E TESTE ---
   let isApproved = false;
 
-  // 1. APROVAÇÃO REAL: Apenas se estiver PAGO ou APROVADO
+  // Configurado para aprovar se o pagamento for confirmado OU se um PIX for gerado (TESTE)
   if (
     eventName === "purchase_approved" ||
+    eventName === "pix_gerado" || // <--- LINHA DE TESTE: Libera ao gerar o Pix
     status === "paid" ||
     status === "approved" ||
     eventName === "subscription_renewed"
@@ -54,104 +38,60 @@ export default async function handler(req, res) {
     isApproved = true;
   }
 
-  // Adicionado 'pix_gerado' para fins de teste de liberação
-  if (
-    eventName === "purchase_approved" ||
-    eventName === "pix_gerado" || // <--- Condição de teste
-    status === "paid" ||
-    status === "approved" ||
-    eventName === "subscription_renewed"
-  ) {
-    isApproved = true;
-  }
-
-  // 2. REVOGAÇÃO: Se for reembolso ou cancelamento, removemos o acesso
-  else if (
-    ["refund", "chargeback", "purchase_refused"].includes(eventName) ||
-    status === "refunded" ||
-    status === "refused"
-  ) {
-    console.log(`⛔ REVOGANDO ACESSO de ${userEmail}`);
-    try {
-      const userRecord = await auth.getUserByEmail(userEmail);
-      await db.collection("users").doc(userRecord.uid).set(
-        {
-          plan: "free",
-          subscriptionEnd: null,
-          lastStatus: eventName,
-        },
-        { merge: true },
-      );
-      return res.json({ success: true, action: "revoked" });
-    } catch (e) {
-      return res.json({ message: "Usuário não encontrado para revogar." });
-    }
-  }
-
-  // Se não for aprovado (ex: pix_gerado, waiting_payment), o código para aqui.
   if (!isApproved) {
-    console.log(`⏳ Evento [${eventName}] recebido, mas aguardando pagamento.`);
-    return res.json({ message: "Aguardando pagamento." });
+    return res.status(200).json({ message: "Evento ignorado (não aprovado)" });
+  }
+
+  if (!email) {
+    return res.status(400).json({ message: "Email não encontrado no payload" });
   }
 
   try {
-    // --- LÓGICA DE PRODUTO (Mensal vs Trimestral) ---
-    const productName = data.product?.name || data.offer?.name || "";
-    console.log(`💰 Pagamento Confirmado! Produto: ${productName}`);
-
-    let monthsToAdd = 1;
+    // Define o tipo de plano e duração com base no produto
     let planType = "monthly";
+    let daysToAdd = 30;
 
     if (productName.toLowerCase().includes("trimestral")) {
-      monthsToAdd = 3;
       planType = "quarterly";
+      daysToAdd = 90;
     }
 
-    const now = new Date();
-    const endDate = new Date();
-    endDate.setMonth(now.getMonth() + monthsToAdd);
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + daysToAdd);
 
-    // --- FIRESTORE & AUTH ---
-    let userRecord;
-    let isNewUser = false;
+    // Referência do usuário no Firestore
+    // Buscamos pelo e-mail ou UID. No webhook, o ideal é usar o email como identificador.
+    // Nota: Esta lógica assume que o UID no Firebase é o próprio email ou que você fará uma busca.
+    // Para simplificar, usaremos o email como ID do documento se for uma nova conta.
+    const userRef = doc(db, "users", email);
+    const userSnap = await getDoc(userRef);
 
-    try {
-      userRecord = await auth.getUserByEmail(userEmail);
-    } catch (error) {
-      if (error.code === "auth/user-not-found") {
-        userRecord = await auth.createUser({
-          email: userEmail,
-          emailVerified: true,
-          displayName: userName,
-        });
-        isNewUser = true;
-      } else throw error;
+    if (userSnap.exists()) {
+      // Se o usuário já existe, apenas faz o upgrade do plano
+      await updateDoc(userRef, {
+        plan: planType,
+        subscriptionEnd: Timestamp.fromDate(expirationDate),
+        updatedAt: serverTimestamp(),
+      });
+      console.log(`Plano atualizado para ${email} até ${expirationDate}`);
+    } else {
+      // Se o usuário não existe, cria a conta Pro direto
+      await setDoc(userRef, {
+        email: email,
+        plan: planType,
+        subscriptionEnd: Timestamp.fromDate(expirationDate),
+        usage: { flashcards: 0, quiz: 0, review: 0 },
+        lastReset: serverTimestamp(),
+        createdAt: serverTimestamp(),
+      });
+      console.log(`Nova conta Pro criada para ${email}`);
     }
 
-    await db
-      .collection("users")
-      .doc(userRecord.uid)
-      .set(
-        {
-          name: userName,
-          email: userEmail,
-          plan: planType,
-          subscriptionEnd: admin.firestore.Timestamp.fromDate(endDate),
-          lastPaymentId: data.id || `webhook_${Date.now()}`,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          ...(isNewUser && {
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            usage: { flashcards: 0, quiz: 0, review: 0 },
-            xp: 0,
-          }),
-        },
-        { merge: true },
-      );
-
-    console.log(`✅ SUCESSO: ${userEmail} ativado.`);
-    return res.json({ success: true });
+    return res
+      .status(200)
+      .json({ success: true, message: "Acesso liberado com sucesso" });
   } catch (error) {
-    console.error("ERRO CRÍTICO:", error);
+    console.error("Erro no processamento do webhook:", error);
     return res.status(500).json({ error: error.message });
   }
 }
