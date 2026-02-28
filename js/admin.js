@@ -14,7 +14,7 @@ import {
   Timestamp,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const SEU_EMAIL_ADMIN = "seu-email@exemplo.com"; // <--- COLOQUE SEU EMAIL AQUI
+const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com"; // <--- COLOQUE SEU EMAIL AQUI
 
 onAuthStateChanged(auth, (user) => {
   if (user && user.email === SEU_EMAIL_ADMIN) {
