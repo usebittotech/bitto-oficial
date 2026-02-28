@@ -9,28 +9,30 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 export default async function handler(req, res) {
-  // A Cakto envia os dados via POST
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Método não permitido" });
   }
 
   const body = req.body;
 
-  // Extração de dados conforme padrão da Cakto
-  const eventName = body.event; // pix_gerado, purchase_approved, etc.
-  const status = body.data?.status;
-  const email = body.data?.email?.toLowerCase();
-  const productName = body.data?.product_name || "";
+  // Na Cakto, os dados costumam vir dentro de body.data
+  const data = body.data || body;
+  const eventName = body.event || data.event;
+  const status = data.status;
 
-  console.log(`Evento recebido: ${eventName} | Usuário: ${email}`);
+  // Busca o e-mail em diferentes locais possíveis do payload da Cakto
+  const email = (data.email || data.customer?.email || data.client?.email)
+    ?.toLowerCase()
+    .trim();
+  const productName = data.product_name || "";
 
-  // --- LÓGICA DE SEGURANÇA E TESTE ---
+  console.log(`Evento: ${eventName} | Status: ${status} | Usuário: ${email}`);
+
+  // --- LÓGICA DE APROVAÇÃO (INCLUINDO PIX PARA TESTE) ---
   let isApproved = false;
-
-  // Configurado para aprovar se o pagamento for confirmado OU se um PIX for gerado (TESTE)
   if (
     eventName === "purchase_approved" ||
-    eventName === "pix_gerado" || // <--- LINHA DE TESTE: Libera ao gerar o Pix
+    eventName === "pix_gerado" || // <--- REMOVER APÓS OS TESTES
     status === "paid" ||
     status === "approved" ||
     eventName === "subscription_renewed"
@@ -39,15 +41,19 @@ export default async function handler(req, res) {
   }
 
   if (!isApproved) {
-    return res.status(200).json({ message: "Evento ignorado (não aprovado)" });
+    return res
+      .status(200)
+      .json({ message: "Evento recebido, mas não processado (não aprovado)" });
   }
 
   if (!email) {
-    return res.status(400).json({ message: "Email não encontrado no payload" });
+    return res
+      .status(400)
+      .json({ message: "E-mail não identificado no payload" });
   }
 
   try {
-    // Define o tipo de plano e duração com base no produto
+    // Define a validade (30 ou 90 dias)
     let planType = "monthly";
     let daysToAdd = 30;
 
@@ -59,39 +65,36 @@ export default async function handler(req, res) {
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + daysToAdd);
 
-    // Referência do usuário no Firestore
-    // Buscamos pelo e-mail ou UID. No webhook, o ideal é usar o email como identificador.
-    // Nota: Esta lógica assume que o UID no Firebase é o próprio email ou que você fará uma busca.
-    // Para simplificar, usaremos o email como ID do documento se for uma nova conta.
+    // --- AÇÃO NO BANCO DE DADOS ---
+    // Usamos o EMAIL como ID do documento para facilitar a localização pelo Webhook
     const userRef = doc(db, "users", email);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
-      // Se o usuário já existe, apenas faz o upgrade do plano
+      // CASO 1: O e-mail já existe (muda de Free para Pago)
       await updateDoc(userRef, {
         plan: planType,
         subscriptionEnd: Timestamp.fromDate(expirationDate),
         updatedAt: serverTimestamp(),
       });
-      console.log(`Plano atualizado para ${email} até ${expirationDate}`);
+      console.log(`Upgrade concluído: ${email} agora é ${planType}`);
     } else {
-      // Se o usuário não existe, cria a conta Pro direto
+      // CASO 2: O e-mail NÃO existe (Cria a conta do zero já como Pago)
       await setDoc(userRef, {
         email: email,
+        name: data.customer?.name || "Estudante Bitto",
         plan: planType,
         subscriptionEnd: Timestamp.fromDate(expirationDate),
         usage: { flashcards: 0, quiz: 0, review: 0 },
         lastReset: serverTimestamp(),
         createdAt: serverTimestamp(),
       });
-      console.log(`Nova conta Pro criada para ${email}`);
+      console.log(`Nova conta criada via Webhook: ${email}`);
     }
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Acesso liberado com sucesso" });
+    return res.status(200).json({ success: true, message: "Acesso liberado" });
   } catch (error) {
-    console.error("Erro no processamento do webhook:", error);
+    console.error("Erro no processamento:", error);
     return res.status(500).json({ error: error.message });
   }
 }
