@@ -15,7 +15,6 @@ export async function syncUserDatabase(user) {
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
 
-  // Só cria o plano Free se o usuário NÃO existir.
   if (!userSnap.exists()) {
     await setDoc(userRef, {
       email: user.email,
@@ -46,18 +45,15 @@ export async function checkUsageLimit(userId, tool) {
   const userData = userSnap.data();
   const now = new Date();
 
-  // --- 1. LOGICA DE PLANOS PAGOS / EMBAIXADOR ---
-  // Se não for 'free' e tiver data de fim definida (Ex: plano 'embaixador')
+  // --- 1. VERIFICAÇÃO DE PLANO PAGO (PRO ou EMBAIXADOR) ---
   if (userData.plan !== "free" && userData.subscriptionEnd) {
     const endDate = userData.subscriptionEnd.toDate();
-
-    // Se a data de hoje for anterior ao vencimento, LIBERA TUDO
     if (now < endDate) {
-      return true;
+      return true; // LIBERADO TOTAL
     }
   }
 
-  // --- 2. REGRAS DO PLANO FREE (Reseta mensalmente ou barra no 3º uso) ---
+  // --- 2. REGRAS DO PLANO FREE ---
   const lastReset = userData.lastReset
     ? userData.lastReset.toDate()
     : new Date(0);
@@ -76,33 +72,29 @@ export async function checkUsageLimit(userId, tool) {
   }
 
   const currentUsage = userData.usage?.[tool] || 0;
-
-  if (currentUsage < 3) {
-    return true;
-  } else {
-    return false;
-  }
+  return currentUsage < 3;
 }
 
 /**
- * Registra o uso de uma ferramenta
+ * Incrementa o uso (APENAS se for usuário FREE)
  */
-export async function recordToolUsage(userId, tool) {
+export async function incrementUsage(userId, tool) {
   if (!userId) return;
 
   const userRef = doc(db, "users", userId);
   const userSnap = await getDoc(userRef);
   const userData = userSnap.data();
 
-  // Se o plano for vitalício/embaixador ativo, não incrementa o contador de uso
+  // REGRA IMPORTANTE: Se o plano for ativo (não free), não gasta o limite de 3 usos
   if (userData.plan !== "free" && userData.subscriptionEnd) {
-    if (new Date() < userData.subscriptionEnd.toDate()) {
-      return;
+    const endDate = userData.subscriptionEnd.toDate();
+    if (new Date() < endDate) {
+      return; // Sai da função sem incrementar o contador
     }
   }
 
-  const field = `usage.${tool}`;
+  // Se for Free, incrementa normal
   await updateDoc(userRef, {
-    [field]: increment(1),
+    [`usage.${tool}`]: increment(1),
   });
 }
