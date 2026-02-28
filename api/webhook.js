@@ -1,100 +1,126 @@
-import { db } from "./js/firebase-init.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  Timestamp,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import admin from 'firebase-admin';
+
+// Inicializa o Firebase apenas se não estiver inicializado
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY 
+                ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') 
+                : undefined,
+        }),
+    });
+}
+
+const db = admin.firestore();
+const auth = admin.auth();
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Método não permitido" });
-  }
+    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-  const body = req.body;
+    const payload = req.body;
+    
+    // Detecção da estrutura de dados da Cakto (payload direto ou dentro de 'data')
+    const data = payload.data || payload;
 
-  // Na Cakto, os dados costumam vir dentro de body.data
-  const data = body.data || body;
-  const eventName = body.event || data.event;
-  const status = data.status;
+    const eventName = payload.event || data.event || ""; 
+    const status = data.status || data.state || "";
 
-  // Busca o e-mail em diferentes locais possíveis do payload da Cakto
-  const email = (data.email || data.customer?.email || data.client?.email)
-    ?.toLowerCase()
-    .trim();
-  const productName = data.product_name || "";
+    // Busca o email em todos os locais possíveis
+    const userEmail = data.customer?.email || data.client?.email || data.payer?.email;
+    const userName = data.customer?.name || data.client?.name || "Estudante VIP";
 
-  console.log(`Evento: ${eventName} | Status: ${status} | Usuário: ${email}`);
+    console.log(`WEBHOOK | Evento: [${eventName}] | Status: [${status}] | Email: [${userEmail}]`);
 
-  // --- LÓGICA DE APROVAÇÃO (INCLUINDO PIX PARA TESTE) ---
-  let isApproved = false;
-  if (
-    eventName === "purchase_approved" ||
-    eventName === "pix_gerado" || // <--- REMOVER APÓS OS TESTES
-    status === "paid" ||
-    status === "approved" ||
-    eventName === "subscription_renewed"
-  ) {
-    isApproved = true;
-  }
-
-  if (!isApproved) {
-    return res
-      .status(200)
-      .json({ message: "Evento recebido, mas não processado (não aprovado)" });
-  }
-
-  if (!email) {
-    return res
-      .status(400)
-      .json({ message: "E-mail não identificado no payload" });
-  }
-
-  try {
-    // Define a validade (30 ou 90 dias)
-    let planType = "monthly";
-    let daysToAdd = 30;
-
-    if (productName.toLowerCase().includes("trimestral")) {
-      planType = "quarterly";
-      daysToAdd = 90;
+    if (!userEmail) {
+        console.log("❌ Ignorado: Email não encontrado no payload.");
+        return res.json({ message: "Email missing" });
     }
 
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + daysToAdd);
+    // --- LÓGICA DE SEGURANÇA ---
+    let isApproved = false;
 
-    // --- AÇÃO NO BANCO DE DADOS ---
-    // Usamos o EMAIL como ID do documento para facilitar a localização pelo Webhook
-    const userRef = doc(db, "users", email);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-      // CASO 1: O e-mail já existe (muda de Free para Pago)
-      await updateDoc(userRef, {
-        plan: planType,
-        subscriptionEnd: Timestamp.fromDate(expirationDate),
-        updatedAt: serverTimestamp(),
-      });
-      console.log(`Upgrade concluído: ${email} agora é ${planType}`);
-    } else {
-      // CASO 2: O e-mail NÃO existe (Cria a conta do zero já como Pago)
-      await setDoc(userRef, {
-        email: email,
-        name: data.customer?.name || "Estudante Bitto",
-        plan: planType,
-        subscriptionEnd: Timestamp.fromDate(expirationDate),
-        usage: { flashcards: 0, quiz: 0, review: 0 },
-        lastReset: serverTimestamp(),
-        createdAt: serverTimestamp(),
-      });
-      console.log(`Nova conta criada via Webhook: ${email}`);
+    // 1. APROVAÇÃO REAL: Apenas se estiver PAGO ou APROVADO
+    if (eventName === 'purchase_approved' || status === 'paid' || status === 'approved' || eventName === 'subscription_renewed') {
+        isApproved = true;
+    } 
+    
+    // 2. REVOGAÇÃO: Se for reembolso ou cancelamento, removemos o acesso
+    else if (['refund', 'chargeback', 'purchase_refused'].includes(eventName) || status === 'refunded' || status === 'refused') {
+        console.log(`⛔ REVOGANDO ACESSO de ${userEmail}`);
+        try {
+            const userRecord = await auth.getUserByEmail(userEmail);
+            await db.collection('users').doc(userRecord.uid).set({
+                plan: 'free',
+                subscriptionEnd: null,
+                lastStatus: eventName
+            }, { merge: true });
+            return res.json({ success: true, action: 'revoked' });
+        } catch (e) {
+            return res.json({ message: "Usuário não encontrado para revogar." });
+        }
     }
 
-    return res.status(200).json({ success: true, message: "Acesso liberado" });
-  } catch (error) {
-    console.error("Erro no processamento:", error);
-    return res.status(500).json({ error: error.message });
-  }
+    // Se não for aprovado (ex: pix_gerado, waiting_payment), o código para aqui.
+    if (!isApproved) {
+        console.log(`⏳ Evento [${eventName}] recebido, mas aguardando pagamento.`);
+        return res.json({ message: "Aguardando pagamento." });
+    }
+
+    try {
+        // --- LÓGICA DE PRODUTO (Mensal vs Trimestral) ---
+        const productName = data.product?.name || data.offer?.name || "";
+        console.log(`💰 Pagamento Confirmado! Produto: ${productName}`);
+        
+        let monthsToAdd = 1;
+        let planType = 'monthly';
+
+        if (productName.toLowerCase().includes('trimestral')) {
+            monthsToAdd = 3;
+            planType = 'quarterly';
+        }
+
+        const now = new Date();
+        const endDate = new Date();
+        endDate.setMonth(now.getMonth() + monthsToAdd);
+
+        // --- FIRESTORE & AUTH ---
+        let userRecord;
+        let isNewUser = false;
+
+        try {
+            userRecord = await auth.getUserByEmail(userEmail);
+        } catch (error) {
+            if (error.code === 'auth/user-not-found') {
+                userRecord = await auth.createUser({
+                    email: userEmail,
+                    emailVerified: true,
+                    displayName: userName
+                });
+                isNewUser = true;
+            } else throw error;
+        }
+
+        await db.collection('users').doc(userRecord.uid).set({
+            name: userName,
+            email: userEmail,
+            plan: planType,
+            subscriptionEnd: admin.firestore.Timestamp.fromDate(endDate),
+            lastPaymentId: data.id || `webhook_${Date.now()}`,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            ...(isNewUser && { 
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                usage: { flashcards: 0, quiz: 0, review: 0 },
+                xp: 0
+            })
+        }, { merge: true });
+
+        console.log(`✅ SUCESSO: ${userEmail} ativado.`);
+        return res.json({ success: true });
+
+    } catch (error) {
+        console.error("ERRO CRÍTICO:", error);
+        return res.status(500).json({ error: error.message });
+    }
 }
