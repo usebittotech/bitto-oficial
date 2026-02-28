@@ -11,7 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const SEU_EMAIL_ADMIN = "seu-email@exemplo.com"; // Altere para o seu e-mail
+const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com"; // Altere para o seu e-mail
 
 // Proteção simples: só carrega se for VOCÊ logado
 onAuthStateChanged(auth, (user) => {
