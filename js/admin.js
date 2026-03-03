@@ -11,12 +11,20 @@ import {
   where,
   getDocs,
   Timestamp,
-  addDoc,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 const URL_SHEETS =
   "https://script.google.com/macros/s/AKfycbxBFmhAhBOKqPHXEqT9lfWE9rbmYKgyb3gEoUmdxdiG9s_HyIIT8g-mjLC0NSglE7Q/exec";
+
+// --- FEEDBACK VISUAL ---
+function showToast(msg, color = "#111") {
+  const toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.style.background = color;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
 
 // --- CONTROLE DE ACESSO ---
 onAuthStateChanged(auth, (user) => {
@@ -28,86 +36,59 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// --- LÓGICA DE ATIVAÇÃO MANUAL (RESTAURADA) ---
-const btnLiberar = document.getElementById("btnLiberar");
-const statusMsg = document.getElementById("statusMsg");
-const inputEmail = document.getElementById("userEmail");
+// --- ATIVAÇÃO MANUAL FIREBASE (O QUE JÁ FUNCIONAVA) ---
+document.getElementById("btnLiberar")?.addEventListener("click", async () => {
+  const email = document.getElementById("userEmail").value.trim().toLowerCase();
+  const btn = document.getElementById("btnLiberar");
 
-btnLiberar?.addEventListener("click", async () => {
-  const emailAlvo = inputEmail.value.trim().toLowerCase();
-  if (!emailAlvo) return;
+  if (!email) return showToast("Digite um e-mail!", "orange");
 
   try {
-    btnLiberar.innerText = "PROCESSANDO...";
-    btnLiberar.disabled = true;
+    btn.innerText = "ATIVANDO...";
+    btn.disabled = true;
 
-    const q = query(collection(db, "users"), where("email", "==", emailAlvo));
-    const querySnapshot = await getDocs(q);
+    const q = query(collection(db, "users"), where("email", "==", email));
+    const snap = await getDocs(q);
 
-    if (querySnapshot.empty) {
-      statusMsg.innerText = "❌ Usuário não encontrado no Firebase.";
-      statusMsg.style.color = "red";
-      btnLiberar.disabled = false;
-      btnLiberar.innerText = "LIBERAR 90 DIAS";
-      return;
-    }
+    if (snap.empty) throw new Error("Usuário não cadastrado no app.");
 
-    const dataExpiracao = new Date();
-    dataExpiracao.setDate(dataExpiracao.getDate() + 90);
-    const userRef = doc(db, "users", querySnapshot.docs[0].id);
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 90);
 
-    await updateDoc(userRef, {
+    await updateDoc(doc(db, "users", snap.docs[0].id), {
       plan: "embaixador",
-      subscriptionEnd: Timestamp.fromDate(dataExpiracao),
+      subscriptionEnd: Timestamp.fromDate(exp),
     });
 
-    statusMsg.innerText = "✅ Ativado com sucesso!";
-    statusMsg.style.color = "green";
-    inputEmail.value = "";
-    btnLiberar.disabled = false;
-    btnLiberar.innerText = "LIBERAR 90 DIAS";
+    showToast("🚀 Plano Ativado com Sucesso!", "#00b884");
+    document.getElementById("userEmail").value = "";
   } catch (e) {
-    console.error(e);
-    statusMsg.innerText = "Erro ao ativar.";
-    btnLiberar.disabled = false;
+    showToast(e.message, "#ff4b4b");
+  } finally {
+    btn.innerText = "LIBERAR 90 DIAS";
+    btn.disabled = false;
   }
 });
 
-// --- CRM / GOOGLE SHEETS ---
+// --- GESTÃO GOOGLE SHEETS ---
 
-// 1. Cadastrar Novo
-document.getElementById("btnSalvarInf")?.addEventListener("click", async () => {
-  const btn = document.getElementById("btnSalvarInf");
-  const dados = {
-    action: "add",
-    nome: document.getElementById("infNome").value,
-    insta: document.getElementById("infInsta").value,
-    nicho: document.getElementById("infNicho").value,
-    status: document.getElementById("infStatus").value,
-  };
-
-  if (!dados.nome || !dados.insta) return alert("Preencha o básico!");
-
-  btn.innerText = "SALVANDO...";
-  await fetch(URL_SHEETS, { method: "POST", body: JSON.stringify(dados) });
-  btn.innerText = "CADASTRAR NA PLANILHA";
-  carregarDadosSheets();
-});
-
-// 2. Atualizar Dados (Interação, Status, Links)
 window.updateSheets = async (insta, tipo, valor, extra = {}) => {
-  await fetch(URL_SHEETS, {
-    method: "POST",
-    body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
-  });
-  carregarDadosSheets();
+  try {
+    await fetch(URL_SHEETS, {
+      method: "POST",
+      body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
+    });
+    showToast("Planilha atualizada!");
+    carregarDadosSheets();
+  } catch (e) {
+    showToast("Erro ao salvar", "red");
+  }
 };
 
-// 3. Renderizar Tabela
 async function carregarDadosSheets() {
   const lista = document.getElementById("listaInfluencers");
   lista.innerHTML =
-    "<tr><td colspan='6' style='text-align:center'>Carregando planilha...</td></tr>";
+    "<tr><td colspan='6' class='loading-shimmer' style='height:150px'></td></tr>";
 
   try {
     const res = await fetch(URL_SHEETS);
@@ -126,42 +107,62 @@ async function carregarDadosSheets() {
         cupom,
         ativado,
       ] = inf;
+      const perc = (Math.min(interacoes, 3) / 3) * 100;
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
-            <td>
-                <div class="row-insta">${nome}</div>
-                <div class="row-nicho">${insta} | ${nicho}</div>
-            </td>
-            <td>
-                <select class="status-select" onchange="updateSheets('${insta}', 'status', this.value)">
-                    <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
-                    <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
-                    <option ${status === "Negociação" ? "selected" : ""}>Negociação</option>
-                    <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
-                </select>
-            </td>
-            <td>
-                <button class="btn-fire" onclick="updateSheets('${insta}', 'interacao', ${Number(interacoes) + 1})">
-                    ${interacoes}/3 🔥
-                </button>
-            </td>
-            <td>
-                <input type="text" class="input-table" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', '', {link: this.value, cupom: '${cupom}'})">
-                <input type="text" class="input-table" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', '', {link: '${link}', cupom: this.value})">
-            </td>
-            <td style="text-align:center; font-weight:bold; color:${ativado === "Sim" ? "green" : "#ccc"}">
-                ${ativado === "Sim" ? "✅ SIM" : "PENDENTE"}
-            </td>
-            <td>
-                <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="width:auto; padding:5px 15px; background:#eee; color:#333; font-size:10px;">DM</button>
-            </td>
-        `;
+                <td>
+                    <b>${nome}</b><br>
+                    <small>${insta}</small> 
+                    <span class="copy-badge" onclick="copyToAtivador('${nome}')">copiar e-mail</span>
+                </td>
+                <td>
+                    <select class="status-select" onchange="updateSheets('${insta}', 'status', this.value)">
+                        <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
+                        <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
+                        <option ${status === "Negociação" ? "selected" : ""}>Negociação</option>
+                        <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn-fire" onclick="updateSheets('${insta}', 'interacao', ${Number(interacoes) + 1})">
+                        ${interacoes}/3 🔥
+                    </button>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${perc}%"></div></div>
+                </td>
+                <td>
+                    <input type="text" class="input-table" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', this.value, {campo: 'link', cupom: '${cupom}'})">
+                    <input type="text" class="input-table" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', this.value, {campo: 'cupom', link: '${link}'})">
+                </td>
+                <td style="text-align:center; font-weight:bold; color:${ativado === "Sim" ? "#00b884" : "#ccc"}">
+                    ${ativado === "Sim" ? "✅ ATIVO" : "PENDENTE"}
+                </td>
+                <td>
+                   <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="padding:8px; border-radius:10px; border:1px solid #ddd; background:white; cursor:pointer">📸</button>
+                </td>
+            `;
       lista.appendChild(tr);
     });
   } catch (e) {
-    lista.innerHTML = "Erro ao carregar dados.";
+    lista.innerHTML = "Erro ao conectar com a planilha.";
   }
 }
 
+window.copyToAtivador = (email) => {
+  document.getElementById("userEmail").value = email;
+  showToast("E-mail pronto para ativação!", "#0035ff");
+};
+
+document.getElementById("btnSalvarInf").onclick = async () => {
+  const dados = {
+    action: "add",
+    nome: document.getElementById("infNome").value,
+    insta: document.getElementById("infInsta").value,
+    nicho: "Geral",
+    status: document.getElementById("infStatus").value,
+  };
+  await fetch(URL_SHEETS, { method: "POST", body: JSON.stringify(dados) });
+  carregarDadosSheets();
+};
+
 document.getElementById("btnSync").onclick = carregarDadosSheets;
-window.updateSheets = updateSheets;
