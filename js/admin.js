@@ -14,7 +14,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
-const URL_SHEETS = "SUA_URL_DO_APPS_SCRIPT_AQUI"; // COLOQUE SEU URL AQUI
+const URL_SHEETS =
+  "https://script.google.com/macros/s/AKfycbykeG4jjW0RK9PFQi4aU5ndO1TzQPg-CWMIR6DYFfyWyn3jTCQ-I7HbCm5O-i3w-Bhd/exec"; // COLOQUE SEU URL AQUI
 
 function showToast(msg, color = "#111") {
   const toast = document.getElementById("toast");
