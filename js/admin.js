@@ -1,7 +1,3 @@
-// Substitua pelo URL que você copiou do Google Apps Script
-const URL_SHEETS =
-  "https://script.google.com/macros/s/AKfycbwk3--wAmDEHTp8fRq9tc74y37lw3IrcxEOBRDDYfJtpHyyVrlI4Vm5q2GbG-zmHAoo/exec";
-
 import {
   auth,
   db,
@@ -18,8 +14,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
+const URL_SHEETS =
+  "https://script.google.com/macros/s/AKfycbxBFmhAhBOKqPHXEqT9lfWE9rbmYKgyb3gEoUmdxdiG9s_HyIIT8g-mjLC0NSglE7Q/exec";
 
-// 1. Controle de Acesso (Original)
 onAuthStateChanged(auth, (user) => {
   if (user && user.email.toLowerCase() === SEU_EMAIL_ADMIN.toLowerCase()) {
     document.body.style.display = "flex";
@@ -29,66 +26,75 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// 2. Ativação de Plano (Sua Lógica Original Mantida)
-const btnLiberar = document.getElementById("btnLiberar");
-btnLiberar?.addEventListener("click", async () => {
-  // ... sua lógica de updateDoc no Firebase aqui (conforme arquivo original) ...
-});
+// FUNÇÃO PARA ATUALIZAR O SHEETS
+async function updateSheets(insta, tipo, valor, extra = {}) {
+  await fetch(URL_SHEETS, {
+    method: "POST",
+    body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
+  });
+  carregarDadosSheets();
+}
 
-// 3. CRM via Google Sheets
-const btnSalvarInf = document.getElementById("btnSalvarInf");
-
-btnSalvarInf?.addEventListener("click", async () => {
-  const dados = {
-    nome: document.getElementById("infNome").value,
-    insta: document.getElementById("infInsta").value,
-    nicho: document.getElementById("infNicho").value,
-    status: document.getElementById("infStatus").value,
-  };
-
-  if (!dados.nome || !dados.insta) return alert("Preencha os campos!");
-
-  btnSalvarInf.innerText = "SALVANDO...";
-
+// LOGICA DE ATIVAÇÃO FIREBASE + CHECK NO SHEETS
+window.ativarPlano = async (email, insta) => {
+  if (!email) return alert("E-mail não encontrado para este influencer.");
   try {
-    await fetch(URL_SHEETS, {
-      method: "POST",
-      body: JSON.stringify(dados),
-    });
-    alert("Enviado para a Planilha!");
-    carregarDadosSheets(); // Atualiza a tabela
-  } catch (e) {
-    console.error("Erro ao salvar no Sheets:", e);
-  } finally {
-    btnSalvarInf.innerText = "SALVAR NA PLANILHA";
-  }
-});
+    const q = query(collection(db, "users"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
 
+    if (querySnapshot.empty) return alert("Usuário não cadastrado no Bitto!");
+
+    const dataExpiracao = new Date();
+    dataExpiracao.setDate(dataExpiracao.getDate() + 90);
+
+    await updateDoc(doc(db, "users", querySnapshot.docs[0].id), {
+      plan: "embaixador",
+      subscriptionEnd: Timestamp.fromDate(dataExpiracao),
+    });
+
+    // Marca como Ativado na Planilha
+    await updateSheets(insta, "ativado", "Sim");
+    alert("Plano Ativado e Planilha Atualizada!");
+  } catch (e) {
+    alert("Erro: " + e.message);
+  }
+};
+
+// RENDERIZAR TABELA
 async function carregarDadosSheets() {
   const lista = document.getElementById("listaInfluencers");
-  lista.innerHTML =
-    "<tr><td colspan='6'>Carregando dados da planilha...</td></tr>";
+  const res = await fetch(URL_SHEETS);
+  const influencers = await res.json();
 
-  try {
-    const res = await fetch(URL_SHEETS);
-    const influencers = await res.json();
-
-    lista.innerHTML = "";
-    influencers.forEach((inf) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-                <td><b>${inf[0]}</b><br><small>${inf[1]}</small></td>
-                <td>${inf[2]}</td>
-                <td><span class="badge">${inf[3]}</span></td>
-                <td>${inf[4]}/3 🔥</td>
-                <td>${inf[6] || "Sem link"}</td>
-                <td>
-                    <button onclick="window.open('https://instagram.com/${inf[1].replace("@", "")}')" style="padding:5px; width:auto;">DM</button>
-                </td>
-            `;
-      lista.appendChild(tr);
-    });
-  } catch (e) {
-    lista.innerHTML = "Erro ao carregar dados.";
-  }
+  lista.innerHTML = "";
+  influencers.forEach((inf) => {
+    const [nome, insta, nicho, status, interacoes, data, link, cupom, ativado] =
+      inf;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+            <td><b>${nome}</b><br><small>${insta}</small></td>
+            <td>
+                <select onchange="updateSheets('${insta}', 'status', this.value)">
+                    <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
+                    <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
+                    <option ${status === "Negociação" ? "selected" : ""}>Negociação</option>
+                    <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
+                </select>
+            </td>
+            <td>
+                <button onclick="updateSheets('${insta}', 'interacao', ${Number(interacoes) + 1})">
+                    ${interacoes}/3 🔥
+                </button>
+            </td>
+            <td>
+                <input type="text" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', '', {link: this.value, cupom: '${cupom}'})"><br>
+                <input type="text" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', '', {link: '${link}', cupom: this.value})">
+            </td>
+            <td>${ativado === "Sim" ? "✅ Ativo" : `<button onclick="ativarPlano('${nome}', '${insta}')">Ativar 90d</button>`}</td>
+        `;
+    lista.appendChild(tr);
+  });
 }
+
+// Expondo funções para o HTML
+window.updateSheets = updateSheets;
