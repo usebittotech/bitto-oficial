@@ -17,7 +17,24 @@ const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 const URL_SHEETS =
   "https://script.google.com/macros/s/AKfycbykeG4jjW0RK9PFQi4aU5ndO1TzQPg-CWMIR6DYFfyWyn3jTCQ-I7HbCm5O-i3w-Bhd/exec";
 
-function showToast(msg, color = "#1A1D21") {
+// --- GESTÃO DE TEMA ---
+const themeBtn = document.getElementById("themeBtn");
+const body = document.body;
+
+themeBtn.addEventListener("click", () => {
+  const isDark = body.getAttribute("data-theme") === "dark";
+  body.setAttribute("data-theme", isDark ? "light" : "dark");
+  themeBtn.innerText = isDark ? "🌙 MODO DARK" : "☀️ MODO LIGHT";
+  localStorage.setItem("backstage-theme", isDark ? "light" : "dark");
+});
+
+// Carregar tema salvo
+const savedTheme = localStorage.getItem("backstage-theme") || "light";
+body.setAttribute("data-theme", savedTheme);
+themeBtn.innerText = savedTheme === "dark" ? "☀️ MODO LIGHT" : "🌙 MODO DARK";
+
+// --- AUTH & CORE ---
+function showToast(msg, color = "var(--bitto-blue)") {
   const toast = document.getElementById("toast");
   toast.innerText = msg;
   toast.style.background = color;
@@ -27,52 +44,49 @@ function showToast(msg, color = "#1A1D21") {
 
 onAuthStateChanged(auth, (user) => {
   if (user && user.email.toLowerCase() === SEU_EMAIL_ADMIN.toLowerCase()) {
-    document.body.style.display = "block";
+    body.style.display = "block";
     carregarDadosSheets();
   } else {
     window.location.href = "index.html";
   }
 });
 
-// ATIVAÇÃO MANUAL FIREBASE
+// ATIVAÇÃO FIREBASE
 document.getElementById("btnLiberar")?.addEventListener("click", async () => {
   const email = document.getElementById("userEmail").value.trim().toLowerCase();
-  if (!email) return showToast("Digite um e-mail!", "orange");
+  if (!email) return showToast("E-mail vazio!", "#f43f5e");
   try {
     const q = query(collection(db, "users"), where("email", "==", email));
     const snap = await getDocs(q);
-    if (snap.empty) throw new Error("Usuário não encontrado no Bitto.");
-
+    if (snap.empty) throw new Error("Não encontrado.");
     const exp = new Date();
     exp.setDate(exp.getDate() + 90);
-
     await updateDoc(doc(db, "users", snap.docs[0].id), {
       plan: "embaixador",
       subscriptionEnd: Timestamp.fromDate(exp),
     });
-
-    showToast("🚀 Plano Ativado com Sucesso!", "#0035ff");
+    showToast("🚀 Acesso liberado!", "var(--bitto-blue)");
     document.getElementById("userEmail").value = "";
   } catch (e) {
-    showToast(e.message, "#ff4b4b");
+    showToast(e.message, "#f43f5e");
   }
 });
 
-// CRM GOOGLE SHEETS
+// CRM LOGIC
 window.updateSheets = async (insta, tipo, valor, extra = {}) => {
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
   });
-  showToast("Sincronizando alteração...");
+  showToast("Sincronizando...", "var(--text-main)");
   setTimeout(carregarDadosSheets, 1500);
 };
 
 async function carregarDadosSheets() {
   const lista = document.getElementById("listaInfluencers");
   lista.innerHTML =
-    "<tr><td colspan='6' style='text-align:center; padding: 40px;'>Carregando pipeline...</td></tr>";
+    "<tr><td colspan='6' style='text-align:center; padding: 50px; color: var(--text-muted)'>Carregando pipeline do Backstage...</td></tr>";
 
   try {
     const res = await fetch(URL_SHEETS, { redirect: "follow" });
@@ -96,13 +110,13 @@ async function carregarDadosSheets() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
                 <td>
-                    <div style="font-weight: 600;">${nome}</div>
-                    <div style="color: var(--text-muted); font-size: 0.75rem;">${insta} 
-                        <span style="cursor:pointer; color:var(--bitto-blue); margin-left:5px" onclick="copyToAtivador('${nome}')">[copiar]</span>
+                    <div style="font-weight: 700; color: var(--text-main)">${nome}</div>
+                    <div style="color: var(--text-muted); font-size: 0.7rem;">${insta} 
+                        <span style="cursor:pointer; color:var(--bitto-blue); font-weight:bold" onclick="copyToAtivador('${nome}')"> [copy]</span>
                     </div>
                 </td>
                 <td>
-                    <select onchange="updateSheets('${insta}', 'status', this.value)" style="padding: 5px; font-size: 11px; background: white;">
+                    <select onchange="updateSheets('${insta}', 'status', this.value)" style="width: auto; padding: 4px 8px; font-size: 0.75rem;">
                         <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
                         <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
                         <option ${status === "Negociação" ? "selected" : ""}>Negociação</option>
@@ -110,38 +124,37 @@ async function carregarDadosSheets() {
                     </select>
                 </td>
                 <td>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button onclick="updateSheets('${insta}', 'interacao', ${Number(interacoes) + 1})" style="width: auto; padding: 4px 6px; font-size: 9px; cursor:pointer">+1 DM</button>
-                        <div>
-                            <span style="font-size: 10px; font-weight: 700;">${interacoes}/3</span>
-                            <div class="progress-container"><div class="progress-bar" style="width:${perc}%"></div></div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button onclick="updateSheets('${insta}', 'interacao', ${Number(interacoes) + 1})" style="background: var(--bitto-blue); color:white; border:none; padding: 4px 8px; border-radius:4px; font-size:9px; cursor:pointer">+1 DM</button>
+                        <div style="flex: 1; min-width: 60px;">
+                            <div style="font-size: 9px; font-weight: 800; margin-bottom: 2px;">${interacoes}/3</div>
+                            <div class="progress-track"><div class="progress-fill" style="width:${perc}%"></div></div>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <input type="text" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: this.value, cupom: '${cupom}'})" style="padding: 4px; font-size: 10px;">
-                        <input type="text" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: '${link}', cupom: this.value})" style="padding: 4px; font-size: 10px;">
+                    <div style="display: grid; gap: 4px;">
+                        <input type="text" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: this.value, cupom: '${cupom}'})" style="padding: 4px 8px; font-size: 10px;">
+                        <input type="text" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: '${link}', cupom: this.value})" style="padding: 4px 8px; font-size: 10px;">
                     </div>
                 </td>
                 <td style="text-align:center;">
-                    <span style="color:${ativado === "Sim" ? "var(--bitto-blue)" : "#E2E8F0"}; font-size: 1.2rem;">●</span>
+                    <span style="color:${ativado === "Sim" ? "var(--bitto-green)" : "var(--border)"}; font-size: 1.4rem;">●</span>
                 </td>
                 <td style="text-align: right;">
-                    <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="width: auto; background: none; color: var(--bitto-blue); padding: 5px; border:none; cursor:pointer; font-weight:600; font-size: 11px;">VER PERFIL ↗</button>
+                    <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="background:none; border: 1px solid var(--border); color: var(--text-main); padding: 6px 10px; border-radius:6px; font-size: 10px; cursor:pointer; font-weight:600;">PROFILE ↗</button>
                 </td>`;
       lista.appendChild(tr);
     });
   } catch (e) {
-    console.error(e);
     lista.innerHTML =
-      "<tr><td colspan='6' style='text-align:center; color: red;'>Erro ao carregar dados.</td></tr>";
+      "<tr><td colspan='6' style='text-align:center; color: #f43f5e;'>Falha na sincronização com Sheets.</td></tr>";
   }
 }
 
 window.copyToAtivador = (e) => {
   document.getElementById("userEmail").value = e;
-  showToast("E-mail copiado para ativação!");
+  showToast("E-mail preparado para ativação!");
 };
 
 document.getElementById("btnSync").onclick = carregarDadosSheets;
@@ -154,9 +167,8 @@ document.getElementById("btnSalvarInf").onclick = async () => {
     status: document.getElementById("infStatus").value,
   };
   if (!dados.nome || !dados.insta)
-    return showToast("Preencha nome e insta!", "orange");
-
-  showToast("Adicionando lead...");
+    return showToast("Dados incompletos!", "#f43f5e");
+  showToast("Registrando lead...");
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
