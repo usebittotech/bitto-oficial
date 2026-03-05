@@ -17,6 +17,22 @@ const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 const URL_SHEETS =
   "https://script.google.com/macros/s/AKfycbykeG4jjW0RK9PFQi4aU5ndO1TzQPg-CWMIR6DYFfyWyn3jTCQ-I7HbCm5O-i3w-Bhd/exec";
 
+// --- THEME ---
+const themeBtn = document.getElementById("themeBtn");
+themeBtn.onclick = () => {
+  const isDark = document.body.getAttribute("data-theme") === "dark";
+  document.body.setAttribute("data-theme", isDark ? "light" : "dark");
+  themeBtn.innerText = isDark ? "Dark Mode" : "Light Mode";
+};
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+  setTimeout(() => (t.style.display = "none"), 2500);
+}
+
+// --- AUTH ---
 onAuthStateChanged(auth, (user) => {
   if (user && user.email.toLowerCase() === SEU_EMAIL_ADMIN.toLowerCase()) {
     document.body.style.display = "block";
@@ -26,10 +42,31 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+// --- CRM FUNCTIONS ---
+window.updateSheets = async (insta, tipo, valor, extra = {}) => {
+  await fetch(URL_SHEETS, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
+  });
+  showToast("Saving...");
+  setTimeout(carregarDadosSheets, 1500);
+};
+
+window.excluirInfluencer = async (insta) => {
+  if (!confirm(`Excluir ${insta}?`)) return;
+  await fetch(URL_SHEETS, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({ action: "delete", insta }),
+  });
+  carregarDadosSheets();
+};
+
 async function carregarDadosSheets() {
   const container = document.getElementById("listaInfluencers");
   container.innerHTML =
-    "<div style='opacity:0.5'>SYNCING DATABASE NODES...</div>";
+    "<div style='font-size:12px; padding:20px; color:var(--text-muted)'>Sincronizando workspace...</div>";
 
   try {
     const res = await fetch(URL_SHEETS, { redirect: "follow" });
@@ -48,29 +85,29 @@ async function carregarDadosSheets() {
         cupom,
         ativado,
       ] = inf;
-      const activeColor = ativado === "Sim" ? "var(--bitto-green)" : "#444";
-
-      const card = document.createElement("div");
-      card.className = "lead-card";
-      card.innerHTML = `
-                <span class="delete-icon" onclick="excluirInfluencer('${insta}')">✕</span>
-                <div style="font-weight: 800; font-size: 1.1rem; margin-bottom: 5px;">${nome}</div>
-                <div style="color: var(--bitto-green); font-size: 0.7rem; margin-bottom: 15px;">${insta}</div>
-                
-                <div class="label-neon">FUNNEL_STATUS</div>
-                <select onchange="updateSheets('${insta}', 'status', this.value)" style="padding: 8px; font-size: 0.7rem; margin-bottom: 10px;">
-                    <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
-                    <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
-                    <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
-                </select>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                    <span style="font-size: 0.6rem; opacity: 0.5;">PLAN_ACTIVE</span>
-                    <div style="width: 12px; height: 12px; background: ${activeColor}; border-radius: 50%; box-shadow: 0 0 10px ${activeColor}"></div>
-                </div>
-                <button onclick="copyToAtivador('${nome}')" style="margin-top: 15px; background: transparent; border: 1px solid var(--border-color); color: #fff; width: 100%; padding: 8px; border-radius: 5px; font-size: 0.6rem; cursor: pointer;">COPY FOR ACTIVATION</button>
-            `;
-      container.appendChild(card);
+      const row = document.createElement("div");
+      row.className = "database-item";
+      row.innerHTML = `
+        <div style="font-size: 14px; font-weight: 500;">
+          <span style="cursor:pointer" onclick="copyToAtivador('${nome}')">📄</span> ${nome}
+          <span style="font-size: 12px; color: var(--text-muted); margin-left: 10px;">${insta}</span>
+        </div>
+        <div>
+          <select onchange="updateSheets('${insta}', 'status', this.value)" style="border:none; font-size:12px; color:var(--text-muted); padding:0">
+            <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
+            <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
+            <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
+          </select>
+        </div>
+        <div>
+          <span class="status-pill">
+            <span class="active-dot" style="background:${ativado === "Sim" ? "var(--bitto-green)" : "#ccc"}"></span>
+            ${ativado === "Sim" ? "Ativo" : "Pendente"}
+          </span>
+        </div>
+        <div style="text-align:right; cursor:pointer; font-size:12px; opacity:0.3" onclick="excluirInfluencer('${insta}')">✕</div>
+      `;
+      container.appendChild(row);
     });
   } catch (e) {
     console.error(e);
@@ -79,9 +116,7 @@ async function carregarDadosSheets() {
 
 window.copyToAtivador = (e) => {
   document.getElementById("userEmail").value = e;
-  const toast = document.getElementById("toast");
-  toast.style.display = "block";
-  setTimeout(() => (toast.style.display = "none"), 2000);
+  showToast("Email movido para ativação");
 };
 
-// Funções de liberação Firebase e exclusão continuam conectadas aos botões...
+// ... Funções de Salvar Lead e Liberar Firebase ...
