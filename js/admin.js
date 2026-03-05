@@ -17,7 +17,6 @@ const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 const URL_SHEETS =
   "https://script.google.com/macros/s/AKfycbykeG4jjW0RK9PFQi4aU5ndO1TzQPg-CWMIR6DYFfyWyn3jTCQ-I7HbCm5O-i3w-Bhd/exec";
 
-// --- GESTÃO DE TEMA ---
 const themeBtn = document.getElementById("themeBtn");
 themeBtn.onclick = () => {
   const isDark = document.body.getAttribute("data-theme") === "dark";
@@ -28,11 +27,10 @@ themeBtn.onclick = () => {
 function showToast(msg) {
   const t = document.getElementById("toast");
   t.innerText = msg;
-  t.style.display = "block";
-  setTimeout(() => (t.style.display = "none"), 3000);
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-// --- AUTENTICAÇÃO ---
 onAuthStateChanged(auth, (user) => {
   if (user && user.email.toLowerCase() === SEU_EMAIL_ADMIN.toLowerCase()) {
     document.body.style.display = "block";
@@ -42,19 +40,18 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// --- OPERAÇÕES CRM (SHEETS) ---
 window.updateSheets = async (insta, tipo, valor, extra = {}) => {
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
   });
-  showToast("A atualizar planilha...");
-  setTimeout(carregarDadosSheets, 2000);
+  showToast("Planilha atualizada!");
+  setTimeout(carregarDadosSheets, 1500);
 };
 
 window.excluirInfluencer = async (insta) => {
-  if (!confirm(`Remover ${insta} permanentemente do CRM?`)) return;
+  if (!confirm(`Remover ${insta} permanentemente?`)) return;
   showToast("Excluindo lead...");
   await fetch(URL_SHEETS, {
     method: "POST",
@@ -67,7 +64,7 @@ window.excluirInfluencer = async (insta) => {
 async function carregarDadosSheets() {
   const lista = document.getElementById("listaInfluencers");
   lista.innerHTML =
-    "<tr><td colspan='6' style='text-align:center; opacity:0.5'>Sincronizando...</td></tr>";
+    "<tr><td colspan='5' style='text-align:center; padding: 40px; opacity:0.5;'>Sincronizando...</td></tr>";
 
   try {
     const res = await fetch(URL_SHEETS, { redirect: "follow" });
@@ -86,40 +83,33 @@ async function carregarDadosSheets() {
         cupom,
         ativado,
       ] = inf;
-      const perc = (Math.min(interacoes, 3) / 3) * 100;
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
-                <td>
-                    <div style="font-weight:600">${nome}</div>
-                    <div style="font-size:11px; color:var(--text-muted)">${insta} <span onclick="copyToAtivador('${nome}')" style="cursor:pointer; color:var(--bitto-blue)">[copiar]</span></div>
+                <td class="col-influencer">
+                    <div style="font-weight:700;">${nome}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); cursor:pointer;" onclick="copyToAtivador('${nome}')">
+                        ${insta} <span style="color:var(--primary-blue); font-weight:800; font-size:10px; margin-left:5px;">COPY</span>
+                    </div>
                 </td>
-                <td>
-                    <select onchange="updateSheets('${insta}', 'status', this.value)" style="border:none; font-size:12px; padding:0; background:transparent">
+                <td class="col-status">
+                    <select onchange="updateSheets('${insta}', 'status', this.value)" style="background:transparent; border:none; color:var(--text-main); font-size:12px; font-weight:600; padding:0;">
                         <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
                         <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
-                        <option ${status === "Negociação" ? "selected" : ""}>Negociação</option>
                         <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
                     </select>
                 </td>
-                <td>
-                    <div style="display:flex; align-items:center; gap:8px">
-                        <button onclick="updateSheets('${insta}', 'interacao', ${Number(interacoes) + 1})" style="background:none; border:1px solid var(--border); border-radius:4px; padding:0 5px; cursor:pointer; font-size:10px">${interacoes}/3 🔥</button>
-                        <div class="progress-bar"><div class="progress-fill" style="width:${perc}%"></div></div>
-                    </div>
+                <td class="col-assets">
+                    <input type="text" placeholder="Cupom" value="${cupom || ""}" 
+                           onblur="updateSheets('${insta}', 'links', this.value, {link: '${link}', cupom: this.value})" 
+                           class="auth-input" style="margin:0; padding: 6px 10px; font-size: 11px; width: 100%;">
                 </td>
-                <td>
-                    <div style="display:flex; flex-direction:column; gap:4px">
-                        <input type="text" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: this.value, cupom: '${cupom}'})" style="font-size:10px; padding:4px; margin:0; border:none; border-bottom:1px solid var(--border)">
-                        <input type="text" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: '${link}', cupom: this.value})" style="font-size:10px; padding:4px; margin:0; border:none; border-bottom:1px solid var(--border)">
-                    </div>
+                <td class="col-plan" style="text-align:center;">
+                    ${ativado === "Sim" ? '<div class="active-dot"></div>' : '<div style="width:10px; height:10px; border-radius:50%; background:var(--border-color); display:inline-block;"></div>'}
                 </td>
-                <td style="text-align:center;">
-                    <span class="status-dot" style="background:${ativado === "Sim" ? "var(--bitto-green)" : "#ccc"}"></span>
-                </td>
-                <td style="text-align:right">
-                    <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="background:none; border:none; color:var(--bitto-blue); cursor:pointer; font-size:12px; margin-right:10px">📸</button>
-                    <button onclick="excluirInfluencer('${insta}')" style="background:none; border:none; color:#ff4b4b; cursor:pointer; font-size:14px; opacity:0.4">✕</button>
+                <td class="col-manage" style="text-align:right;">
+                    <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="background:none; border:none; cursor:pointer; font-size:1.1rem; margin-right:10px;">📸</button>
+                    <button onclick="excluirInfluencer('${insta}')" class="btn-delete">✕</button>
                 </td>
             `;
       lista.appendChild(tr);
@@ -131,29 +121,25 @@ async function carregarDadosSheets() {
 
 window.copyToAtivador = (e) => {
   document.getElementById("userEmail").value = e;
-  showToast("E-mail copiado!");
+  showToast("Email preparado!");
 };
 
 document.getElementById("btnSync").onclick = carregarDadosSheets;
 
 document.getElementById("btnSalvarInf").onclick = async () => {
-  const dados = {
-    action: "add",
-    nome: document.getElementById("infNome").value,
-    insta: document.getElementById("infInsta").value,
-    status: document.getElementById("infStatus").value,
-  };
-  if (!dados.nome || !dados.insta) return showToast("Preencha os campos!");
-  showToast("A enviar lead...");
+  const nome = document.getElementById("infNome").value;
+  const insta = document.getElementById("infInsta").value;
+  const status = document.getElementById("infStatus").value;
+  if (!nome || !insta) return showToast("Preencha os campos!");
+  showToast("Salvando lead...");
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
-    body: JSON.stringify(dados),
+    body: JSON.stringify({ action: "add", nome, insta, status }),
   });
   setTimeout(carregarDadosSheets, 2000);
 };
 
-// --- ATIVAÇÃO FIREBASE ---
 document.getElementById("btnLiberar")?.addEventListener("click", async () => {
   const email = document.getElementById("userEmail").value.trim().toLowerCase();
   if (!email) return showToast("Digite um e-mail!");
@@ -161,11 +147,11 @@ document.getElementById("btnLiberar")?.addEventListener("click", async () => {
     const q = query(collection(db, "users"), where("email", "==", email));
     const snap = await getDocs(q);
     if (snap.empty) throw new Error("Usuário não encontrado.");
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 90);
     await updateDoc(doc(db, "users", snap.docs[0].id), {
       plan: "embaixador",
-      subscriptionEnd: Timestamp.fromDate(exp),
+      subscriptionEnd: Timestamp.fromDate(
+        new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      ),
     });
     showToast("🚀 Acesso Liberado!");
     document.getElementById("userEmail").value = "";
