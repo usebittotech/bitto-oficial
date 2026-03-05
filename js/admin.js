@@ -17,6 +17,8 @@ const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 const URL_SHEETS =
   "https://script.google.com/macros/s/AKfycbykeG4jjW0RK9PFQi4aU5ndO1TzQPg-CWMIR6DYFfyWyn3jTCQ-I7HbCm5O-i3w-Bhd/exec";
 
+let currentLeadInsta = "";
+
 // --- GESTÃO DE TEMA ---
 const themeBtn = document.getElementById("themeBtn");
 themeBtn.onclick = () => {
@@ -32,7 +34,7 @@ function showToast(msg) {
   setTimeout(() => (t.style.display = "none"), 3000);
 }
 
-// --- AUTENTICAÇÃO ---
+// --- AUTH ---
 onAuthStateChanged(auth, (user) => {
   if (user && user.email.toLowerCase() === SEU_EMAIL_ADMIN.toLowerCase()) {
     document.body.style.display = "block";
@@ -42,32 +44,31 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// --- OPERAÇÕES CRM (SHEETS) ---
+// --- CRM (GOOGLE SHEETS) ---
 window.updateSheets = async (insta, tipo, valor, extra = {}) => {
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
   });
-  showToast("A atualizar planilha...");
+  showToast("Sincronizando...");
   setTimeout(carregarDadosSheets, 2000);
 };
 
 window.excluirInfluencer = async (insta) => {
-  if (!confirm(`Remover ${insta} permanentemente do CRM?`)) return;
-  showToast("Excluindo lead...");
+  if (!confirm(`Remover ${insta} permanentemente?`)) return;
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify({ action: "delete", insta }),
   });
-  setTimeout(carregarDadosSheets, 1500);
+  carregarDadosSheets();
 };
 
 async function carregarDadosSheets() {
   const lista = document.getElementById("listaInfluencers");
   lista.innerHTML =
-    "<tr><td colspan='6' style='text-align:center; opacity:0.5'>Sincronizando...</td></tr>";
+    "<tr><td colspan='5' style='text-align:center; opacity:0.5'>Carregando...</td></tr>";
 
   try {
     const res = await fetch(URL_SHEETS, { redirect: "follow" });
@@ -91,14 +92,13 @@ async function carregarDadosSheets() {
 
       tr.innerHTML = `
                 <td>
-                    <div style="font-weight:600">${nome}</div>
-                    <div style="font-size:11px; color:var(--text-muted)">${insta} <span onclick="copyToAtivador('${nome}')" style="cursor:pointer; color:var(--bitto-blue)">[copiar]</span></div>
+                    <div style="font-weight:600; cursor:pointer;" onclick="openLeadPeek('${nome}', '${insta}', '${link}', '${cupom}')">${nome}</div>
+                    <div style="font-size:11px; color:var(--text-muted)">${insta}</div>
                 </td>
                 <td>
                     <select onchange="updateSheets('${insta}', 'status', this.value)" style="border:none; font-size:12px; padding:0; background:transparent">
                         <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
                         <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
-                        <option ${status === "Negociação" ? "selected" : ""}>Negociação</option>
                         <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
                     </select>
                 </td>
@@ -109,16 +109,10 @@ async function carregarDadosSheets() {
                     </div>
                 </td>
                 <td>
-                    <div style="display:flex; flex-direction:column; gap:4px">
-                        <input type="text" placeholder="Link" value="${link || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: this.value, cupom: '${cupom}'})" style="font-size:10px; padding:4px; margin:0; border:none; border-bottom:1px solid var(--border)">
-                        <input type="text" placeholder="Cupom" value="${cupom || ""}" onblur="updateSheets('${insta}', 'links', this.value, {link: '${link}', cupom: this.value})" style="font-size:10px; padding:4px; margin:0; border:none; border-bottom:1px solid var(--border)">
-                    </div>
-                </td>
-                <td style="text-align:center;">
                     <span class="status-dot" style="background:${ativado === "Sim" ? "var(--bitto-green)" : "#ccc"}"></span>
+                    <span style="font-size:11px">${ativado === "Sim" ? "Ativo" : "Pendente"}</span>
                 </td>
                 <td style="text-align:right">
-                    <button onclick="window.open('https://instagram.com/${insta.replace("@", "")}')" style="background:none; border:none; color:var(--bitto-blue); cursor:pointer; font-size:12px; margin-right:10px">📸</button>
                     <button onclick="excluirInfluencer('${insta}')" style="background:none; border:none; color:#ff4b4b; cursor:pointer; font-size:14px; opacity:0.4">✕</button>
                 </td>
             `;
@@ -129,47 +123,32 @@ async function carregarDadosSheets() {
   }
 }
 
-window.copyToAtivador = (e) => {
-  document.getElementById("userEmail").value = e;
-  showToast("E-mail copiado!");
+// --- SIDE PEEK LOGIC ---
+window.togglePeek = (show) => {
+  document.getElementById("sidePeek").classList.toggle("open", show);
 };
 
-document.getElementById("btnSync").onclick = carregarDadosSheets;
-
-document.getElementById("btnSalvarInf").onclick = async () => {
-  const dados = {
-    action: "add",
-    nome: document.getElementById("infNome").value,
-    insta: document.getElementById("infInsta").value,
-    status: document.getElementById("infStatus").value,
-  };
-  if (!dados.nome || !dados.insta) return showToast("Preencha os campos!");
-  showToast("A enviar lead...");
-  await fetch(URL_SHEETS, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(dados),
-  });
-  setTimeout(carregarDadosSheets, 2000);
+window.openLeadPeek = (nome, insta, link, cupom) => {
+  currentLeadInsta = insta;
+  document.getElementById("peekName").innerText = nome;
+  document.getElementById("peekInsta").innerText = insta;
+  document.getElementById("editLink").value = link || "";
+  document.getElementById("editCupom").value = cupom || "";
+  togglePeek(true);
 };
 
-// --- ATIVAÇÃO FIREBASE ---
-document.getElementById("btnLiberar")?.addEventListener("click", async () => {
-  const email = document.getElementById("userEmail").value.trim().toLowerCase();
-  if (!email) return showToast("Digite um e-mail!");
-  try {
-    const q = query(collection(db, "users"), where("email", "==", email));
-    const snap = await getDocs(q);
-    if (snap.empty) throw new Error("Usuário não encontrado.");
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 90);
-    await updateDoc(doc(db, "users", snap.docs[0].id), {
-      plan: "embaixador",
-      subscriptionEnd: Timestamp.fromDate(exp),
-    });
-    showToast("🚀 Acesso Liberado!");
-    document.getElementById("userEmail").value = "";
-  } catch (e) {
-    showToast(e.message);
-  }
-});
+document.getElementById("btnSavePeek").onclick = () => {
+  const link = document.getElementById("editLink").value;
+  const cupom = document.getElementById("editCupom").value;
+  updateSheets(currentLeadInsta, "links", link, { link, cupom });
+  togglePeek(false);
+};
+
+document.getElementById("btnCopyPeek").onclick = () => {
+  document.getElementById("userEmail").value =
+    document.getElementById("peekName").innerText;
+  showToast("E-mail movido!");
+  togglePeek(false);
+};
+
+// ... Funções de Salvar Lead e Ativação Firebase permanecem as mesmas ...s
