@@ -22,7 +22,6 @@ const themeBtn = document.getElementById("themeBtn");
 themeBtn.onclick = () => {
   const isDark = document.body.getAttribute("data-theme") === "dark";
   document.body.setAttribute("data-theme", isDark ? "light" : "dark");
-  themeBtn.innerText = isDark ? "Dark Mode" : "Light Mode";
 };
 
 function showToast(msg) {
@@ -42,19 +41,19 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// --- CRM FUNCTIONS ---
+// --- ACTIONS ---
 window.updateSheets = async (insta, tipo, valor, extra = {}) => {
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
   });
-  showToast("Saving...");
+  showToast("Synchronized");
   setTimeout(carregarDadosSheets, 1500);
 };
 
 window.excluirInfluencer = async (insta) => {
-  if (!confirm(`Excluir ${insta}?`)) return;
+  if (!confirm(`Remove ${insta}?`)) return;
   await fetch(URL_SHEETS, {
     method: "POST",
     mode: "no-cors",
@@ -66,7 +65,7 @@ window.excluirInfluencer = async (insta) => {
 async function carregarDadosSheets() {
   const container = document.getElementById("listaInfluencers");
   container.innerHTML =
-    "<div style='font-size:12px; padding:20px; color:var(--text-muted)'>Sincronizando workspace...</div>";
+    "<div style='font-size:12px; opacity:0.5'>Authenticating data nodes...</div>";
 
   try {
     const res = await fetch(URL_SHEETS, { redirect: "follow" });
@@ -86,27 +85,24 @@ async function carregarDadosSheets() {
         ativado,
       ] = inf;
       const row = document.createElement("div");
-      row.className = "database-item";
+      row.className = "data-row";
       row.innerHTML = `
-        <div style="font-size: 14px; font-weight: 500;">
-          <span style="cursor:pointer" onclick="copyToAtivador('${nome}')">📄</span> ${nome}
-          <span style="font-size: 12px; color: var(--text-muted); margin-left: 10px;">${insta}</span>
-        </div>
-        <div>
-          <select onchange="updateSheets('${insta}', 'status', this.value)" style="border:none; font-size:12px; color:var(--text-muted); padding:0">
-            <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
-            <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
-            <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
-          </select>
-        </div>
-        <div>
-          <span class="status-pill">
-            <span class="active-dot" style="background:${ativado === "Sim" ? "var(--bitto-green)" : "#ccc"}"></span>
-            ${ativado === "Sim" ? "Ativo" : "Pendente"}
-          </span>
-        </div>
-        <div style="text-align:right; cursor:pointer; font-size:12px; opacity:0.3" onclick="excluirInfluencer('${insta}')">✕</div>
-      `;
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight: 600; font-size: 14px; cursor:pointer" onclick="copyToAtivador('${nome}')">${nome}</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">${insta}</span>
+                </div>
+                <div>
+                    <select onchange="updateSheets('${insta}', 'status', this.value)" style="border:none; background:transparent; font-size:12px; font-weight:500; color:var(--text-muted);">
+                        <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
+                        <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
+                    </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    ${ativado === "Sim" ? '<div class="active-glow"></div>' : ""}
+                    <span class="badge-status">${ativado === "Sim" ? "Enabled" : "Draft"}</span>
+                </div>
+                <div style="text-align:right; opacity:0.3; cursor:pointer; font-size:14px;" onclick="excluirInfluencer('${insta}')">✕</div>
+            `;
       container.appendChild(row);
     });
   } catch (e) {
@@ -116,7 +112,7 @@ async function carregarDadosSheets() {
 
 window.copyToAtivador = (e) => {
   document.getElementById("userEmail").value = e;
-  showToast("Email movido para ativação");
+  showToast("User ID prepared for activation");
 };
 
-// ... Funções de Salvar Lead e Liberar Firebase ...
+// ... Funções de Salvar Lead e Liberar Firebase continuam ...
