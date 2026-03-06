@@ -24,12 +24,10 @@ if (generateBtn) {
   generateBtn.addEventListener("click", async () => {
     const topic = topicInput?.value || "";
     const content = contentInput?.value || "";
-
     if (!content.trim() && !topic.trim()) {
       showToast("Cole um texto ou defina um tema!", "error");
       return;
     }
-
     if (!currentUser) return;
 
     const canUse = await checkUsageLimit(currentUser.uid, "review");
@@ -39,11 +37,11 @@ if (generateBtn) {
     }
 
     const originalText = generateBtn.innerHTML;
-    generateBtn.innerHTML = '<span class="loader"></span> PROCESSANDO...';
+    generateBtn.innerHTML = '<span class="loader"></span> BITTO PROCESSANDO...';
     generateBtn.disabled = true;
 
     try {
-      const prompt = `BITTO AI - Modo Professor. Tema: "${topic}". Conteúdo: "${content}". Gere: 1. Resumo Teórico. 2. Simulado (15 questões). 3. Gabarito. Formato: Markdown.`;
+      const prompt = `BITTO AI - Modo Professor Técnico. Tema: "${topic}". Conteúdo: "${content}". Gere: 1. Resumo Teórico. 2. Simulado (15 questões). 3. Gabarito. Formato: Markdown bonito. Idioma: PT-BR.`;
 
       const response = await fetch("../api/generate", {
         method: "POST",
@@ -60,7 +58,7 @@ if (generateBtn) {
       if (typeof marked !== "undefined") {
         reviewOutput.innerHTML = marked.parse(aiResponse);
       } else {
-        reviewOutput.innerHTML = aiResponse;
+        reviewOutput.innerHTML = `<pre style="white-space: pre-wrap;">${aiResponse}</pre>`;
       }
 
       await incrementUsage(currentUser.uid, "review");
@@ -71,9 +69,9 @@ if (generateBtn) {
       reviewOutput.style.display = "block";
       if (outputActions) outputActions.style.display = "flex";
       if (topic && reviewTitle) reviewTitle.innerText = `Revisão: ${topic}`;
-      showToast("Gerado com sucesso!", "success");
+      showToast("Revisão gerada!", "success");
     } catch (error) {
-      showToast("Erro na geração.", "error");
+      showToast("Erro ao gerar.", "error");
     } finally {
       generateBtn.innerHTML = originalText;
       generateBtn.disabled = false;
@@ -81,42 +79,60 @@ if (generateBtn) {
   });
 }
 
-// --- SOLUÇÃO DEFINITIVA PDF ---
+// --- SOLUÇÃO PARA O PDF EM BRANCO/CORTADO ---
 if (downloadPdfBtn) {
   downloadPdfBtn.addEventListener("click", async () => {
     const element = document.getElementById("reviewOutput");
-    if (!element || element.innerText.trim() === "") return;
+    if (!element || element.innerHTML.trim() === "") return;
 
-    // 1. Preparar o elemento (Remover animações e forçar cores sólidas)
+    // 1. Forçar estado estático para evitar "branco" (opacidade 0 da animação)
     element.style.animation = "none";
-    element.style.transition = "none";
-    element.classList.add("pdf-force-visible");
+    element.style.opacity = "1";
+    element.style.display = "block";
+    element.classList.add("pdf-rendering-mode");
 
     const opt = {
-      margin: 10,
+      margin: [15, 12],
       filename: `Bitto_${topicInput.value || "Revisao"}.pdf`,
-      image: { type: "jpeg", quality: 1.0 },
+      image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
-        backgroundColor: "#ffffff",
+        backgroundColor: "#ffffff", // Fundo branco sólido
         scrollY: 0,
-        windowWidth: element.scrollWidth,
+        windowWidth: 800, // Evita cortes laterais
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
     try {
-      // Pequeno delay para o browser processar a remoção da animação
-      await new Promise((resolve) => setTimeout(resolve, 100));
       await html2pdf().set(opt).from(element).save();
     } catch (e) {
-      showToast("Erro ao baixar PDF", "error");
+      console.error(e);
     } finally {
-      element.classList.remove("pdf-force-visible");
-      element.style.animation = ""; // Restaura animação original
+      // Restaurar estilo original
+      element.classList.remove("pdf-rendering-mode");
+      element.style.animation = "";
     }
+  });
+}
+
+if (copyBtn) {
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText(reviewOutput.innerText)
+      .then(() => showToast("Copiado!", "success"));
+  });
+}
+
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const html = document.documentElement;
+    html.setAttribute(
+      "data-theme",
+      html.getAttribute("data-theme") === "dark" ? "light" : "dark",
+    );
   });
 }
 
@@ -131,5 +147,5 @@ function showToast(message, type = "success") {
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `<span>${type === "success" ? "✅" : "⚠️"}</span> ${message}`;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  setTimeout(() => toast.remove(), 3500);
 }
