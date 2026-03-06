@@ -102,7 +102,7 @@ if (generateBtn) {
   });
 }
 
-// --- UTILS (CORREÇÃO PDF) ---
+// --- UTILS (DOWNLOAD PDF COM FIX DE COR) ---
 if (downloadPdfBtn) {
   downloadPdfBtn.addEventListener("click", () => {
     if (typeof html2pdf === "undefined") {
@@ -117,22 +117,32 @@ if (downloadPdfBtn) {
       return;
     }
 
+    // Aplica classe para forçar contraste no PDF
+    element.classList.add("pdf-export-mode");
+
     const opt = {
-      margin: [15, 15, 15, 15], // Margens equilibradas (topo, esq, baixo, dir)
+      margin: [15, 15, 15, 15],
       filename: `Bitto_Revisao_${topicInput.value || "Estudo"}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
+      image: { type: "jpeg", quality: 1.0 },
       html2canvas: {
-        scale: 2,
+        scale: 3, // Aumentado para maior nitidez
         useCORS: true,
         letterRendering: true,
         scrollY: 0,
+        windowWidth: 1024,
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
-    // Força a renderização garantindo que o elemento está visível
-    html2pdf().set(opt).from(element).save();
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        // Remove a classe após gerar para manter o tema da UI do usuário
+        element.classList.remove("pdf-export-mode");
+      });
   });
 }
 
@@ -147,9 +157,11 @@ if (copyBtn) {
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const html = document.documentElement;
-    if (html.getAttribute("data-theme") === "dark")
+    if (html.getAttribute("data-theme") === "dark") {
       html.setAttribute("data-theme", "light");
-    else html.setAttribute("data-theme", "dark");
+    } else {
+      html.setAttribute("data-theme", "dark");
+    }
   });
 }
 

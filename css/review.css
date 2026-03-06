@@ -28,6 +28,7 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   width: 100%;
+  padding: 0 1rem;
 }
 .nav-left {
   display: flex;
@@ -44,6 +45,7 @@
   display: flex;
   justify-content: center;
 }
+
 .logo-mini img {
   width: 36px;
   height: 36px;
@@ -55,6 +57,7 @@
   height: 24px;
   background: var(--border-color);
 }
+
 .back-pill {
   text-decoration: none;
   color: var(--text-muted);
@@ -106,6 +109,47 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 1000px) {
+  .review-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+  .content-column {
+    width: 100%;
+    max-width: 100%;
+  }
+  .sidebar-column {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+
+/* --- COMPONENTES --- */
+.deck-header {
+  margin-bottom: 2rem;
+}
+.deck-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+.deck-info h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin: 0;
+}
+.counter-badge {
+  background: var(--input-bg);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  color: var(--accent-green);
+  font-size: 0.9rem;
+}
+
 /* --- FOLHA DE PAPEL --- */
 .paper-sheet {
   background: var(--paper-bg);
@@ -117,6 +161,7 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
+  transition: transform 0.1s;
 }
 
 .paper-sheet::before {
@@ -129,43 +174,72 @@
   background: linear-gradient(90deg, var(--primary-blue), var(--accent-green));
 }
 
-/* --- CONTEÚDO IA / PDF --- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* --- CONTEÚDO IA --- */
 .review-content {
   font-family: "DM Sans", sans-serif;
   line-height: 1.7;
-  font-size: 1.05rem;
+  font-size: 1rem;
   animation: fadeIn 0.5s ease;
-  word-wrap: break-word;
 }
-
-/* Organização de Margens no PDF */
-.review-content h1,
-.review-content h2 {
-  color: var(--primary-blue);
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  page-break-after: avoid;
-}
-
 .review-content h2 {
   border-bottom: 2px solid var(--accent-green);
-  padding-bottom: 5px;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+  margin-top: 2rem;
 }
-
-.review-content p,
+.review-content strong {
+  color: var(--primary-blue);
+}
+.review-content ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
 .review-content li {
-  margin-bottom: 1rem;
-  page-break-inside: avoid;
+  margin-bottom: 0.8rem;
+}
+.review-content blockquote {
+  border-left: 4px solid var(--accent-green);
+  padding: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  background: rgba(204, 255, 0, 0.05);
+  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
 }
 
-/* Ajuste de contraste para o PDF (Garante que saia preto no branco se necessário) */
-@media print {
-  .review-content {
-    color: #000 !important;
-  }
+/* --- AJUSTES DE EXPORTAÇÃO PDF (CORREÇÃO DE CORES CLARAS) --- */
+.pdf-export-mode {
+  color: #000000 !important;
+  background: #ffffff !important;
+  padding: 20px !important;
 }
 
-/* --- SIDEBAR & BOTÕES --- */
+.pdf-export-mode * {
+  color: #000000 !important;
+}
+
+.pdf-export-mode h1,
+.pdf-export-mode h2,
+.pdf-export-mode strong {
+  color: #0035ff !important; /* Mantém azul forte para leitura */
+}
+
+/* --- SIDEBAR --- */
 .tool-panel {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -174,6 +248,38 @@
   position: sticky;
   top: 90px;
 }
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.panel-header h3 {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  font-weight: 700;
+  margin: 0;
+}
+.ai-badge {
+  background: rgba(204, 255, 0, 0.2);
+  color: #84a700;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.input-field,
 .input-textarea {
   width: 100%;
   padding: 1rem;
@@ -181,9 +287,16 @@
   border: 1px solid var(--border-color);
   background: var(--input-bg);
   color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.2s;
+}
+.input-textarea {
   resize: none;
   height: 200px;
 }
+
 .btn-generate {
   width: 100%;
   padding: 1.2rem;
@@ -192,21 +305,72 @@
   background: var(--accent-green);
   color: var(--primary-blue);
   font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: 0.2s;
+  margin-top: 1rem;
 }
 .btn-generate:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(204, 255, 0, 0.4);
 }
+
+.loader {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--primary-blue);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Utilitários */
+.tilt-element {
+  transition: transform 0.1s;
+  transform-style: preserve-3d;
+}
+.nav-btn {
+  padding: 0 1.5rem;
+  height: 50px;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+  color: var(--text-main);
+  gap: 8px;
+}
 .action-btn {
   padding: 0 2rem;
   height: 50px;
   border-radius: 50px;
+  border: none;
   background: var(--text-main);
   color: var(--bg-color);
   font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
   cursor: pointer;
+  transition: 0.2s;
+}
+.action-btn:hover {
+  background: var(--primary-blue);
+  color: white;
+  box-shadow: 0 5px 20px rgba(0, 53, 255, 0.3);
 }
 
 @keyframes fadeIn {
