@@ -117,67 +117,25 @@ if (downloadPdfBtn) {
     }
 
     const source = document.getElementById("reviewOutput");
+    const htmlContent = source.innerHTML;
 
-    // Cria um elemento temporário fora do DOM para evitar clipping/overflow do paper-sheet
-    const wrapper = document.createElement("div");
-    wrapper.style.cssText = `
-            position: fixed;
-            left: -9999px;
-            top: 0;
-            width: 794px;
-            padding: 40px;
-            background: #ffffff;
-            color: #111111;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            line-height: 1.7;
-            box-sizing: border-box;
-        `;
-
-    // Copia e estiliza o conteúdo inline para garantir renderização correta
-    const clone = source.cloneNode(true);
-    clone.style.display = "block";
-    clone.style.width = "100%";
-    clone.style.overflow = "visible";
-
-    // Garante que elementos internos não quebrem layout entre páginas
-    clone.querySelectorAll("h1, h2, h3").forEach((el) => {
-      el.style.pageBreakAfter = "avoid";
-      el.style.breakAfter = "avoid";
-    });
-    clone.querySelectorAll("p, li, blockquote").forEach((el) => {
-      el.style.pageBreakInside = "avoid";
-      el.style.breakInside = "avoid";
-    });
-
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
+    const fullHtml = `<div style="width:100%;padding:20px;background:#ffffff;color:#111111;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;box-sizing:border-box;"><style>h1{font-size:20px;font-weight:800;margin:20px 0 10px;color:#111;page-break-after:avoid}h2{font-size:17px;font-weight:700;margin:18px 0 8px;color:#111;border-bottom:2px solid #aac900;padding-bottom:4px;page-break-after:avoid}h3{font-size:15px;font-weight:700;margin:14px 0 6px;color:#111;page-break-after:avoid}p{margin:0 0 10px;page-break-inside:avoid}ul,ol{margin:0 0 10px 20px}li{margin-bottom:6px;page-break-inside:avoid}strong{color:#0035ff}blockquote{border-left:4px solid #aac900;padding:8px 12px;margin:10px 0;color:#555;font-style:italic;background:#f9ffe0;page-break-inside:avoid}pre{background:#f4f4f4;padding:10px;border-radius:6px;font-size:12px;white-space:pre-wrap;word-break:break-word}code{background:#f4f4f4;padding:2px 5px;border-radius:4px;font-size:12px}</style>${htmlContent}</div>`;
 
     const opt = {
-      margin: [15, 15, 15, 15],
+      margin: [12, 12, 12, 12],
       filename: "Bitto_Resumo.pdf",
       image: { type: "jpeg", quality: 0.95 },
-      html2canvas: {
-        scale: 1.5,
-        useCORS: true,
-        logging: false,
-        windowWidth: 794,
-        scrollY: 0,
-      },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+      pagebreak: { mode: ["css", "legacy"] },
     };
 
     html2pdf()
       .set(opt)
-      .from(wrapper)
+      .from(fullHtml, "string")
       .save()
-      .then(() => {
-        document.body.removeChild(wrapper);
-      })
       .catch((err) => {
         console.error("Erro ao gerar PDF:", err);
-        document.body.removeChild(wrapper);
         alert("Erro ao gerar o PDF. Tente novamente.");
       });
   });
