@@ -15,17 +15,15 @@ const statusText = document.getElementById("statusText");
 
 let currentUser = null;
 
-// --- AUTH ---
 onAuthStateChanged(auth, (user) => {
   if (user) currentUser = user;
   else window.location.href = "login.html";
 });
 
-// --- EVENTO DE GERAR ---
 if (generateBtn) {
   generateBtn.addEventListener("click", async () => {
-    const topic = topicInput ? topicInput.value : "";
-    const content = contentInput ? contentInput.value : "";
+    const topic = topicInput?.value || "";
+    const content = contentInput?.value || "";
 
     if (!content.trim() && !topic.trim()) {
       showToast("Cole um texto ou defina um tema!", "error");
@@ -36,22 +34,16 @@ if (generateBtn) {
 
     const canUse = await checkUsageLimit(currentUser.uid, "review");
     if (!canUse) {
-      showToast("🔒 Limite mensal atingido (3/3).", "error");
+      showToast("🔒 Limite mensal atingido.", "error");
       return;
     }
 
     const originalText = generateBtn.innerHTML;
-    generateBtn.innerHTML = '<span class="loader"></span> BITTO PROCESSANDO...';
-    generateBtn.classList.add("btn-loading");
+    generateBtn.innerHTML = '<span class="loader"></span> PROCESSANDO...';
     generateBtn.disabled = true;
 
     try {
-      const prompt = `
-                BITTO AI - Modo Professor Técnico.
-                Tema: "${topic}". Conteúdo: "${content}".
-                Gere: 1. Resumo Teórico (Conceitos, Aplicação). 2. Simulado (15 questões variadas). 3. Gabarito.
-                Formato: Markdown bonito. Idioma: PT-BR.
-            `;
+      const prompt = `BITTO AI - Modo Professor. Tema: "${topic}". Conteúdo: "${content}". Gere: 1. Resumo Teórico. 2. Simulado (15 questões). 3. Gabarito. Formato: Markdown.`;
 
       const response = await fetch("../api/generate", {
         method: "POST",
@@ -68,7 +60,7 @@ if (generateBtn) {
       if (typeof marked !== "undefined") {
         reviewOutput.innerHTML = marked.parse(aiResponse);
       } else {
-        reviewOutput.innerHTML = `<pre style="white-space: pre-wrap;">${aiResponse}</pre>`;
+        reviewOutput.innerHTML = aiResponse;
       }
 
       await incrementUsage(currentUser.uid, "review");
@@ -79,80 +71,59 @@ if (generateBtn) {
       reviewOutput.style.display = "block";
       if (outputActions) outputActions.style.display = "flex";
       if (topic && reviewTitle) reviewTitle.innerText = `Revisão: ${topic}`;
-      showToast("Revisão gerada!", "success");
+      showToast("Gerado com sucesso!", "success");
     } catch (error) {
-      showToast("Erro ao gerar.", "error");
+      showToast("Erro na geração.", "error");
     } finally {
       generateBtn.innerHTML = originalText;
-      generateBtn.classList.remove("btn-loading");
       generateBtn.disabled = false;
     }
   });
 }
 
-// --- DOWNLOAD PDF (FIX DEFINITIVO PARA BRANCO E CORES CLARAS) ---
+// --- SOLUÇÃO DEFINITIVA PDF ---
 if (downloadPdfBtn) {
   downloadPdfBtn.addEventListener("click", async () => {
-    if (typeof html2pdf === "undefined") {
-      alert("Biblioteca PDF não encontrada.");
-      return;
-    }
-
     const element = document.getElementById("reviewOutput");
-    if (!element || element.innerHTML.trim() === "") return;
+    if (!element || element.innerText.trim() === "") return;
 
-    // Força o elemento a ficar visível, preto no branco, antes da captura
-    element.classList.add("pdf-rendering");
+    // 1. Preparar o elemento (Remover animações e forçar cores sólidas)
+    element.style.animation = "none";
+    element.style.transition = "none";
+    element.classList.add("pdf-force-visible");
 
     const opt = {
-      margin: [15, 15],
+      margin: 10,
       filename: `Bitto_${topicInput.value || "Revisao"}.pdf`,
       image: { type: "jpeg", quality: 1.0 },
       html2canvas: {
         scale: 2,
         useCORS: true,
-        logging: false,
-        letterRendering: true,
-        backgroundColor: "#FFFFFF",
-        scrollY: -window.scrollY, // Ajusta o offset do scroll
+        backgroundColor: "#ffffff",
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
     try {
+      // Pequeno delay para o browser processar a remoção da animação
+      await new Promise((resolve) => setTimeout(resolve, 100));
       await html2pdf().set(opt).from(element).save();
-    } catch (err) {
-      console.error("Erro no PDF:", err);
-      showToast("Erro ao gerar PDF", "error");
+    } catch (e) {
+      showToast("Erro ao baixar PDF", "error");
     } finally {
-      // Remove a classe de renderização para voltar ao tema do app
-      element.classList.remove("pdf-rendering");
+      element.classList.remove("pdf-force-visible");
+      element.style.animation = ""; // Restaura animação original
     }
   });
 }
 
-if (copyBtn) {
-  copyBtn.addEventListener("click", () => {
-    navigator.clipboard
-      .writeText(reviewOutput.innerText)
-      .then(() => showToast("Copiado!", "success"));
-  });
-}
-
-if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    const html = document.documentElement;
-    const newTheme =
-      html.getAttribute("data-theme") === "dark" ? "light" : "dark";
-    html.setAttribute("data-theme", newTheme);
-  });
-}
-
 function showToast(message, type = "success") {
-  let container = document.getElementById("toast-container");
-  if (!container) {
-    container = document.createElement("div");
+  let container =
+    document.getElementById("toast-container") || document.createElement("div");
+  if (!container.id) {
     container.id = "toast-container";
     document.body.appendChild(container);
   }
@@ -160,5 +131,5 @@ function showToast(message, type = "success") {
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `<span>${type === "success" ? "✅" : "⚠️"}</span> ${message}`;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
+  setTimeout(() => toast.remove(), 3000);
 }
