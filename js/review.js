@@ -15,33 +15,49 @@ const statusText = document.getElementById("statusText");
 
 let currentUser = null;
 
+// --- AUTH ---
 onAuthStateChanged(auth, (user) => {
   if (user) currentUser = user;
   else window.location.href = "login.html";
 });
 
+// --- EVENTO DE GERAR ---
 if (generateBtn) {
   generateBtn.addEventListener("click", async () => {
-    const topic = topicInput?.value || "";
-    const content = contentInput?.value || "";
+    const topic = topicInput ? topicInput.value : "";
+    const content = contentInput ? contentInput.value : "";
+
     if (!content.trim() && !topic.trim()) {
       showToast("Cole um texto ou defina um tema!", "error");
       return;
     }
+
     if (!currentUser) return;
 
+    // 1. LIMIT CHECK (Plano)
     const canUse = await checkUsageLimit(currentUser.uid, "review");
     if (!canUse) {
-      showToast("🔒 Limite mensal atingido.", "error");
+      showToast("🔒 Limite mensal atingido (3/3).", "error");
       return;
     }
 
+    // UI Loading
     const originalText = generateBtn.innerHTML;
     generateBtn.innerHTML = '<span class="loader"></span> BITTO PROCESSANDO...';
+    generateBtn.classList.add("btn-loading");
     generateBtn.disabled = true;
+    if (statusText) {
+      statusText.style.display = "block";
+      statusText.innerText = "Gerando síntese técnica...";
+    }
 
     try {
-      const prompt = `BITTO AI - Modo Professor Técnico. Tema: "${topic}". Conteúdo: "${content}". Gere: 1. Resumo Teórico. 2. Simulado (15 questões). 3. Gabarito. Formato: Markdown bonito. Idioma: PT-BR.`;
+      const prompt = `
+                BITTO AI - Modo Professor Técnico.
+                Tema: "${topic}". Conteúdo: "${content}".
+                Gere: 1. Resumo Teórico (Conceitos, Aplicação). 2. Simulado (15 questões variadas). 3. Gabarito.
+                Formato: Markdown bonito. Idioma: PT-BR.
+            `;
 
       const response = await fetch("../api/generate", {
         method: "POST",
@@ -52,69 +68,118 @@ if (generateBtn) {
         }),
       });
 
+      if (!response.ok) throw new Error("Erro no Servidor");
+
       const data = await response.json();
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!aiResponse) throw new Error("A IA não gerou resposta.");
 
+      // Render Markdown
       if (typeof marked !== "undefined") {
         reviewOutput.innerHTML = marked.parse(aiResponse);
       } else {
         reviewOutput.innerHTML = `<pre style="white-space: pre-wrap;">${aiResponse}</pre>`;
       }
 
+      // 2. INCREMENT LIMIT (Plano)
       await incrementUsage(currentUser.uid, "review");
-      if (window.recordActivity) window.recordActivity("review", 1);
-      if (window.awardXP) window.awardXP(20, "Resumo IA");
 
+      // --- 3. XP E ESTATÍSTICAS (NOVO) ---
+      if (window.recordActivity) window.recordActivity("review", 1); // Conta geração
+      if (window.awardXP) window.awardXP(20, "Resumo IA"); // Ganha XP
+
+      // UI Sucesso
       if (emptyState) emptyState.style.display = "none";
       reviewOutput.style.display = "block";
       if (outputActions) outputActions.style.display = "flex";
       if (topic && reviewTitle) reviewTitle.innerText = `Revisão: ${topic}`;
-      showToast("Revisão gerada!", "success");
+      showToast("Revisão gerada com sucesso!", "success");
     } catch (error) {
+      console.error(error);
       showToast("Erro ao gerar.", "error");
+      statusText.innerText = "Erro na conexão.";
     } finally {
       generateBtn.innerHTML = originalText;
+      generateBtn.classList.remove("btn-loading");
       generateBtn.disabled = false;
+      if (statusText)
+        setTimeout(() => (statusText.style.display = "none"), 5000);
     }
   });
 }
 
-// --- SOLUÇÃO PARA O PDF EM BRANCO/CORTADO ---
+// --- UTILS ---
 if (downloadPdfBtn) {
-  downloadPdfBtn.addEventListener("click", async () => {
-    const element = document.getElementById("reviewOutput");
-    if (!element || element.innerHTML.trim() === "") return;
+  downloadPdfBtn.addEventListener("click", () => {
+    if (typeof html2pdf === "undefined") {
+      alert("Erro: Lib html2pdf não carregada.");
+      return;
+    }
 
-    // 1. Forçar estado estático para evitar "branco" (opacidade 0 da animação)
-    element.style.animation = "none";
-    element.style.opacity = "1";
-    element.style.display = "block";
-    element.classList.add("pdf-rendering-mode");
+    const source = document.getElementById("reviewOutput");
+
+    // Cria um elemento temporário fora do DOM para evitar clipping/overflow do paper-sheet
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = `
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 794px;
+            padding: 40px;
+            background: #ffffff;
+            color: #111111;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+            box-sizing: border-box;
+        `;
+
+    // Copia e estiliza o conteúdo inline para garantir renderização correta
+    const clone = source.cloneNode(true);
+    clone.style.display = "block";
+    clone.style.width = "100%";
+    clone.style.overflow = "visible";
+
+    // Garante que elementos internos não quebrem layout entre páginas
+    clone.querySelectorAll("h1, h2, h3").forEach((el) => {
+      el.style.pageBreakAfter = "avoid";
+      el.style.breakAfter = "avoid";
+    });
+    clone.querySelectorAll("p, li, blockquote").forEach((el) => {
+      el.style.pageBreakInside = "avoid";
+      el.style.breakInside = "avoid";
+    });
+
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
 
     const opt = {
-      margin: [15, 12],
-      filename: `Bitto_${topicInput.value || "Revisao"}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
+      margin: [15, 15, 15, 15],
+      filename: "Bitto_Resumo.pdf",
+      image: { type: "jpeg", quality: 0.95 },
       html2canvas: {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
-        backgroundColor: "#ffffff", // Fundo branco sólido
+        logging: false,
+        windowWidth: 794,
         scrollY: 0,
-        windowWidth: 800, // Evita cortes laterais
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
-    try {
-      await html2pdf().set(opt).from(element).save();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      // Restaurar estilo original
-      element.classList.remove("pdf-rendering-mode");
-      element.style.animation = "";
-    }
+    html2pdf()
+      .set(opt)
+      .from(wrapper)
+      .save()
+      .then(() => {
+        document.body.removeChild(wrapper);
+      })
+      .catch((err) => {
+        console.error("Erro ao gerar PDF:", err);
+        document.body.removeChild(wrapper);
+        alert("Erro ao gerar o PDF. Tente novamente.");
+      });
   });
 }
 
@@ -129,17 +194,16 @@ if (copyBtn) {
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const html = document.documentElement;
-    html.setAttribute(
-      "data-theme",
-      html.getAttribute("data-theme") === "dark" ? "light" : "dark",
-    );
+    if (html.getAttribute("data-theme") === "dark")
+      html.setAttribute("data-theme", "light");
+    else html.setAttribute("data-theme", "dark");
   });
 }
 
 function showToast(message, type = "success") {
-  let container =
-    document.getElementById("toast-container") || document.createElement("div");
-  if (!container.id) {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
     container.id = "toast-container";
     document.body.appendChild(container);
   }
@@ -147,5 +211,7 @@ function showToast(message, type = "success") {
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `<span>${type === "success" ? "✅" : "⚠️"}</span> ${message}`;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
 }
