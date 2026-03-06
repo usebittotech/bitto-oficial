@@ -90,7 +90,7 @@ if (generateBtn) {
   });
 }
 
-// --- DOWNLOAD PDF (VERSÃO FINAL SEM CORTES) ---
+// --- DOWNLOAD PDF (FIX DEFINITIVO PARA BRANCO E CORES CLARAS) ---
 if (downloadPdfBtn) {
   downloadPdfBtn.addEventListener("click", async () => {
     if (typeof html2pdf === "undefined") {
@@ -98,16 +98,14 @@ if (downloadPdfBtn) {
       return;
     }
 
-    const originalElement = document.getElementById("reviewOutput");
-    if (!originalElement || originalElement.innerHTML.trim() === "") return;
+    const element = document.getElementById("reviewOutput");
+    if (!element || element.innerHTML.trim() === "") return;
 
-    // 1. Criar um clone "limpo" fora da tela para evitar cortes e transparência
-    const clone = originalElement.cloneNode(true);
-    clone.classList.add("pdf-export-mode");
-    document.body.appendChild(clone);
+    // Força o elemento a ficar visível, preto no branco, antes da captura
+    element.classList.add("pdf-rendering");
 
     const opt = {
-      margin: 15,
+      margin: [15, 15],
       filename: `Bitto_${topicInput.value || "Revisao"}.pdf`,
       image: { type: "jpeg", quality: 1.0 },
       html2canvas: {
@@ -115,17 +113,21 @@ if (downloadPdfBtn) {
         useCORS: true,
         logging: false,
         letterRendering: true,
-        backgroundColor: "#FFFFFF", // Força fundo branco sólido
+        backgroundColor: "#FFFFFF",
+        scrollY: -window.scrollY, // Ajusta o offset do scroll
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
     try {
-      await html2pdf().set(opt).from(clone).save();
+      await html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error("Erro no PDF:", err);
+      showToast("Erro ao gerar PDF", "error");
     } finally {
-      // 2. Remove o clone após o download
-      document.body.removeChild(clone);
+      // Remove a classe de renderização para voltar ao tema do app
+      element.classList.remove("pdf-rendering");
     }
   });
 }
@@ -148,9 +150,9 @@ if (themeToggle) {
 }
 
 function showToast(message, type = "success") {
-  let container =
-    document.getElementById("toast-container") || document.createElement("div");
-  if (!container.id) {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
     container.id = "toast-container";
     document.body.appendChild(container);
   }
