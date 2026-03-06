@@ -44,10 +44,6 @@ if (generateBtn) {
     generateBtn.innerHTML = '<span class="loader"></span> BITTO PROCESSANDO...';
     generateBtn.classList.add("btn-loading");
     generateBtn.disabled = true;
-    if (statusText) {
-      statusText.style.display = "block";
-      statusText.innerText = "Gerando síntese técnica...";
-    }
 
     try {
       const prompt = `
@@ -66,11 +62,8 @@ if (generateBtn) {
         }),
       });
 
-      if (!response.ok) throw new Error("Erro no Servidor");
-
       const data = await response.json();
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!aiResponse) throw new Error("A IA não gerou resposta.");
 
       if (typeof marked !== "undefined") {
         reviewOutput.innerHTML = marked.parse(aiResponse);
@@ -79,7 +72,6 @@ if (generateBtn) {
       }
 
       await incrementUsage(currentUser.uid, "review");
-
       if (window.recordActivity) window.recordActivity("review", 1);
       if (window.awardXP) window.awardXP(20, "Resumo IA");
 
@@ -87,62 +79,54 @@ if (generateBtn) {
       reviewOutput.style.display = "block";
       if (outputActions) outputActions.style.display = "flex";
       if (topic && reviewTitle) reviewTitle.innerText = `Revisão: ${topic}`;
-      showToast("Revisão gerada com sucesso!", "success");
+      showToast("Revisão gerada!", "success");
     } catch (error) {
-      console.error(error);
       showToast("Erro ao gerar.", "error");
-      statusText.innerText = "Erro na conexão.";
     } finally {
       generateBtn.innerHTML = originalText;
       generateBtn.classList.remove("btn-loading");
       generateBtn.disabled = false;
-      if (statusText)
-        setTimeout(() => (statusText.style.display = "none"), 5000);
     }
   });
 }
 
-// --- UTILS (DOWNLOAD PDF COM FIX DE COR) ---
+// --- DOWNLOAD PDF (VERSÃO FINAL SEM CORTES) ---
 if (downloadPdfBtn) {
-  downloadPdfBtn.addEventListener("click", () => {
+  downloadPdfBtn.addEventListener("click", async () => {
     if (typeof html2pdf === "undefined") {
-      alert("Erro: Lib html2pdf não carregada.");
+      alert("Biblioteca PDF não encontrada.");
       return;
     }
 
-    const element = document.getElementById("reviewOutput");
+    const originalElement = document.getElementById("reviewOutput");
+    if (!originalElement || originalElement.innerHTML.trim() === "") return;
 
-    if (!element || element.innerHTML.trim() === "") {
-      showToast("Gere um conteúdo primeiro!", "error");
-      return;
-    }
-
-    // Aplica classe para forçar contraste no PDF
-    element.classList.add("pdf-export-mode");
+    // 1. Criar um clone "limpo" fora da tela para evitar cortes e transparência
+    const clone = originalElement.cloneNode(true);
+    clone.classList.add("pdf-export-mode");
+    document.body.appendChild(clone);
 
     const opt = {
-      margin: [15, 15, 15, 15],
-      filename: `Bitto_Revisao_${topicInput.value || "Estudo"}.pdf`,
+      margin: 15,
+      filename: `Bitto_${topicInput.value || "Revisao"}.pdf`,
       image: { type: "jpeg", quality: 1.0 },
       html2canvas: {
-        scale: 3, // Aumentado para maior nitidez
+        scale: 2,
         useCORS: true,
+        logging: false,
         letterRendering: true,
-        scrollY: 0,
-        windowWidth: 1024,
+        backgroundColor: "#FFFFFF", // Força fundo branco sólido
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
-    html2pdf()
-      .set(opt)
-      .from(element)
-      .save()
-      .then(() => {
-        // Remove a classe após gerar para manter o tema da UI do usuário
-        element.classList.remove("pdf-export-mode");
-      });
+    try {
+      await html2pdf().set(opt).from(clone).save();
+    } finally {
+      // 2. Remove o clone após o download
+      document.body.removeChild(clone);
+    }
   });
 }
 
@@ -157,18 +141,16 @@ if (copyBtn) {
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const html = document.documentElement;
-    if (html.getAttribute("data-theme") === "dark") {
-      html.setAttribute("data-theme", "light");
-    } else {
-      html.setAttribute("data-theme", "dark");
-    }
+    const newTheme =
+      html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", newTheme);
   });
 }
 
 function showToast(message, type = "success") {
-  let container = document.getElementById("toast-container");
-  if (!container) {
-    container = document.createElement("div");
+  let container =
+    document.getElementById("toast-container") || document.createElement("div");
+  if (!container.id) {
     container.id = "toast-container";
     document.body.appendChild(container);
   }
@@ -176,7 +158,5 @@ function showToast(message, type = "success") {
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `<span>${type === "success" ? "✅" : "⚠️"}</span> ${message}`;
   container.appendChild(toast);
-  setTimeout(() => {
-    toast.remove();
-  }, 3500);
+  setTimeout(() => toast.remove(), 3500);
 }
