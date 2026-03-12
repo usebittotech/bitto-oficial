@@ -150,7 +150,7 @@ document.getElementById("btnLiberar")?.addEventListener("click", async () => {
     await updateDoc(doc(db, "users", snap.docs[0].id), {
       plan: "embaixador",
       subscriptionEnd: Timestamp.fromDate(
-        new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        new Date(Date.now() + 13 * 24 * 60 * 60 * 1000),
       ),
     });
     showToast("🚀 Acesso Liberado!");
