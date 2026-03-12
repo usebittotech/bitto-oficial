@@ -6,131 +6,486 @@
     <title>BACKSTAGE // BITTO PRIVADO</title>
     <link rel="icon" type="image/png" href="imagens/favicon.png" />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Unbounded:wght@700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --bg-color: #fafafa;
-        --text-main: #111111;
-        --text-muted: #666666;
-        --card-bg: #ffffff;
-        --border-color: #e0e0e0;
-        --input-bg: #f8f9fa;
-        --primary-blue: #0035ff;
-        --accent-green: #ccff00;
-        --font-display: "Unbounded", sans-serif;
-        --font-body: "DM Sans", sans-serif;
+        --bg: #08090c;
+        --surface: #0f1117;
+        --surface-2: #161923;
+        --surface-3: #1d2130;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-hover: rgba(255, 255, 255, 0.14);
+        --text: #e8eaf0;
+        --muted: #5a6070;
+        --muted-2: #8892a4;
+        --blue: #3b6fff;
+        --blue-glow: rgba(59, 111, 255, 0.25);
+        --green: #00e57a;
+        --green-glow: rgba(0, 229, 122, 0.2);
+        --yellow: #ffc850;
+        --red: #ff4d6a;
+        --purple: #a855f7;
+        --font: "Space Grotesk", sans-serif;
+        --mono: "Space Mono", monospace;
       }
 
-      [data-theme="dark"] {
-        --bg-color: #050505;
-        --text-main: #ededed;
-        --text-muted: #aaaaaa;
-        --card-bg: #111111;
-        --border-color: #333333;
-        --input-bg: #1a1a1a;
-        --primary-blue: #3366ff;
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
 
       body {
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        font-family: var(--font-body);
-        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
         min-height: 100vh;
-        display: none; /* Controlado pelo admin.js */
-        -webkit-font-smoothing: antialiased;
-        background-image: radial-gradient(
-          circle at 50% 50%,
-          rgba(0, 53, 255, 0.04) 0%,
-          transparent 70%
-        );
-        padding: 40px 20px;
-      }
-
-      .admin-wrapper {
-        max-width: 1300px;
-        margin: 0 auto;
-      }
-
-      header {
         display: flex;
-        justify-content: space-between;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      /* ── NOISE OVERLAY ── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.5;
+      }
+
+      /* ── SIDEBAR ── */
+      .sidebar {
+        width: 260px;
+        min-height: 100vh;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 10;
+        flex-shrink: 0;
+      }
+
+      .sidebar-logo {
+        padding: 28px 24px 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .logo-mark {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .logo-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+      .logo-name span {
+        color: var(--blue);
+      }
+
+      .sidebar-nav {
+        padding: 16px 12px;
+        flex: 1;
+      }
+      .nav-label {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.15em;
+        color: var(--muted);
+        text-transform: uppercase;
+        padding: 0 12px;
+        margin: 16px 0 8px;
+      }
+      .nav-item {
+        display: flex;
         align-items: center;
-        margin-bottom: 40px;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--muted-2);
+        transition: all 0.15s;
+        text-decoration: none;
+        border: 1px solid transparent;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+        color: var(--text);
+        border-color: var(--border);
+      }
+      .nav-item.active {
+        background: var(--blue-glow);
+        color: var(--text);
+        border-color: rgba(59, 111, 255, 0.3);
+      }
+      .nav-item .icon {
+        width: 18px;
+        text-align: center;
+        font-size: 1rem;
+      }
+      .nav-badge {
+        margin-left: auto;
+        background: var(--blue);
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 20px;
+        font-family: var(--mono);
       }
 
-      .logo {
-        font-family: var(--font-display);
-        font-weight: 900;
-        font-size: 1.2rem;
-        letter-spacing: -0.04em;
+      .sidebar-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border);
       }
-      .logo span {
-        color: var(--primary-blue);
+      .user-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), var(--purple));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      .user-info {
+        font-size: 0.78rem;
+      }
+      .user-name {
+        font-weight: 600;
+      }
+      .user-role {
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+      .theme-toggle {
+        margin-left: auto;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--muted-2);
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+      }
+      .theme-toggle:hover {
+        background: var(--surface-3);
+        color: var(--text);
       }
 
-      /* GRID SYSTEM */
-      .dashboard-grid {
+      /* ── MAIN AREA ── */
+      .main {
+        margin-left: 260px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ── TOP BAR ── */
+      .topbar {
+        padding: 20px 32px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: rgba(8, 9, 12, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+      .topbar-title {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .topbar-sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-left: 2px;
+      }
+      .topbar-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: var(--font);
+        background: var(--surface-2);
+        color: var(--text);
+      }
+      .btn:hover {
+        background: var(--surface-3);
+        border-color: var(--border-hover);
+      }
+      .btn-blue {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: white;
+      }
+      .btn-blue:hover {
+        background: #2d5fe8;
+        border-color: #2d5fe8;
+        box-shadow: 0 0 20px var(--blue-glow);
+      }
+      .btn-ghost {
+        background: transparent;
+      }
+      .btn-sm {
+        padding: 5px 11px;
+        font-size: 0.72rem;
+      }
+      .btn-icon {
+        padding: 8px;
+      }
+
+      /* ── CONTENT ── */
+      .content {
+        padding: 28px 32px;
+        flex: 1;
+      }
+
+      /* ── KPI CARDS ── */
+      .kpi-grid {
         display: grid;
-        grid-template-columns: 360px 1fr;
-        gap: 24px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .kpi-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s;
+      }
+      .kpi-card:hover {
+        border-color: var(--border-hover);
+      }
+      .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        opacity: 0.08;
+        transform: translate(30%, -30%);
+      }
+      .kpi-card.blue::before {
+        background: var(--blue);
+      }
+      .kpi-card.green::before {
+        background: var(--green);
+      }
+      .kpi-card.yellow::before {
+        background: var(--yellow);
+      }
+      .kpi-card.purple::before {
+        background: var(--purple);
+      }
+
+      .kpi-label {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .kpi-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .blue .kpi-dot {
+        background: var(--blue);
+        box-shadow: 0 0 6px var(--blue);
+      }
+      .green .kpi-dot {
+        background: var(--green);
+        box-shadow: 0 0 6px var(--green);
+      }
+      .yellow .kpi-dot {
+        background: var(--yellow);
+        box-shadow: 0 0 6px var(--yellow);
+      }
+      .purple .kpi-dot {
+        background: var(--purple);
+        box-shadow: 0 0 6px var(--purple);
+      }
+
+      .kpi-value {
+        font-size: 1.9rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        margin-bottom: 4px;
+      }
+      .kpi-delta {
+        font-size: 0.72rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .kpi-delta.up {
+        color: var(--green);
+      }
+      .kpi-delta.down {
+        color: var(--red);
+      }
+
+      /* ── MAIN GRID ── */
+      .workspace-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 20px;
         align-items: start;
       }
 
-      .auth-card-style {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 24px;
-        padding: 28px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+      /* ── PANEL ── */
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .panel-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .panel-count {
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--muted-2);
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        border-radius: 20px;
+      }
+      .panel-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
       }
 
-      .section-title {
-        font-family: var(--font-display);
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 24px;
-        display: block;
+      /* ── SEARCH BAR ── */
+      .search-bar-wrapper {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+        align-items: center;
       }
-
-      .auth-input {
-        width: 100%;
-        background: var(--input-bg);
-        color: var(--text-main);
-        border: 1px solid var(--border-color);
-        padding: 12px 16px;
-        border-radius: 12px;
-        font-size: 0.9rem;
+      .search-bar {
+        flex: 1;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 14px 8px 34px;
+        font-size: 0.82rem;
+        color: var(--text);
+        font-family: var(--font);
         outline: none;
-        margin-bottom: 12px;
-        box-sizing: border-box;
-      }
-
-      .btn-primary {
+        transition: border-color 0.2s;
+        position: relative;
         width: 100%;
-        padding: 14px;
-        border-radius: 50px;
-        border: none;
-        font-weight: 800;
-        font-family: var(--font-display);
-        font-size: 0.8rem;
+      }
+      .search-bar:focus {
+        border-color: var(--blue);
+      }
+      .search-wrap {
+        position: relative;
+        flex: 1;
+      }
+      .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        font-size: 0.85rem;
+        pointer-events: none;
+      }
+      .filter-chip {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.72rem;
+        font-weight: 500;
         cursor: pointer;
-        transition: 0.3s;
-        background: var(--primary-blue);
-        color: white;
+        color: var(--muted-2);
+        white-space: nowrap;
+        transition: all 0.15s;
+      }
+      .filter-chip:hover,
+      .filter-chip.active {
+        border-color: var(--blue);
+        color: var(--text);
+        background: var(--blue-glow);
       }
 
-      .btn-green {
-        background: var(--accent-green);
-        color: #111;
-      }
-
-      /* TABLE ALIGNMENT FIX */
-      .table-container {
-        width: 100%;
+      /* ── TABLE ── */
+      .table-wrap {
         overflow-x: auto;
       }
       table {
@@ -138,188 +493,785 @@
         border-collapse: collapse;
         table-layout: fixed;
       }
-
-      th {
-        text-align: left;
-        padding: 15px;
-        font-size: 0.65rem;
-        font-weight: 800;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        border-bottom: 1px solid var(--border-color);
+      thead tr {
+        background: var(--surface-2);
       }
-
+      th {
+        padding: 10px 20px;
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        font-weight: 400;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        text-align: left;
+        white-space: nowrap;
+      }
       td {
-        padding: 16px 15px;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 0.85rem;
-        vertical-align: middle;
+        padding: 0 20px;
+        font-size: 0.82rem;
+        color: var(--text);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        vertical-align: middle;
+      }
+      tbody tr {
+        height: 56px;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.1s;
+        cursor: pointer;
+      }
+      tbody tr:hover {
+        background: var(--surface-2);
+      }
+      tbody tr:last-child {
+        border-bottom: none;
       }
 
-      /* Column Widths */
-      .col-influencer {
-        width: 30%;
+      .col-inf {
+        width: 28%;
       }
       .col-status {
-        width: 20%;
+        width: 16%;
       }
       .col-assets {
-        width: 25%;
+        width: 24%;
       }
       .col-plan {
-        width: 10%;
+        width: 12%;
         text-align: center;
       }
+      .col-date {
+        width: 12%;
+      }
       .col-manage {
-        width: 15%;
+        width: 8%;
         text-align: right;
       }
 
-      .active-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--accent-green);
-        box-shadow: 0 0 10px var(--accent-green);
-        display: inline-block;
+      /* ── INF NAME CELL ── */
+      .inf-cell {
+        display: flex;
+        align-items: center;
+        gap: 11px;
       }
-
-      #themeBtn {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        padding: 8px 16px;
-        border-radius: 50px;
-        cursor: pointer;
-        font-weight: 700;
+      .inf-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 0.7rem;
-        color: var(--text-main);
+        font-weight: 700;
+        flex-shrink: 0;
+        color: var(--muted-2);
+      }
+      .inf-name {
+        font-weight: 600;
+        font-size: 0.83rem;
+      }
+      .inf-handle {
+        font-size: 0.7rem;
+        color: var(--muted);
       }
 
+      /* ── STATUS BADGES ── */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        font-family: var(--mono);
+        white-space: nowrap;
+      }
+      .badge-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+      }
+      .badge-green {
+        background: rgba(0, 229, 122, 0.1);
+        color: var(--green);
+        border: 1px solid rgba(0, 229, 122, 0.2);
+      }
+      .badge-green .badge-dot {
+        background: var(--green);
+        box-shadow: 0 0 4px var(--green);
+      }
+      .badge-yellow {
+        background: rgba(255, 200, 80, 0.1);
+        color: var(--yellow);
+        border: 1px solid rgba(255, 200, 80, 0.2);
+      }
+      .badge-yellow .badge-dot {
+        background: var(--yellow);
+      }
+      .badge-blue {
+        background: rgba(59, 111, 255, 0.1);
+        color: #7ba3ff;
+        border: 1px solid rgba(59, 111, 255, 0.2);
+      }
+      .badge-blue .badge-dot {
+        background: var(--blue);
+      }
+      .badge-red {
+        background: rgba(255, 77, 106, 0.1);
+        color: var(--red);
+        border: 1px solid rgba(255, 77, 106, 0.2);
+      }
+      .badge-purple {
+        background: rgba(168, 85, 247, 0.1);
+        color: var(--purple);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+      }
+
+      /* ── PLAN PILL ── */
+      .plan-pill {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--muted-2);
+      }
+      .plan-pill.pro {
+        background: rgba(59, 111, 255, 0.12);
+        border-color: rgba(59, 111, 255, 0.3);
+        color: #7ba3ff;
+      }
+      .plan-pill.elite {
+        background: rgba(168, 85, 247, 0.12);
+        border-color: rgba(168, 85, 247, 0.3);
+        color: var(--purple);
+      }
+
+      /* ── ASSETS ── */
+      .asset-code {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        padding: 3px 8px;
+        border-radius: 5px;
+        color: var(--yellow);
+      }
+
+      /* ── ACTION BUTTONS ── */
+      .action-btns {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+      }
+      .icon-btn {
+        background: none;
+        border: 1px solid transparent;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 5px 7px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        transition: all 0.15s;
+        line-height: 1;
+      }
+      .icon-btn:hover {
+        background: var(--surface-3);
+        border-color: var(--border);
+        color: var(--text);
+      }
+      .icon-btn.danger:hover {
+        background: rgba(255, 77, 106, 0.1);
+        border-color: rgba(255, 77, 106, 0.3);
+        color: var(--red);
+      }
+
+      /* ── RIGHT PANEL FORMS ── */
+      .right-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .form-section {
+        padding: 20px;
+      }
+      .form-label {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 4px;
+        display: block;
+      }
+      .form-group {
+        margin-bottom: 12px;
+      }
+      .form-input {
+        width: 100%;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 13px;
+        font-size: 0.82rem;
+        color: var(--text);
+        font-family: var(--font);
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .form-input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px var(--blue-glow);
+      }
+      .form-input::placeholder {
+        color: var(--muted);
+      }
+      select.form-input {
+        cursor: pointer;
+        appearance: none;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── ACTIVITY FEED ── */
+      .activity-list {
+        padding: 8px 0;
+      }
+      .activity-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 20px;
+        transition: background 0.1s;
+      }
+      .activity-item:hover {
+        background: var(--surface-2);
+      }
+      .activity-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: var(--surface-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+      }
+      .activity-text {
+        font-size: 0.78rem;
+        line-height: 1.45;
+      }
+      .activity-time {
+        font-size: 0.65rem;
+        color: var(--muted);
+        margin-top: 2px;
+        font-family: var(--mono);
+      }
+
+      /* ── EMPTY STATE ── */
+      .empty-state {
+        padding: 48px 20px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+      .empty-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        opacity: 0.4;
+      }
+      .empty-title {
+        font-weight: 600;
+        color: var(--muted-2);
+        margin-bottom: 4px;
+      }
+
+      /* ── TOAST ── */
       #toast {
         position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: var(--card-bg);
-        color: var(--text-main);
-        padding: 15px 30px;
-        border-radius: 16px;
-        font-weight: 700;
-        border-left: 6px solid var(--primary-blue);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-        transform: translateY(150px);
-        transition: 0.4s;
+        bottom: 28px;
+        right: 28px;
+        background: var(--surface);
+        color: var(--text);
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--green);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        transform: translateY(100px) scale(0.95);
+        opacity: 0;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 320px;
       }
       #toast.show {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      #toast .toast-icon {
+        font-size: 1.1rem;
       }
 
-      .btn-delete {
-        color: #ff3b3b;
+      /* ── MODAL OVERLAY ── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 28px;
+        width: 440px;
+        max-width: 95vw;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+        animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes modalIn {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .modal-close {
+        margin-left: auto;
         background: none;
         border: none;
+        color: var(--muted);
         cursor: pointer;
-        opacity: 0.4;
-        font-size: 1rem;
+        font-size: 1.2rem;
+        transition: color 0.15s;
       }
-      .btn-delete:hover {
-        opacity: 1;
+      .modal-close:hover {
+        color: var(--text);
+      }
+
+      /* ── SCROLLBAR ── */
+      ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--surface-3);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--muted);
+      }
+
+      /* ── PIPELINE KANBAN ── */
+      .kanban-strip {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .kanban-col {
+        flex-shrink: 0;
+        width: 200px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .kanban-col-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      .kanban-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 7px;
+        cursor: pointer;
+        transition: border-color 0.15s;
+        font-size: 0.75rem;
+      }
+      .kanban-card:hover {
+        border-color: var(--border-hover);
+      }
+      .kanban-card-name {
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+      .kanban-card-handle {
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      /* ── PROGRESS BARS ── */
+      .progress-bar {
+        height: 4px;
+        background: var(--surface-3);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 6px;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.5s;
+      }
+
+      /* ─── LIGHT THEME ─── */
+      [data-theme="light"] {
+        --bg: #f5f6fa;
+        --surface: #ffffff;
+        --surface-2: #f0f2f7;
+        --surface-3: #e8eaf0;
+        --border: rgba(0, 0, 0, 0.08);
+        --border-hover: rgba(0, 0, 0, 0.14);
+        --text: #0f1117;
+        --muted: #8891a6;
+        --muted-2: #5a6178;
+        --blue: #2f5ee8;
+        --blue-glow: rgba(47, 94, 232, 0.15);
+        --green: #00c46a;
+        --green-glow: rgba(0, 196, 106, 0.15);
       }
     </style>
   </head>
   <body>
-    <div class="admin-wrapper">
-      <header>
-        <div class="logo">BACK<span>STAGE</span></div>
-        <button id="themeBtn">SWITCH THEME</button>
-      </header>
-
-      <div class="dashboard-grid">
-        <div class="sidebar">
-          <div class="auth-card-style" style="margin-bottom: 24px">
-            <span class="section-title">Ativação Firebase</span>
-            <input
-              type="email"
-              id="userEmail"
-              class="auth-input"
-              placeholder="E-mail do embaixador"
-            />
-            <button id="btnLiberar" class="btn-primary">GRANT ACCESS</button>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">// Sistema Privado</div>
+        <div class="logo-name">BACK<span>STAGE</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a class="nav-item active" href="#">
+          <span class="icon">⬛</span> Pipeline
+          <span class="nav-badge" id="navBadge">0</span>
+        </a>
+        <a class="nav-item" href="#"> <span class="icon">🔥</span> Ativos </a>
+        <a class="nav-item" href="#">
+          <span class="icon">📦</span> Assets & Cupons
+        </a>
+        <div class="nav-label">Ferramentas</div>
+        <a class="nav-item" href="#"> <span class="icon">⚡</span> Firebase </a>
+        <a class="nav-item" href="#">
+          <span class="icon">📊</span> Google Sheets
+        </a>
+        <a class="nav-item" href="#">
+          <span class="icon">⚙️</span> Configurações
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar">B</div>
+          <div class="user-info">
+            <div class="user-name">Bitto</div>
+            <div class="user-role">Admin · Backstage</div>
           </div>
+          <button class="theme-toggle" id="themeBtn" title="Trocar tema">
+            ☀️
+          </button>
+        </div>
+      </div>
+    </aside>
 
-          <div class="auth-card-style">
-            <span class="section-title">Captura de Lead</span>
-            <input
-              type="text"
-              id="infNome"
-              class="auth-input"
-              placeholder="Nome Real"
-            />
-            <input
-              type="text"
-              id="infInsta"
-              class="auth-input"
-              placeholder="@usuario"
-            />
-            <select id="infStatus" class="auth-input">
-              <option value="Prospecção">Prospecção</option>
-              <option value="Abordagem">Abordagem</option>
-              <option value="Ativo">Ativo</option>
-            </select>
-            <button id="btnSalvarInf" class="btn-primary btn-green">
-              SAVE LEAD
-            </button>
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Dashboard de Influencers</div>
+          <div class="topbar-sub">Pipeline CRM — visão geral</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" id="btnSync">
+            ↻ Re-sync Sheets
+          </button>
+          <button class="btn btn-blue btn-sm" id="btnOpenModal">
+            + Novo Lead
+          </button>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card blue">
+            <div class="kpi-label">
+              <span class="kpi-dot"></span>Total Pipeline
+            </div>
+            <div class="kpi-value" id="kpiTotal">0</div>
+            <div class="kpi-delta up">↑ +3 esta semana</div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                style="width: 68%; background: var(--blue)"
+              ></div>
+            </div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-label"><span class="kpi-dot"></span>Ativos</div>
+            <div class="kpi-value" id="kpiAtivos">0</div>
+            <div class="kpi-delta up">↑ Conversão 40%</div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                style="width: 40%; background: var(--green)"
+              ></div>
+            </div>
+          </div>
+          <div class="kpi-card yellow">
+            <div class="kpi-label">
+              <span class="kpi-dot"></span>Em Abordagem
+            </div>
+            <div class="kpi-value" id="kpiAbordagem">0</div>
+            <div class="kpi-delta">→ Aguardando resp.</div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                style="width: 55%; background: var(--yellow)"
+              ></div>
+            </div>
+          </div>
+          <div class="kpi-card purple">
+            <div class="kpi-label"><span class="kpi-dot"></span>Prospecção</div>
+            <div class="kpi-value" id="kpiProspeccao">0</div>
+            <div class="kpi-delta">→ Top of funnel</div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                style="width: 80%; background: var(--purple)"
+              ></div>
+            </div>
           </div>
         </div>
 
-        <div class="auth-card-style">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 20px;
-            "
-          >
-            <span class="section-title" style="margin: 0"
-              >Pipeline Database</span
-            >
-            <button
-              id="btnSync"
-              style="
-                background: none;
-                border: none;
-                color: var(--primary-blue);
-                font-weight: 800;
-                font-size: 0.7rem;
-                cursor: pointer;
-              "
-            >
-              RE-SYNC SHEETS
-            </button>
+        <!-- WORKSPACE -->
+        <div class="workspace-grid">
+          <!-- TABLE PANEL -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                📋 Pipeline Database
+                <span class="panel-count" id="tableCount">0 registros</span>
+              </div>
+              <div class="panel-actions">
+                <button class="btn btn-sm" id="btnExport">⬇ Export CSV</button>
+              </div>
+            </div>
+
+            <div class="search-bar-wrapper">
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input
+                  type="text"
+                  class="search-bar"
+                  id="searchInput"
+                  placeholder="Buscar por nome, @handle, cupom..."
+                />
+              </div>
+              <div class="filter-chip active" data-filter="all">Todos</div>
+              <div class="filter-chip" data-filter="Ativo">Ativos</div>
+              <div class="filter-chip" data-filter="Abordagem">Abordagem</div>
+              <div class="filter-chip" data-filter="Prospecção">Prospecção</div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="col-inf">Influencer</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-assets">Assets / Cupom</th>
+                    <th class="col-plan">Plano</th>
+                    <th class="col-date">Adicionado</th>
+                    <th class="col-manage">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="listaInfluencers">
+                  <tr>
+                    <td colspan="6">
+                      <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">Nenhum lead cadastrado</div>
+                        <div>Use o botão "+ Novo Lead" para começar</div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th class="col-influencer">Influencer</th>
-                  <th class="col-status">Status</th>
-                  <th class="col-assets">Assets (Cupom)</th>
-                  <th class="col-plan" style="text-align: center">Plano</th>
-                  <th class="col-manage" style="text-align: right">Gerir</th>
-                </tr>
-              </thead>
-              <tbody id="listaInfluencers"></tbody>
-            </table>
+          <!-- RIGHT PANEL -->
+          <div class="right-col">
+            <!-- FIREBASE PANEL -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">⚡ Ativação Firebase</div>
+              </div>
+              <div class="form-section">
+                <div class="form-group">
+                  <label class="form-label">E-mail do embaixador</label>
+                  <input
+                    type="email"
+                    id="userEmail"
+                    class="form-input"
+                    placeholder="embaixador@email.com"
+                  />
+                </div>
+                <button
+                  id="btnLiberar"
+                  class="btn btn-blue"
+                  style="width: 100%; justify-content: center"
+                >
+                  ⚡ Grant Access
+                </button>
+              </div>
+            </div>
+
+            <!-- ACTIVITY FEED -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">🕐 Atividade Recente</div>
+              </div>
+              <div class="activity-list" id="activityFeed">
+                <div class="activity-item">
+                  <div class="activity-icon">👤</div>
+                  <div>
+                    <div class="activity-text">
+                      Sistema iniciado — Backstage CRM v2.0
+                    </div>
+                    <div class="activity-time">agora</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+        <!-- end workspace-grid -->
+      </div>
+      <!-- end content -->
+    </main>
+
+    <!-- MODAL: Novo Lead -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-title">
+          👤 Captura de Lead
+          <button class="modal-close" id="btnCloseModal">✕</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome Real</label>
+          <input
+            type="text"
+            id="infNome"
+            class="form-input"
+            placeholder="Nome completo"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">@ Instagram / Handle</label>
+          <input
+            type="text"
+            id="infInsta"
+            class="form-input"
+            placeholder="@usuario"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cupom / Asset</label>
+          <input
+            type="text"
+            id="infCupom"
+            class="form-input"
+            placeholder="BITTO15"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Plano</label>
+          <select id="infPlano" class="form-input">
+            <option value="Basic">Basic</option>
+            <option value="Pro">Pro</option>
+            <option value="Elite">Elite</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="infStatus" class="form-input">
+            <option value="Prospecção">Prospecção</option>
+            <option value="Abordagem">Abordagem</option>
+            <option value="Ativo">Ativo</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 4px">
+          <button
+            class="btn"
+            style="flex: 1; justify-content: center"
+            id="btnCancelModal"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-blue"
+            style="flex: 2; justify-content: center"
+            id="btnSalvarInf"
+          >
+            💾 Salvar Lead
+          </button>
         </div>
       </div>
     </div>
-    <div id="toast">Ação concluída com sucesso</div>
+
+    <div id="toast">
+      <span class="toast-icon">✅</span>
+      <span id="toastMsg">Ação concluída</span>
+    </div>
+
     <script type="module" src="js/admin.js"></script>
   </body>
 </html>
