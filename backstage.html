@@ -963,6 +963,18 @@
       }
 
       /* ─── LIGHT THEME ─── */
+      [data-theme="light"] .topbar {
+        background: rgba(245, 246, 250, 0.9);
+      }
+      [data-theme="light"] select {
+        background: var(--surface-2) !important;
+        color: var(--text) !important;
+        border-color: var(--border) !important;
+      }
+      [data-theme="light"] .form-input {
+        background: var(--surface-2);
+        color: var(--text);
+      }
       [data-theme="light"] {
         --bg: #f5f6fa;
         --surface: #ffffff;
@@ -1049,7 +1061,8 @@
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                style="width: 68%; background: var(--blue)"
+                id="barTotal"
+                style="width: 0%; background: var(--blue)"
               ></div>
             </div>
           </div>
@@ -1060,7 +1073,8 @@
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                style="width: 40%; background: var(--green)"
+                id="barAtivos"
+                style="width: 0%; background: var(--green)"
               ></div>
             </div>
           </div>
@@ -1073,7 +1087,8 @@
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                style="width: 55%; background: var(--yellow)"
+                id="barAbordagem"
+                style="width: 0%; background: var(--yellow)"
               ></div>
             </div>
           </div>
@@ -1084,7 +1099,8 @@
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                style="width: 80%; background: var(--purple)"
+                id="barProspeccao"
+                style="width: 0%; background: var(--purple)"
               ></div>
             </div>
           </div>

@@ -80,19 +80,30 @@ function avatarColor(name = "") {
   return colors[(name.charCodeAt(0) || 0) % colors.length];
 }
 
-// ── KPIs ──
+// ── FIX 4: KPIs dinâmicos com barras de progresso reais ──
 function updateKPIs(influencers) {
-  document.getElementById("kpiTotal").textContent = influencers.length;
-  document.getElementById("kpiAtivos").textContent = influencers.filter(
-    (i) => i[3] === "Ativo",
-  ).length;
-  document.getElementById("kpiAbordagem").textContent = influencers.filter(
-    (i) => i[3] === "Abordagem",
-  ).length;
-  document.getElementById("kpiProspeccao").textContent = influencers.filter(
-    (i) => i[3] === "Prospecção",
-  ).length;
-  document.getElementById("navBadge").textContent = influencers.length;
+  const total = influencers.length;
+  const ativos = influencers.filter((i) => i[3] === "Ativo").length;
+  const abordagem = influencers.filter((i) => i[3] === "Abordagem").length;
+  const prospeccao = influencers.filter((i) => i[3] === "Prospecção").length;
+
+  document.getElementById("kpiTotal").textContent = total;
+  document.getElementById("kpiAtivos").textContent = ativos;
+  document.getElementById("kpiAbordagem").textContent = abordagem;
+  document.getElementById("kpiProspeccao").textContent = prospeccao;
+  document.getElementById("navBadge").textContent = total;
+
+  // Barras de progresso baseadas em % real do total
+  if (total > 0) {
+    setBar("barAtivos", (ativos / total) * 100);
+    setBar("barAbordagem", (abordagem / total) * 100);
+    setBar("barProspeccao", (prospeccao / total) * 100);
+    setBar("barTotal", Math.min(100, total * 5)); // escala visual p/ total
+  }
+}
+function setBar(id, pct) {
+  const el = document.getElementById(id);
+  if (el) el.style.width = Math.round(pct) + "%";
 }
 
 // ── RENDER ROWS ──
@@ -138,6 +149,9 @@ function renderRows(influencers) {
       cupom,
       ativado,
     ] = inf;
+    const instaEscaped = (insta || "").replace(/'/g, "\\'");
+    const nomeEscaped = (nome || "").replace(/'/g, "\\'");
+    const linkEscaped = (link || "").replace(/'/g, "\\'");
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="col-inf">
@@ -145,16 +159,18 @@ function renderRows(influencers) {
           <div class="inf-avatar" style="background:${avatarColor(nome)}">${getInitials(nome)}</div>
           <div>
             <div class="inf-name">${nome || "—"}</div>
-            <div class="inf-handle" style="cursor:pointer" onclick="copyToAtivador('${insta}')">
-              ${insta}
+            <div class="inf-handle" style="cursor:pointer" onclick="copyToAtivador('${instaEscaped}')">
+              ${insta || ""}
               <span style="color:var(--blue);font-size:0.6rem;font-weight:700;margin-left:4px">COPY</span>
             </div>
           </div>
         </div>
       </td>
       <td class="col-status">
-        <select onchange="updateSheets('${insta}', 'status', this.value)"
-          style="background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:0.8rem;font-weight:600;cursor:pointer;outline:none;padding:0">
+        <select onchange="updateSheets('${instaEscaped}', 'status', this.value)"
+          style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+                 font-family:var(--font);font-size:0.8rem;font-weight:600;cursor:pointer;
+                 outline:none;padding:4px 8px;border-radius:6px;width:100%">
           <option ${status === "Prospecção" ? "selected" : ""}>Prospecção</option>
           <option ${status === "Abordagem" ? "selected" : ""}>Abordagem</option>
           <option ${status === "Ativo" ? "selected" : ""}>Ativo</option>
@@ -162,9 +178,11 @@ function renderRows(influencers) {
       </td>
       <td class="col-assets">
         <input type="text" placeholder="Cupom..." value="${cupom || ""}"
-          onblur="updateSheets('${insta}', 'links', this.value, {link:'${link || ""}', cupom:this.value})"
+          onchange="window._pendingCupom_${instaEscaped.replace(/\W/g, "_")} = this.value"
+          onblur="salvarCupom('${instaEscaped}', '${linkEscaped}', this.value)"
           class="form-input"
-          style="margin:0;padding:5px 10px;font-size:0.72rem;font-family:var(--mono);color:var(--yellow);width:100%"/>
+          style="margin:0;padding:5px 10px;font-size:0.72rem;font-family:var(--mono);
+                 color:var(--yellow);width:100%;background:var(--surface-2);border-color:var(--border)"/>
       </td>
       <td class="col-plan" style="text-align:center">
         ${
@@ -181,7 +199,7 @@ function renderRows(influencers) {
           <button class="icon-btn" title="Ver Instagram"
             onclick="window.open('https://instagram.com/${(insta || "").replace("@", "")}','_blank')">📸</button>
           <button class="icon-btn danger" title="Remover"
-            onclick="excluirInfluencer('${insta}', '${nome}')">🗑</button>
+            onclick="excluirInfluencer('${instaEscaped}', '${nomeEscaped}')">🗑</button>
         </div>
       </td>`;
     lista.appendChild(tr);
@@ -212,34 +230,78 @@ async function carregarDadosSheets() {
   }
 }
 
-// ── FUNÇÕES GLOBAIS (onclick na tabela) ──
+// ── FIX: COPY TO ATIVADOR ──
 window.copyToAtivador = (insta) => {
   document.getElementById("userEmail").value = insta;
   showToast("Handle copiado!", "info");
   addActivity("📋", `Handle copiado: ${insta}`);
 };
 
+// ── FIX: UPDATE STATUS ──
 window.updateSheets = async (insta, tipo, valor, extra = {}) => {
-  await fetch(URL_SHEETS, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
-  });
-  showToast("Planilha atualizada!");
-  addActivity("✏️", `Atualizado: <b>${insta}</b> → ${tipo}: ${valor}`);
-  setTimeout(carregarDadosSheets, 1500);
+  try {
+    await fetch(URL_SHEETS, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({ action: "update", insta, tipo, valor, ...extra }),
+    });
+    showToast("Planilha atualizada!");
+    addActivity("✏️", `Atualizado: <b>${insta}</b> → ${tipo}: ${valor}`);
+    setTimeout(carregarDadosSheets, 2000);
+  } catch (e) {
+    showToast("Erro ao atualizar", "error");
+  }
 };
 
+// ── FIX 2: SALVAR CUPOM separado com valor correto ──
+window.salvarCupom = async (insta, link, cupomValor) => {
+  if (!cupomValor && cupomValor !== "") return;
+  try {
+    await fetch(URL_SHEETS, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({
+        action: "update",
+        insta,
+        tipo: "links",
+        valor: cupomValor,
+        link: link,
+        cupom: cupomValor,
+      }),
+    });
+    showToast("Cupom salvo!");
+    addActivity("🎟️", `Cupom de <b>${insta}</b>: ${cupomValor}`);
+    setTimeout(carregarDadosSheets, 2000);
+  } catch (e) {
+    showToast("Erro ao salvar cupom", "error");
+  }
+};
+
+// ── FIX 1: EXCLUIR — delay maior + feedback ──
 window.excluirInfluencer = async (insta, nome) => {
   if (!confirm(`Remover ${nome || insta} permanentemente?`)) return;
   showToast("Excluindo lead...", "info");
-  await fetch(URL_SHEETS, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify({ action: "delete", insta }),
-  });
-  addActivity("🗑", `Lead removido: <b>${nome}</b>`);
-  setTimeout(carregarDadosSheets, 1500);
+  try {
+    await fetch(URL_SHEETS, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({ action: "delete", insta }),
+    });
+    // Remove da lista local imediatamente para feedback visual instantâneo
+    if (window._allInfluencers) {
+      window._allInfluencers = window._allInfluencers.filter(
+        (i) => i[1] !== insta,
+      );
+      updateKPIs(window._allInfluencers);
+      renderRows(window._allInfluencers);
+    }
+    showToast(`"${nome}" removido com sucesso!`);
+    addActivity("🗑", `Lead removido: <b>${nome}</b> (${insta})`);
+    // Re-sync com Sheets após 3s para confirmar
+    setTimeout(carregarDadosSheets, 3000);
+  } catch (e) {
+    showToast("Erro ao excluir", "error");
+  }
 };
 
 // ── SALVAR NOVO LEAD ──
@@ -254,19 +316,30 @@ document.getElementById("btnSalvarInf").onclick = async () => {
     return;
   }
   showToast("Salvando lead...", "info");
-  await fetch(URL_SHEETS, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify({ action: "add", nome, insta, status, cupom, plano }),
-  });
-  document.getElementById("modalOverlay").classList.remove("open");
-  ["infNome", "infInsta", "infCupom"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.value = "";
-  });
-  addActivity("👤", `Novo lead: <b>${nome}</b> (${insta}) — ${status}`);
-  showToast(`Lead "${nome}" salvo!`);
-  setTimeout(carregarDadosSheets, 2000);
+  try {
+    await fetch(URL_SHEETS, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({
+        action: "add",
+        nome,
+        insta,
+        status,
+        cupom,
+        plano,
+      }),
+    });
+    document.getElementById("modalOverlay").classList.remove("open");
+    ["infNome", "infInsta", "infCupom"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    addActivity("👤", `Novo lead: <b>${nome}</b> (${insta}) — ${status}`);
+    showToast(`Lead "${nome}" salvo!`);
+    setTimeout(carregarDadosSheets, 2500);
+  } catch (e) {
+    showToast("Erro ao salvar lead", "error");
+  }
 };
 
 // ── FIREBASE GRANT ──
@@ -348,7 +421,7 @@ modal?.addEventListener("click", (e) => {
   if (e.target === modal) modal.classList.remove("open");
 });
 
-// ── THEME ──
+// ── FIX 3: THEME — aplica no <html> para pegar TODOS os elementos ──
 const themeBtn = document.getElementById("themeBtn");
 const savedTheme = localStorage.getItem("bitto_theme") || "dark";
 if (savedTheme === "light") {
