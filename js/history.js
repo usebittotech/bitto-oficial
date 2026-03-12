@@ -231,7 +231,7 @@ if (btnShareStory) {
       const emojis = ["🔥", "🚀", "🧠", "⚡"];
       const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
       document.getElementById("suggestedCaption").innerText =
-        `"Meu mês na @bitto.app: ${valTotal} materiais gerados com Inteligência Artificial! ${randomEmoji} Acelerando os estudos pro próximo nível."`;
+        `"Meu mês na @usebitto: ${valTotal} materiais gerados com Inteligência Artificial! ${randomEmoji} Acelerando os estudos pro próximo nível."`;
 
       // Delay para garantir carregamento de fontes e imagens no template oculto
       await new Promise((resolve) => setTimeout(resolve, 800));
