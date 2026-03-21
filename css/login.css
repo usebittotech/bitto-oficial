@@ -43,6 +43,7 @@ body {
   line-height: 1.5;
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-y: auto;
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
@@ -149,7 +150,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 20px;
+  padding: 80px 20px 40px; /* Padding generoso top/bottom para nunca cortar */
   background-image: radial-gradient(
     circle at 50% 50%,
     rgba(0, 53, 255, 0.04) 0%,
@@ -501,22 +502,18 @@ body {
    MEDIA QUERIES E AJUSTE RESPONSIVO
    ========================================================================== */
 
-/* Desktop grande: painel direito visível, sem scroll */
+/* Desktop grande (1024px+): mostra painel direito */
 @media (min-width: 1024px) {
-  body {
-    overflow: hidden;
-  }
   .auth-right {
     display: flex;
   }
 }
 
-/* Tablet / laptop pequeno (600px–1023px): layout coluna única, sem painel direito */
+/* Tablet / laptop pequeno (600px–1023px): coluna única, sem painel direito */
 @media (min-width: 600px) and (max-width: 1023px) {
   .auth-body {
     padding: 100px 24px 40px;
     align-items: flex-start;
-    overflow-y: auto;
   }
 
   .auth-card {
@@ -529,7 +526,6 @@ body {
   .auth-left {
     padding: 3rem 2.5rem;
   }
-
   .auth-right {
     display: none;
   }
@@ -550,9 +546,8 @@ body {
 /* Mobile (até 599px) */
 @media (max-width: 599px) {
   .auth-body {
-    padding-top: 100px;
+    padding: 100px 16px 40px;
     align-items: flex-start;
-    overflow-y: auto;
   }
 
   .back-home {
