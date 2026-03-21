@@ -57,7 +57,25 @@ if (themeToggle) {
   });
 }
 
-// TILT 3D REMOVIDO - animação desativada para melhor UX
+// TILT 3D
+const tiltElement = document.querySelector(".tilt-element");
+document.addEventListener("mousemove", (e) => {
+  if (tiltElement && window.innerWidth > 900) {
+    const rect = tiltElement.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x >= -50 && x <= rect.width + 50 && y >= -50 && y <= rect.height + 50) {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -5;
+      const rotateY = ((x - centerX) / centerX) * 5;
+      tiltElement.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    } else {
+      tiltElement.style.transform =
+        "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)";
+    }
+  }
+});
 
 // TOGGLE SENHA
 const togglePassBtns = document.querySelectorAll(".toggle-pass-btn");
