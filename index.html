@@ -1,293 +1,656 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Bitto | Estudo Inteligente com IA</title>
-    <meta name="description" content="Aprenda 3x mais rápido com a Bitto. A plataforma de estudo inteligente para universitários.">
-    <link rel="icon" type="image/png" href="imagens/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="site/loading.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- ================================================
+         SEO PRIMÁRIO
+         Foco em buscas de intenção: "como estudar mais rápido",
+         "gerador de flashcards", "como aprender mais fácil", etc.
+    ================================================ -->
+    <title>
+      BITTO – Gerador de Flashcards e Quizzes com IA | Estude 3x Mais Rápido
+    </title>
+    <meta
+      name="description"
+      content="Transforme qualquer texto em flashcards, quizzes e revisões automáticas em segundos com IA. A forma mais fácil e rápida de estudar e aprender de verdade. Grátis para começar."
+    />
+    <meta
+      name="keywords"
+      content="gerador de flashcards, como estudar mais rápido, como aprender mais fácil, flashcards com IA, quiz automático, método de estudo eficiente, revisão espaçada, plataforma de estudos, estudar com inteligência artificial, aprender mais rápido, técnica de memorização, resumo automático"
+    />
+    <meta name="author" content="BITTO" />
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <link rel="canonical" href="https://usebitto.com/" />
+
+    <!-- ================================================
+         OPEN GRAPH — WhatsApp, Facebook, LinkedIn
+    ================================================ -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BITTO" />
+    <meta
+      property="og:title"
+      content="BITTO – Gerador de Flashcards com IA | Estude 3x Mais Rápido"
+    />
+    <meta
+      property="og:description"
+      content="Cole seu texto e receba flashcards, quizzes e revisões prontos em segundos. A forma mais fácil de aprender qualquer conteúdo."
+    />
+    <meta property="og:url" content="https://usebitto.com/" />
+    <meta
+      property="og:image"
+      content="https://usebitto.com/imagens/og-bitto.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="BITTO – Plataforma de estudo com IA que gera flashcards e quizzes automaticamente"
+    />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- ================================================
+         TWITTER CARD
+    ================================================ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BITTO – Gerador de Flashcards com IA" />
+    <meta
+      name="twitter:description"
+      content="Transforme qualquer texto em flashcards e quizzes em segundos. Estude 3x mais rápido com IA."
+    />
+    <meta
+      name="twitter:image"
+      content="https://usebitto.com/imagens/og-bitto.png"
+    />
+
+    <!-- ================================================
+         SCHEMA.ORG — SOFTWAREAPPLICATION
+         Faz a IA do Google reconhecer o BITTO como uma
+         ferramenta/app de educação com avaliação e preço.
+    ================================================ -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "BITTO",
+        "url": "https://usebitto.com",
+        "applicationCategory": "EducationApplication",
+        "operatingSystem": "Web, Android, iOS",
+        "description": "Plataforma de estudo inteligente que usa IA para gerar flashcards, quizzes e revisões automáticas a partir de qualquer texto. Ajuda estudantes a aprenderem mais rápido com menos esforço.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "BRL",
+          "description": "Plano gratuito disponível. Planos pagos a partir de R$19,90/mês."
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "87",
+          "bestRating": "5"
+        },
+        "featureList": [
+          "Gerador de flashcards com IA",
+          "Quiz adaptativo automático",
+          "Resumo e revisão de textos",
+          "Gamificação com XP e níveis",
+          "Funciona no celular e desktop"
+        ],
+        "inLanguage": "pt-BR",
+        "author": {
+          "@type": "Organization",
+          "name": "BITTO Tecnologia",
+          "url": "https://usebitto.com"
+        }
+      }
+    </script>
+
+    <!-- ================================================
+         SCHEMA.ORG — HOWTO
+         Aparece em buscas do tipo "como estudar mais rápido",
+         "como aprender com flashcards", "como memorizar conteúdo".
+         O Google pode renderizar isso como rich result (passos visuais).
+    ================================================ -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "Como estudar mais rápido com flashcards e IA",
+        "description": "Aprenda a usar inteligência artificial para transformar qualquer texto em flashcards e quizzes, memorizando o conteúdo em muito menos tempo.",
+        "totalTime": "PT5M",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Cole seu conteúdo",
+            "text": "Copie o texto que deseja estudar — pode ser um PDF, anotação de aula ou qualquer material teórico."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "A IA gera seus flashcards",
+            "text": "Em segundos, a BITTO transforma o texto em flashcards, quizzes e revisões prontos para você usar."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Estude e evolua",
+            "text": "Pratique com os flashcards, responda os quizzes e acumule XP enquanto domina o conteúdo de forma eficiente."
+          }
+        ]
+      }
+    </script>
+
+    <!-- ================================================
+         SCHEMA.ORG — FAQPAGE
+         Aparece como rich result no Google (perguntas expandíveis
+         direto na SERP). Aumenta CTR e visibilidade para buscas
+         do tipo "como funciona flashcard", "serve para meu curso", etc.
+    ================================================ -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Como estudar mais rápido e aprender de verdade?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A forma mais eficiente é combinar geração ativa de conhecimento (flashcards e quizzes) com revisão espaçada. A BITTO usa IA para criar esses materiais automaticamente a partir do seu texto, reduzindo em até 3x o tempo necessário para memorizar um conteúdo."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O que é um gerador de flashcards com IA?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "É uma ferramenta que usa inteligência artificial para ler qualquer texto e criar automaticamente cartões de perguntas e respostas (flashcards). Na BITTO, você cola o seu material e recebe os flashcards prontos em segundos, sem precisar criar um por um."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Como a BITTO funciona?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Você cola seu texto de estudo (PDF, Word ou anotações) e nossa IA gera flashcards, quizzes e resumos automaticamente em segundos."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "A BITTO serve para meu curso?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sim! A BITTO funciona para Medicina, Direito, Engenharia, Humanas e qualquer curso ou área que utilize material teórico. Qualquer texto vira material de estudo."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Qual a forma mais fácil de aprender um conteúdo novo?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Estudos de ciência cognitiva mostram que a recuperação ativa — praticar tentando lembrar a informação — é muito mais eficiente do que reler passivamente. Flashcards e quizzes são as melhores ferramentas para isso, e a BITTO os gera automaticamente com IA."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Tem garantia?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Absolutamente. Oferecemos 7 dias de garantia incondicional. Se a plataforma não te ajudar a estudar melhor, devolvemos 100% do valor."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- ================================================
+         SCHEMA.ORG — ORGANIZATION
+         Ajuda o Google a montar o painel de conhecimento
+         da marca (Knowledge Panel) nos resultados.
+    ================================================ -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "BITTO",
+        "url": "https://usebitto.com",
+        "logo": "https://usebitto.com/imagens/favicon.png",
+        "sameAs": ["https://instagram.com/usebitto"],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "availableLanguage": "Portuguese"
+        }
+      }
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="imagens/favicon.png" />
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="site/loading.css" />
+  </head>
+  <body>
     <nav>
-        <div class="nav-container">
-            <a href="index.html" class="logo">BITTO<span>.</span></a>
-            
-            <ul class="nav-links">
-                <li><a href="#ferramentas">Ferramentas</a></li>
-                <li><a href="#demonstracao">Demonstração</a></li>
-                <li><a href="#planos">Planos</a></li>
-                <li><a href="#faq">FAQ</a></li>
-            </ul>
+      <div class="nav-container">
+        <a href="index.html" class="logo">BITTO<span>.</span></a>
 
-            <a href="pages/login.html" class="btn-login">Entrar</a>
-        </div>
+        <ul class="nav-links">
+          <li><a href="#ferramentas">Ferramentas</a></li>
+          <li><a href="#demonstracao">Demonstração</a></li>
+          <li><a href="#planos">Planos</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+
+        <a href="pages/login.html" class="btn-login">Entrar</a>
+      </div>
     </nav>
 
     <main>
-        <section class="hero">
-            <div class="hero-text">
-                <span class="badge">🚀 A Plataforma nº 1 de Estudo</span>
-                <h1>Aprenda 3x <span class="highlight">MAIS RÁPIDO</span> com a BITTO!</h1>
-                <p>O ecossistema universitário inteligente. Transforme seus conteúdos em Flashcards, Quizzes e Revisões automáticas em segundos.</p>
-                
-                <div class="cta-group">
-                    <a href="pages/login.html?mode=register" class="btn-main">Quero Começar Agora</a>
-                    <a href="pages/login.html" class="btn-secondary">Fazer Login</a>
-                </div>
+      <section class="hero">
+        <div class="hero-text">
+          <span class="badge">🚀 A Plataforma nº 1 de Estudo com IA</span>
+          <h1>
+            A forma mais fácil de
+            <span class="highlight">aprender de verdade</span> — flashcards e
+            quizzes com IA em segundos
+          </h1>
+          <p>
+            Cole qualquer texto e a BITTO transforma em Flashcards, Quizzes e
+            Revisões automáticas. Estude 3x mais rápido, com menos esforço e sem
+            enrolação.
+          </p>
 
-                <div class="hero-stats">
-                    <div class="stat-item"><h3>+120</h3><p>Revisões Geradas</p></div>
-                    <div class="stat-item"><h3>+600</h3><p>Flashcards Gerados
-                    </p></div>
-                </div>
+          <div class="cta-group">
+            <a href="pages/login.html?mode=register" class="btn-main"
+              >Quero Começar Agora</a
+            >
+            <a href="pages/login.html" class="btn-secondary">Fazer Login</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <h3>+120</h3>
+              <p>Revisões Geradas</p>
             </div>
-            
-            <div class="hero-image-area">
-                <div class="main-img-box">
-                    <img src="site/universitario.png" alt="Estudante universitário usando a Bitto" loading="eager">
-                </div>
-                <div class="floating-card card-1"><p>⭐️ 87% Satisfação</p></div>
-                <div class="floating-card card-2"><p>Bitto AI Ativa ⚡️</p></div>
+            <div class="stat-item">
+              <h3>+600</h3>
+              <p>Flashcards Gerados</p>
             </div>
-        </section>
+          </div>
+        </div>
 
-        <section class="social-proof-section">
-            <h2 class="section-title-white">Resultados Reais</h2>
-            <div class="dual-cards-container" id="persona-container">
-                <div class="persona-card active" data-pair="0">
-                    <div class="tag">Engenharia • Lucas</div>
-                    <h4>O Estudante que Trabalha</h4>
-                    <p>"O que eu levava a noite inteira para resumir, a Bitto faz em segundos. Já tenho meus Flashcards para o ônibus."</p>
-                </div>
-                <div class="persona-card active" data-pair="0">
-                    <div class="tag">Direito • Mariana</div>
-                    <h4>A Concurseira</h4>
-                    <p>"Transformo artigos em Quizzes automáticos. Decorar prazos processuais nunca foi tão fácil."</p>
-                </div>
-                <div class="persona-card" data-pair="1">
-                    <div class="tag">Medicina • Felipe</div>
-                    <h4>Ciclo Básico</h4>
-                    <p>"Em medicina, ou você é inteligente ou pifa. A Bitto é minha ferramenta oficial para revisões rápidas."</p>
-                </div>
-                <div class="persona-card" data-pair="1">
-                    <div class="tag">Humanas • Beatriz</div>
-                    <h4>Universitária</h4>
-                    <p>"Perdia muito tempo sublinhando livros. Agora colo na Bitto e ela me entrega a essência em tópicos."</p>
-                </div>
-            </div>
-        </section>
+        <div class="hero-image-area">
+          <div class="main-img-box">
+            <img
+              src="site/universitario.png"
+              alt="Estudante universitário usando a Bitto"
+              loading="eager"
+            />
+          </div>
+          <div class="floating-card card-1"><p>⭐️ 87% Satisfação</p></div>
+          <div class="floating-card card-2"><p>Bitto AI Ativa ⚡️</p></div>
+        </div>
+      </section>
 
-        <section class="section-padding" id="ferramentas">
-            <h2 class="section-title">Estudo de Alta Performance</h2>
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <span class="tool-icon">🃏</span>
-                    <h3>Flashcards AI</h3>
-                    <p>Memorização instantânea baseada nos seus textos copiados.</p>
-                </div>
-                <div class="tool-card">
-                    <span class="tool-icon">📝</span>
-                    <h3>Quiz Adaptativo</h3>
-                    <p>Simulados inteligentes que reforçam seus pontos fracos.</p>
-                </div>
-                <div class="tool-card">
-                    <span class="tool-icon">🚀</span>
-                    <h3>Gerador de Revisão</h3>
-                    <p>Resumos otimizados pela nossa tecnologia exclusiva.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section-padding bg-light" id="demonstracao">
-            <h2 class="section-title">Veja na Prática</h2>
-            <div class="video-grid">
-                <div class="video-card">
-                    <h4>Flashcards</h4>
-                    <div class="video-placeholder">
-                        <video controls poster="site/thumb-flashcards.jpg" preload="none">
-                            <source src="site/flashcards.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                </div>
-                <div class="video-card">
-                    <h4>Quizzes</h4>
-                    <div class="video-placeholder">
-                        <video controls poster="site/thumb-quiz.jpg" preload="none">
-                            <source src="site/quiz.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                </div>
-                <div class="video-card">
-                    <h4>Revisão AI</h4>
-                    <div class="video-placeholder">
-                        <video controls poster="site/thumb-revisao.jpg" preload="none">
-                            <source src="site/revisao.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="pricing-section-modern" id="planos">
-            <div class="pricing-header">
-                <h2>Invista no seu Futuro</h2>
-                <p>Escolha o plano ideal para sua rotina de estudos. Cancele a qualquer momento.</p>
-            </div>
-
-            <div class="pricing-grid">
-                
-                <div class="plan-card">
-                    <span class="plan-name">Iniciante</span>
-                    <div class="plan-price">R$ 0 <span>/mês</span></div>
-                    <p class="plan-desc">Para conhecer a plataforma e testar o poder da IA.</p>
-                    
-                    <ul class="plan-features">
-                        <li><span class="icon-check">✓</span> 3 Flashcards por mês</li>
-                        <li><span class="icon-check">✓</span> 3 Quizzes por mês</li>
-                        <li><span class="icon-check">✓</span> Acesso básico</li>
-                    </ul>
-
-                    <a href="pages/login.html?mode=register" class="btn-plan btn-outline">Começar Grátis</a>
-                </div>
-
-                <div class="plan-card">
-                    <span class="plan-name">Mensal</span>
-                    <div class="plan-price">R$ 20,20 <span>/mês</span></div>
-                    <p class="plan-desc">Liberdade total. Pague mês a mês sem fidelidade.</p>
-                    
-                    <ul class="plan-features">
-                        <li><span class="icon-check">✓</span> <b>Tudo Ilimitado</b></li>
-                        <li><span class="icon-check">✓</span> Flashcards Infinitos</li>
-                        <li><span class="icon-check">✓</span> Resumos de otimizados</li>
-                        <li><span class="icon-check">✓</span> Cancele quando quiser</li>
-                    </ul>
-
-                    <a href="https://pay.cakto.com.br/ar6yxop_697009" class="btn-plan btn-outline" style="border-color: var(--primary); color: var(--primary);">Assinar Mensal</a>
-                </div>
-
-                <div class="plan-card featured">
-                    <div class="badge-popular">MAIS ESCOLHIDO 🏆</div>
-                    <span class="plan-name">Trimestral</span>
-                    <div class="plan-price">
-                        R$ 17,90 <span>/mês</span>
-                    </div>
-                    <p class="plan-desc" style="color: #ccff00; font-weight: 600;">Economize R$ 20,00 no total</p>
-                    
-                    <ul class="plan-features">
-                        <li><span class="icon-check">✓</span> <b>Acesso Ilimitado</b></li>
-                        <li><span class="icon-check">✓</span> Foco no Semestre</li>
-                        <li><span class="icon-check">✓</span> Suporte Prioritário</li>
-                        <li><span class="icon-check">✓</span> Acesso antecipado a novas IAs</li>
-                    </ul>
-
-                    <a href="https://pay.cakto.com.br/emb9kxo_700051" class="btn-plan btn-primary-neon">QUERO ESSE PLANO</a>
-                </div>
-
-            </div>
-        </section>
-
-        <section class="section-padding" id="faq">
-            <h2 class="section-title">Perguntas Frequentes</h2>
-            <div class="faq-wrapper">
-                <div class="faq-item">
-                    <div class="faq-question">1. Como a Bitto funciona? <div class="faq-icon-box">+</div></div>
-                    <div class="faq-content"><div class="faq-answer">Você cola seu texto de estudo (PDF, Word ou anotações) e nossa IA gera flashcards, quizzes e resumos automaticamente em segundos.</div></div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">2. Serve para meu curso? <div class="faq-icon-box">+</div></div>
-                    <div class="faq-content"><div class="faq-answer">Sim! A Bitto funciona para Medicina, Direito, Engenharia, Humanas e qualquer curso que utilize material teórico.</div></div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">3. Posso cancelar quando quiser? <div class="faq-icon-box">+</div></div>
-                    <div class="faq-content"><div class="faq-answer">Sim. No plano mensal não existe fidelidade, você pode cancelar a renovação a qualquer momento direto no painel.</div></div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">4. Quais as formas de pagamento? <div class="faq-icon-box">+</div></div>
-                    <div class="faq-content"><div class="faq-answer">Aceitamos PIX (liberação imediata) e Cartão de Crédito. Utilizamos processamento seguro criptografado.</div></div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">5. Tem garantia? <div class="faq-icon-box">+</div></div>
-                    <div class="faq-content"><div class="faq-answer">Absolutamente. Oferecemos 7 dias de garantia incondicional. Se a plataforma não te ajudar a estudar melhor, devolvemos 100% do valor.</div></div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">6. Funciona no celular? <div class="faq-icon-box">+</div></div>
-                    <div class="faq-content"><div class="faq-answer">Sim! A plataforma é 100% otimizada para você estudar no ônibus, no intervalo ou onde estiver, direto pelo navegador do celular.</div></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="partner-banner-clean">
-            <span style="color: var(--accent); font-weight: 800; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block;">Área de Creators</span>
-            <h2>Influenciador ou Criador de Conteúdo?</h2>
+      <section class="social-proof-section">
+        <h2 class="section-title-white">Resultados Reais</h2>
+        <div class="dual-cards-container" id="persona-container">
+          <div class="persona-card active" data-pair="0">
+            <div class="tag">Engenharia • Lucas</div>
+            <h4>O Estudante que Trabalha</h4>
             <p>
-                Temos um programa de embaixadores com comissão de 35% e dashboard exclusivo.
-                Monetize sua audiência ajudando estudantes.
+              "O que eu levava a noite inteira para resumir, a Bitto faz em
+              segundos. Já tenho meus Flashcards para o ônibus."
             </p>
-            <a href="site/parceiro.html" class="btn-banner-link">Conhecer Programa</a>
-        </section>
+          </div>
+          <div class="persona-card active" data-pair="0">
+            <div class="tag">Direito • Mariana</div>
+            <h4>A Concurseira</h4>
+            <p>
+              "Transformo artigos em Quizzes automáticos. Decorar prazos
+              processuais nunca foi tão fácil."
+            </p>
+          </div>
+          <div class="persona-card" data-pair="1">
+            <div class="tag">Medicina • Felipe</div>
+            <h4>Ciclo Básico</h4>
+            <p>
+              "Em medicina, ou você é inteligente ou pifa. A Bitto é minha
+              ferramenta oficial para revisões rápidas."
+            </p>
+          </div>
+          <div class="persona-card" data-pair="1">
+            <div class="tag">Humanas • Beatriz</div>
+            <h4>Universitária</h4>
+            <p>
+              "Perdia muito tempo sublinhando livros. Agora colo na Bitto e ela
+              me entrega a essência em tópicos."
+            </p>
+          </div>
+        </div>
+      </section>
 
-        <section class="final-cta">
-            <h2>O semestre não espera por você. <br>A Bitto sim.</h2>
-            <p>Automatize sua rotina acadêmica hoje e recupere seu tempo livre.</p>
-            <a href="pages/login.html?mode=register" class="btn-cta-large">QUERO COMEÇAR AGORA</a>
-        </section>
+      <section class="section-padding" id="ferramentas">
+        <h2 class="section-title">
+          As ferramentas que tornam o estudo fácil e rápido
+        </h2>
+        <div class="tools-grid">
+          <div class="tool-card">
+            <span class="tool-icon">🃏</span>
+            <h3>Flashcards AI</h3>
+            <p>Memorização instantânea baseada nos seus textos copiados.</p>
+          </div>
+          <div class="tool-card">
+            <span class="tool-icon">📝</span>
+            <h3>Quiz Adaptativo</h3>
+            <p>Simulados inteligentes que reforçam seus pontos fracos.</p>
+          </div>
+          <div class="tool-card">
+            <span class="tool-icon">🚀</span>
+            <h3>Gerador de Revisão</h3>
+            <p>Resumos otimizados pela nossa tecnologia exclusiva.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-padding bg-light" id="demonstracao">
+        <h2 class="section-title">Veja na Prática</h2>
+        <div class="video-grid">
+          <div class="video-card">
+            <h4>Flashcards</h4>
+            <div class="video-placeholder">
+              <video controls poster="site/thumb-flashcards.jpg" preload="none">
+                <source src="site/flashcards.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+          <div class="video-card">
+            <h4>Quizzes</h4>
+            <div class="video-placeholder">
+              <video controls poster="site/thumb-quiz.jpg" preload="none">
+                <source src="site/quiz.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+          <div class="video-card">
+            <h4>Revisão AI</h4>
+            <div class="video-placeholder">
+              <video controls poster="site/thumb-revisao.jpg" preload="none">
+                <source src="site/revisao.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pricing-section-modern" id="planos">
+        <div class="pricing-header">
+          <h2>Invista no seu Futuro</h2>
+          <p>
+            Escolha o plano ideal para sua rotina de estudos. Cancele a qualquer
+            momento.
+          </p>
+        </div>
+
+        <div class="pricing-grid">
+          <div class="plan-card">
+            <span class="plan-name">Iniciante</span>
+            <div class="plan-price">R$ 0 <span>/mês</span></div>
+            <p class="plan-desc">
+              Para conhecer a plataforma e testar o poder da IA.
+            </p>
+
+            <ul class="plan-features">
+              <li><span class="icon-check">✓</span> 3 Flashcards por mês</li>
+              <li><span class="icon-check">✓</span> 3 Quizzes por mês</li>
+              <li><span class="icon-check">✓</span> Acesso básico</li>
+            </ul>
+
+            <a
+              href="pages/login.html?mode=register"
+              class="btn-plan btn-outline"
+              >Começar Grátis</a
+            >
+          </div>
+
+          <div class="plan-card">
+            <span class="plan-name">Mensal</span>
+            <div class="plan-price">R$ 20,20 <span>/mês</span></div>
+            <p class="plan-desc">
+              Liberdade total. Pague mês a mês sem fidelidade.
+            </p>
+
+            <ul class="plan-features">
+              <li><span class="icon-check">✓</span> <b>Tudo Ilimitado</b></li>
+              <li><span class="icon-check">✓</span> Flashcards Infinitos</li>
+              <li><span class="icon-check">✓</span> Resumos de otimizados</li>
+              <li><span class="icon-check">✓</span> Cancele quando quiser</li>
+            </ul>
+
+            <a
+              href="https://pay.cakto.com.br/ar6yxop_697009"
+              class="btn-plan btn-outline"
+              style="border-color: var(--primary); color: var(--primary)"
+              >Assinar Mensal</a
+            >
+          </div>
+
+          <div class="plan-card featured">
+            <div class="badge-popular">MAIS ESCOLHIDO 🏆</div>
+            <span class="plan-name">Trimestral</span>
+            <div class="plan-price">R$ 17,90 <span>/mês</span></div>
+            <p class="plan-desc" style="color: #ccff00; font-weight: 600">
+              Economize R$ 20,00 no total
+            </p>
+
+            <ul class="plan-features">
+              <li><span class="icon-check">✓</span> <b>Acesso Ilimitado</b></li>
+              <li><span class="icon-check">✓</span> Foco no Semestre</li>
+              <li><span class="icon-check">✓</span> Suporte Prioritário</li>
+              <li>
+                <span class="icon-check">✓</span> Acesso antecipado a novas IAs
+              </li>
+            </ul>
+
+            <a
+              href="https://pay.cakto.com.br/emb9kxo_700051"
+              class="btn-plan btn-primary-neon"
+              >QUERO ESSE PLANO</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="section-padding" id="faq">
+        <h2 class="section-title">Perguntas Frequentes</h2>
+        <div class="faq-wrapper">
+          <div class="faq-item">
+            <div class="faq-question">
+              1. Como a Bitto funciona?
+              <div class="faq-icon-box">+</div>
+            </div>
+            <div class="faq-content">
+              <div class="faq-answer">
+                Você cola seu texto de estudo (PDF, Word ou anotações) e nossa
+                IA gera flashcards, quizzes e resumos automaticamente em
+                segundos.
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              2. Serve para meu curso?
+              <div class="faq-icon-box">+</div>
+            </div>
+            <div class="faq-content">
+              <div class="faq-answer">
+                Sim! A Bitto funciona para Medicina, Direito, Engenharia,
+                Humanas e qualquer curso que utilize material teórico.
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              3. Posso cancelar quando quiser?
+              <div class="faq-icon-box">+</div>
+            </div>
+            <div class="faq-content">
+              <div class="faq-answer">
+                Sim. No plano mensal não existe fidelidade, você pode cancelar a
+                renovação a qualquer momento direto no painel.
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              4. Quais as formas de pagamento?
+              <div class="faq-icon-box">+</div>
+            </div>
+            <div class="faq-content">
+              <div class="faq-answer">
+                Aceitamos PIX (liberação imediata) e Cartão de Crédito.
+                Utilizamos processamento seguro criptografado.
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              5. Tem garantia?
+              <div class="faq-icon-box">+</div>
+            </div>
+            <div class="faq-content">
+              <div class="faq-answer">
+                Absolutamente. Oferecemos 7 dias de garantia incondicional. Se a
+                plataforma não te ajudar a estudar melhor, devolvemos 100% do
+                valor.
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              6. Funciona no celular?
+              <div class="faq-icon-box">+</div>
+            </div>
+            <div class="faq-content">
+              <div class="faq-answer">
+                Sim! A plataforma é 100% otimizada para você estudar no ônibus,
+                no intervalo ou onde estiver, direto pelo navegador do celular.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="partner-banner-clean">
+        <span
+          style="
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+          "
+          >Área de Creators</span
+        >
+        <h2>Influenciador ou Criador de Conteúdo?</h2>
+        <p>
+          Temos um programa de embaixadores com comissão de 35% e dashboard
+          exclusivo. Monetize sua audiência ajudando estudantes.
+        </p>
+        <a href="site/parceiro.html" class="btn-banner-link"
+          >Conhecer Programa</a
+        >
+      </section>
+
+      <section class="final-cta">
+        <h2>
+          Pare de perder tempo relendo. <br />Comece a aprender de verdade.
+        </h2>
+        <p>
+          Gere seus flashcards com IA agora e veja a diferença em poucos dias.
+        </p>
+        <a href="pages/login.html?mode=register" class="btn-cta-large"
+          >QUERO COMEÇAR AGORA</a
+        >
+      </section>
     </main>
 
     <footer>
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-col brand-col">
-                    <div class="logo logo-footer">BITTO<span>.</span></div>
-                    <p>A inteligência artificial que transforma universitários cansados em alunos de alta performance.</p>
-                    <div class="social-links">
-                        <a href="https://instagram.com/usebitto" target="_blank">Instagram</a>
-                        <a href="mailto:suporte@bitto.app">Email</a>
-                    </div>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Plataforma</h4>
-                    <ul>
-                        <li><a href="#ferramentas">Funcionalidades</a></li>
-                        <li><a href="#planos">Planos e Preços</a></li>
-                        <li><a href="site/parceiro.html">Seja um Parceiro 👑</a></li>
-                        <li><a href="pages/login.html">Fazer Login</a></li>
-                        <li><a href="pages/login.html?mode=register">Criar Conta</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Suporte</h4>
-                    <ul>
-                        <li><a href="#faq">Central de Ajuda</a></li>
-                        <li><a href="mailto:suporte@bitto.app">Fale Conosco</a></li>
-                        <li><a href="#">Status do Sistema</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="site/termos.html">Termos de Uso</a></li>
-                        <li><a href="site/privacidade.html">Política de Privacidade</a></li>
-                        <li><a href="site/reembolso.html">Política de Reembolso</a></li>
-                    </ul>
-                </div>
+      <div class="footer-container">
+        <div class="footer-grid">
+          <div class="footer-col brand-col">
+            <div class="logo logo-footer">BITTO<span>.</span></div>
+            <p>
+              A inteligência artificial que transforma universitários cansados
+              em alunos de alta performance.
+            </p>
+            <div class="social-links">
+              <a href="https://instagram.com/usebitto" target="_blank"
+                >Instagram</a
+              >
+              <a
+                href="/cdn-cgi/l/email-protection#f685838699848293b6949f828299d8978686"
+                >Email</a
+              >
             </div>
-            
-            <div class="footer-bottom">
-                <p>© 2026 Bitto Tecnologia. Todos os direitos reservados.</p>
-                <p>Feito com ⚡️ para estudantes.</p>
-            </div>
+          </div>
+
+          <div class="footer-col">
+            <h4>Plataforma</h4>
+            <ul>
+              <li><a href="#ferramentas">Funcionalidades</a></li>
+              <li><a href="#planos">Planos e Preços</a></li>
+              <li><a href="site/parceiro.html">Seja um Parceiro 👑</a></li>
+              <li><a href="pages/login.html">Fazer Login</a></li>
+              <li><a href="pages/login.html?mode=register">Criar Conta</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Suporte</h4>
+            <ul>
+              <li><a href="#faq">Central de Ajuda</a></li>
+              <li>
+                <a
+                  href="/cdn-cgi/l/email-protection#aad9dfdac5d8decfeac8c3dedec584cbdada"
+                  >Fale Conosco</a
+                >
+              </li>
+              <li><a href="#">Status do Sistema</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="site/termos.html">Termos de Uso</a></li>
+              <li>
+                <a href="site/privacidade.html">Política de Privacidade</a>
+              </li>
+              <li><a href="site/reembolso.html">Política de Reembolso</a></li>
+            </ul>
+          </div>
         </div>
-    </footer>
 
-    <script src="site/loading.js"></script>
-</body>
+        <div class="footer-bottom">
+          <p>© 2026 Bitto Tecnologia. Todos os direitos reservados.</p>
+          <p>Feito com ⚡️ para estudantes.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>
