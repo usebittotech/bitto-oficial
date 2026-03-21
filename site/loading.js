@@ -1,6 +1,6 @@
 // JS do Depoimento (Troca os cards automaticamente)
 let currentPair = 0;
-const totalPairs = 2;
+const totalPairs = 4;
 const cards = document.querySelectorAll(".persona-card");
 const dots = document.querySelectorAll(".persona-dot");
 
