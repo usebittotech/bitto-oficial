@@ -1890,43 +1890,61 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   /* FERRAMENTAS */
   .features-section {
-    padding: 70px 5%;
+    padding: 56px 6%;
   }
   .features-header {
-    margin-bottom: 50px;
+    margin-bottom: 40px;
   }
   .features-header h2 {
-    font-size: 1.7rem;
+    font-size: 1.65rem;
+    line-height: 1.2;
+    margin-bottom: 12px;
   }
   .features-header p {
-    font-size: 0.95rem;
+    font-size: 0.93rem;
+    line-height: 1.6;
   }
   .features-list {
-    gap: 50px;
+    gap: 44px;
   }
   .feature-row {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 20px;
     direction: ltr;
   }
   .feature-row-reverse {
     direction: ltr;
   }
-  /* Visual sempre embaixo do texto no mobile */
   .feature-text {
     order: 1;
+    padding: 0 2px;
   }
   .feature-visual {
     order: 2;
     min-height: auto;
-    padding: 24px;
+    padding: 28px 20px;
     border-radius: 20px;
   }
+  .feature-badge {
+    font-size: 0.76rem;
+    padding: 6px 13px;
+    margin-bottom: 14px;
+  }
   .feature-text h3 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
+    line-height: 1.25;
+    margin-bottom: 10px;
   }
   .feature-text > p {
-    font-size: 0.93rem;
+    font-size: 0.91rem;
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+  .feature-bullets {
+    gap: 8px;
+  }
+  .feature-bullets li {
+    font-size: 0.88rem;
   }
   .mock-card,
   .mock-quiz,
@@ -2081,20 +2099,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .demo-section,
   .pricing-section-modern,
   .social-proof-section {
-    padding: 60px 4%;
+    padding: 52px 5%;
   }
   #faq.section-padding {
-    padding: 60px 4%;
+    padding: 52px 5%;
   }
 
   .features-header h2 {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
   }
   .feature-text h3 {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+  }
+  .feature-text > p {
+    font-size: 0.89rem;
   }
   .feature-visual {
-    padding: 18px;
+    padding: 22px 16px;
   }
 
   .plan-card {
