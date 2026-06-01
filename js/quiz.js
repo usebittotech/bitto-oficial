@@ -5,27 +5,30 @@ const themeToggle = document.getElementById('themeToggle');
 const startBtn    = document.getElementById('startQuizBtn');
 const nextBtn     = document.getElementById('nextQuestionBtn');
 
-const emptyState       = document.getElementById('emptyState');
-const loadingState     = document.getElementById('loadingState');
-const gameActive       = document.getElementById('gameActive');
-const gameResult       = document.getElementById('gameResult');
-const questionText     = document.getElementById('questionText');
-const optionsContainer = document.getElementById('optionsContainer');
-const feedbackArea     = document.getElementById('feedbackArea');
-const feedbackMsg      = document.getElementById('feedbackMsg');
-const scoreBadge       = document.getElementById('scoreBadge');
-const progressSteps    = document.getElementById('progressSteps');
-const questionCounter  = document.getElementById('questionCounter');
-const finalScoreEl     = document.getElementById('finalScore');
-const resultTopicEl    = document.getElementById('resultTopic');
-const gameTitle        = document.getElementById('gameTitle');
-const statusText       = document.getElementById('statusText');
+const emptyState        = document.getElementById('emptyState');
+const loadingState      = document.getElementById('loadingState');
+const gameActive        = document.getElementById('gameActive');
+const gameResult        = document.getElementById('gameResult');
+const questionText      = document.getElementById('questionText');
+const optionsContainer  = document.getElementById('optionsContainer');
+const feedbackArea      = document.getElementById('feedbackArea');
+const feedbackMsg       = document.getElementById('feedbackMsg');
+const feedbackIcon      = document.getElementById('feedbackIcon');
+const feedbackLabel     = document.getElementById('feedbackLabel');
+const feedbackExplan    = document.getElementById('feedbackExplanation');
+const scoreBadge        = document.getElementById('scoreBadge');
+const progressSteps     = document.getElementById('progressSteps');
+const questionCounter   = document.getElementById('questionCounter');
+const finalScoreEl      = document.getElementById('finalScore');
+const resultTopicEl     = document.getElementById('resultTopic');
+const gameTitle         = document.getElementById('gameTitle');
+const statusText        = document.getElementById('statusText');
 
 let questions            = [];
 let currentQuestionIndex = 0;
 let score                = 0;
 let currentUser          = null;
-const TOTAL_QUESTIONS    = 5;
+let TOTAL_QUESTIONS      = 5;   // atualizado dinamicamente ao iniciar
 const OPTION_LABELS      = ['A', 'B', 'C', 'D'];
 
 // --- AUTH ---
@@ -40,6 +43,8 @@ if (startBtn) {
         const topic        = document.getElementById('quizTopic').value.trim();
         const difficultyEl = document.querySelector('input[name="difficulty"]:checked');
         const difficulty   = difficultyEl ? difficultyEl.value : 'Iniciante';
+        const qtyEl        = document.querySelector('input[name="quizQty"]:checked');
+        TOTAL_QUESTIONS    = qtyEl ? parseInt(qtyEl.value) : 5;
 
         if (!topic) { showToast('Digite um tema para começar!', 'error'); return; }
         if (!currentUser) { showToast('Aguarde a conexão...', 'info'); return; }
@@ -207,11 +212,13 @@ function checkAnswer(selectedIdx, btnElement) {
 // --- FEEDBACK ---
 function showFeedback(isCorrect, explanation) {
     feedbackArea.style.display = 'block';
-    const label   = isCorrect ? 'Correto!' : 'Ops! Resposta errada.';
-    feedbackMsg.innerHTML  = `<strong>${label}</strong> ${explanation}`;
-    feedbackMsg.className  = isCorrect
+    feedbackMsg.className = isCorrect
         ? 'feedback-box feedback-correct'
         : 'feedback-box feedback-wrong';
+
+    feedbackIcon.textContent  = isCorrect ? '✓' : '✗';
+    feedbackLabel.textContent = isCorrect ? 'Resposta correta!' : 'Resposta incorreta';
+    feedbackExplan.textContent = explanation || '';
     feedbackMsg.setAttribute('role', 'alert');
 }
 

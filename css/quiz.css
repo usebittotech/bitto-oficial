@@ -305,39 +305,71 @@
 /* --- FEEDBACK --- */
 .feedback-container {
     margin-top: 1.5rem;
-    animation: fadeIn 0.3s;
+    animation: fadeIn 0.25s ease;
     border-top: 1px dashed var(--border-color);
     padding-top: 1.25rem;
 }
-.feedback-box {
-    padding: 1rem 1.1rem;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.92rem;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    border: 1.5px solid;
+
+/* Linha de status: ícone + label */
+.feedback-status {
     display: flex;
+    align-items: center;
     gap: 10px;
-    align-items: flex-start;
+    margin-bottom: 0.75rem;
 }
-.feedback-box::before {
-    font-size: 1.1rem;
+.feedback-status-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
     flex-shrink: 0;
-    margin-top: 1px;
 }
-.feedback-correct {
-    border-color: var(--accent-green);
-    color: #15803d;
-    background: rgba(34, 197, 94, 0.1);
+.feedback-status-label {
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
 }
-.feedback-correct::before { content: "✅"; }
-.feedback-wrong {
-    border-color: #EF4444;
-    color: #b91c1c;
-    background: rgba(239, 68, 68, 0.1);
+
+/* Versão correta */
+.feedback-correct .feedback-status-icon  { background: rgba(34,197,94,0.15); color: #15803d; }
+.feedback-correct .feedback-status-label { color: #15803d; }
+
+/* Versão errada */
+.feedback-wrong .feedback-status-icon  { background: rgba(239,68,68,0.12); color: #b91c1c; }
+.feedback-wrong .feedback-status-label { color: #b91c1c; }
+
+/* Bloco de explicação — neutro, legível */
+.feedback-explanation {
+    background: var(--input-bg);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    border-left: 3px solid var(--border-color);
+    margin-bottom: 1rem;
 }
-.feedback-wrong::before { content: "❌"; }
+.feedback-correct .feedback-explanation { border-left-color: var(--accent-green); }
+.feedback-wrong   .feedback-explanation { border-left-color: #EF4444; }
+
+.feedback-explanation-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+    opacity: 0.7;
+}
+
+/* wrapper que agrupa tudo */
+.feedback-box {
+    margin-bottom: 0;
+}
 
 /* --- BOTÃO PRÓXIMA --- */
 .action-btn {

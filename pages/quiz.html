@@ -91,7 +91,16 @@
               <div class="options-grid" id="optionsContainer"></div>
 
               <div id="feedbackArea" class="feedback-container" style="display:none">
-                <div class="feedback-box" id="feedbackMsg"></div>
+                <div class="feedback-box" id="feedbackMsg">
+                  <div class="feedback-status">
+                    <div class="feedback-status-icon" id="feedbackIcon"></div>
+                    <span class="feedback-status-label" id="feedbackLabel"></span>
+                  </div>
+                  <div class="feedback-explanation">
+                    <span class="feedback-explanation-label">Por quê?</span>
+                    <span id="feedbackExplanation"></span>
+                  </div>
+                </div>
                 <!-- Botão começa desabilitado; JS habilita após resposta -->
                 <button
                   class="action-btn"
@@ -153,6 +162,24 @@
                 <label class="qty-option">
                   <input type="radio" name="difficulty" value="Difícil" />
                   <div class="qty-box">Difícil</div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Quantidade de Questões</label>
+              <div class="qty-selector-group">
+                <label class="qty-option">
+                  <input type="radio" name="quizQty" value="5" checked />
+                  <div class="qty-box">5</div>
+                </label>
+                <label class="qty-option">
+                  <input type="radio" name="quizQty" value="10" />
+                  <div class="qty-box">10</div>
+                </label>
+                <label class="qty-option">
+                  <input type="radio" name="quizQty" value="15" />
+                  <div class="qty-box">15</div>
                 </label>
               </div>
             </div>
