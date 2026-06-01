@@ -11,7 +11,6 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap"
       rel="stylesheet"
     />
-
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="stylesheet" href="../css/quiz.css" />
   </head>
@@ -26,61 +25,24 @@
             <span class="icon">←</span> Voltar
           </a>
         </div>
-
         <div class="nav-center">
           <span class="page-title">QUIZ GAME</span>
         </div>
-
         <div class="nav-right">
           <button class="icon-button" id="themeToggle" title="Alternar Tema">
-            <svg
-              class="icon-sun"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
-            <svg
-              class="icon-moon"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              style="display: none"
-            >
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
-
-          <div
-            class="user-profile"
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              margin-left: 15px;
-            "
-          >
-            <span
-              class="user-name"
-              id="navUserName"
-              style="font-size: 0.9rem; font-weight: 600"
-              >...</span
-            >
+          <div class="user-profile" style="display:flex;align-items:center;gap:10px;margin-left:15px">
+            <span class="user-name" id="navUserName" style="font-size:0.9rem;font-weight:600">...</span>
             <div class="avatar-circle"></div>
           </div>
         </div>
@@ -89,6 +51,8 @@
 
     <div class="container main-wrapper">
       <div class="quiz-layout">
+
+        <!-- COLUNA DO JOGO -->
         <div class="game-column">
           <div class="deck-header">
             <div class="deck-info">
@@ -98,21 +62,27 @@
           </div>
 
           <div class="paper-sheet tilt-element">
+
+            <!-- Estado vazio -->
             <div id="emptyState" class="empty-state">
               <div class="empty-icon">🎮</div>
               <h3>Configure sua Partida</h3>
               <p>Escolha um tema no painel ao lado e inicie o desafio.</p>
             </div>
 
-            <div id="loadingState" class="empty-state" style="display: none">
+            <!-- Loading -->
+            <div id="loadingState" class="empty-state" style="display:none">
               <span class="loader-large"></span>
-              <p id="statusText" style="margin-top: 20px">
-                Bitto está criando as perguntas...
-              </p>
+              <p id="statusText" style="margin-top:20px">Bitto está criando as perguntas...</p>
             </div>
 
-            <div id="gameActive" style="display: none">
+            <!-- Jogo ativo -->
+            <div id="gameActive" style="display:none">
+              <!-- Barra de progresso por passos -->
               <div class="progress-steps" id="progressSteps"></div>
+
+              <!-- Contador textual — sempre visível -->
+              <span class="question-counter" id="questionCounter">Questão 1 de 5</span>
 
               <div class="question-header">
                 <h2 id="questionText">...</h2>
@@ -120,49 +90,38 @@
 
               <div class="options-grid" id="optionsContainer"></div>
 
-              <div
-                id="feedbackArea"
-                class="feedback-container"
-                style="display: none"
-              >
+              <div id="feedbackArea" class="feedback-container" style="display:none">
                 <div class="feedback-box" id="feedbackMsg"></div>
+                <!-- Botão começa desabilitado; JS habilita após resposta -->
                 <button
                   class="action-btn"
                   id="nextQuestionBtn"
-                  style="width: 100%; margin-top: 1rem"
+                  disabled
+                  style="opacity:0.45;cursor:not-allowed"
                 >
                   PRÓXIMA ➔
                 </button>
               </div>
             </div>
 
-            <div
-              id="gameResult"
-              style="display: none; text-align: center; padding: 2rem 0"
-            >
+            <!-- Resultado final -->
+            <div id="gameResult" style="display:none;text-align:center;padding:2rem 0">
               <div class="result-icon">🏆</div>
               <h1 class="result-title">Missão Cumprida!</h1>
-              <p class="result-desc">
-                Você finalizou o desafio sobre
-                <strong id="resultTopic">Tema</strong>.
-              </p>
-
+              <p class="result-desc">Você finalizou o desafio sobre <strong id="resultTopic">Tema</strong>.</p>
               <div class="final-score-box">
                 <span class="score-label">PONTUAÇÃO TOTAL</span>
                 <span class="score-number" id="finalScore">0</span>
               </div>
-
-              <button
-                class="nav-btn"
-                onclick="location.reload()"
-                style="margin: 0 auto"
-              >
+              <button class="nav-btn" onclick="location.reload()" style="margin:0 auto">
                 JOGAR NOVAMENTE
               </button>
             </div>
+
           </div>
         </div>
 
+        <!-- SIDEBAR -->
         <div class="sidebar-column">
           <div class="tool-panel creator-card">
             <div class="panel-header">
@@ -171,7 +130,7 @@
             </div>
 
             <div class="form-group">
-              <label>Tema do Desafio</label>
+              <label for="quizTopic">Tema do Desafio</label>
               <input
                 type="text"
                 class="input-field"
@@ -184,12 +143,7 @@
               <label>Nível de Dificuldade</label>
               <div class="qty-selector-group">
                 <label class="qty-option">
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    value="Iniciante"
-                    checked
-                  />
+                  <input type="radio" name="difficulty" value="Iniciante" checked />
                   <div class="qty-box">Fácil</div>
                 </label>
                 <label class="qty-option">
@@ -208,6 +162,7 @@
             </button>
           </div>
         </div>
+
       </div>
     </div>
 
