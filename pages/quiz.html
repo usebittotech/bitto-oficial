@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script defer src="/_vercel/insights/script.js"></script>
     <title>BITTO - Quiz Game</title>
     <link rel="icon" type="image/png" href="/imagens/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,19 +31,53 @@
         </div>
         <div class="nav-right">
           <button class="icon-button" id="themeToggle" title="Alternar Tema">
-            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              class="icon-sun"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
-            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+            <svg
+              class="icon-moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="display: none"
+            >
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
-          <div class="user-profile" style="display:flex;align-items:center;gap:10px;margin-left:15px">
-            <span class="user-name" id="navUserName" style="font-size:0.9rem;font-weight:600">...</span>
+          <div
+            class="user-profile"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              margin-left: 15px;
+            "
+          >
+            <span
+              class="user-name"
+              id="navUserName"
+              style="font-size: 0.9rem; font-weight: 600"
+              >...</span
+            >
             <div class="avatar-circle"></div>
           </div>
         </div>
@@ -51,7 +86,6 @@
 
     <div class="container main-wrapper">
       <div class="quiz-layout">
-
         <!-- COLUNA DO JOGO -->
         <div class="game-column">
           <div class="deck-header">
@@ -62,7 +96,6 @@
           </div>
 
           <div class="paper-sheet tilt-element">
-
             <!-- Estado vazio -->
             <div id="emptyState" class="empty-state">
               <div class="empty-icon">🎮</div>
@@ -71,18 +104,22 @@
             </div>
 
             <!-- Loading -->
-            <div id="loadingState" class="empty-state" style="display:none">
+            <div id="loadingState" class="empty-state" style="display: none">
               <span class="loader-large"></span>
-              <p id="statusText" style="margin-top:20px">Bitto está criando as perguntas...</p>
+              <p id="statusText" style="margin-top: 20px">
+                Bitto está criando as perguntas...
+              </p>
             </div>
 
             <!-- Jogo ativo -->
-            <div id="gameActive" style="display:none">
+            <div id="gameActive" style="display: none">
               <!-- Barra de progresso por passos -->
               <div class="progress-steps" id="progressSteps"></div>
 
               <!-- Contador textual — sempre visível -->
-              <span class="question-counter" id="questionCounter">Questão 1 de 5</span>
+              <span class="question-counter" id="questionCounter"
+                >Questão 1 de 5</span
+              >
 
               <div class="question-header">
                 <h2 id="questionText">...</h2>
@@ -90,11 +127,18 @@
 
               <div class="options-grid" id="optionsContainer"></div>
 
-              <div id="feedbackArea" class="feedback-container" style="display:none">
+              <div
+                id="feedbackArea"
+                class="feedback-container"
+                style="display: none"
+              >
                 <div class="feedback-box" id="feedbackMsg">
                   <div class="feedback-status">
                     <div class="feedback-status-icon" id="feedbackIcon"></div>
-                    <span class="feedback-status-label" id="feedbackLabel"></span>
+                    <span
+                      class="feedback-status-label"
+                      id="feedbackLabel"
+                    ></span>
                   </div>
                   <div class="feedback-explanation">
                     <span class="feedback-explanation-label">Por quê?</span>
@@ -106,7 +150,7 @@
                   class="action-btn"
                   id="nextQuestionBtn"
                   disabled
-                  style="opacity:0.45;cursor:not-allowed"
+                  style="opacity: 0.45; cursor: not-allowed"
                 >
                   PRÓXIMA ➔
                 </button>
@@ -114,19 +158,28 @@
             </div>
 
             <!-- Resultado final -->
-            <div id="gameResult" style="display:none;text-align:center;padding:2rem 0">
+            <div
+              id="gameResult"
+              style="display: none; text-align: center; padding: 2rem 0"
+            >
               <div class="result-icon">🏆</div>
               <h1 class="result-title">Missão Cumprida!</h1>
-              <p class="result-desc">Você finalizou o desafio sobre <strong id="resultTopic">Tema</strong>.</p>
+              <p class="result-desc">
+                Você finalizou o desafio sobre
+                <strong id="resultTopic">Tema</strong>.
+              </p>
               <div class="final-score-box">
                 <span class="score-label">PONTUAÇÃO TOTAL</span>
                 <span class="score-number" id="finalScore">0</span>
               </div>
-              <button class="nav-btn" onclick="location.reload()" style="margin:0 auto">
+              <button
+                class="nav-btn"
+                onclick="location.reload()"
+                style="margin: 0 auto"
+              >
                 JOGAR NOVAMENTE
               </button>
             </div>
-
           </div>
         </div>
 
@@ -152,7 +205,12 @@
               <label>Nível de Dificuldade</label>
               <div class="qty-selector-group">
                 <label class="qty-option">
-                  <input type="radio" name="difficulty" value="Iniciante" checked />
+                  <input
+                    type="radio"
+                    name="difficulty"
+                    value="Iniciante"
+                    checked
+                  />
                   <div class="qty-box">Fácil</div>
                 </label>
                 <label class="qty-option">
@@ -189,7 +247,6 @@
             </button>
           </div>
         </div>
-
       </div>
     </div>
 
