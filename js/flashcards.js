@@ -13,15 +13,37 @@ const cardBackText = document.getElementById("cardBackText");
 const generateBtn = document.getElementById("generateBtn");
 const deckTitle = document.getElementById("deckTitle");
 const statusText = document.getElementById("statusText");
+const evalControls = document.getElementById("evalControls");
+const flipControls = document.getElementById("flipControls");
+const wrongBtn = document.getElementById("wrongBtn");
+const rightBtn = document.getElementById("rightBtn");
+const sessionRight = document.getElementById("sessionRight");
+const sessionWrong = document.getElementById("sessionWrong");
+
+let sessionRightCount = 0;
+let sessionWrongCount = 0;
+let isFlipped = false;
 
 let currentDeck = [
   {
-    q: "Bem-vindo ao BITTO!",
-    a: "Sua plataforma de estudos. Digite QUALQUER tema acima para gerar cards.",
+    q: "👋 Olá! Bem-vindo ao BITTO Flashcards",
+    a: "Aqui você transforma qualquer texto em flashcards com IA. Depois de virar o card, diga se lembrou ou não — o BITTO acompanha seu progresso.",
   },
   {
-    q: "Login Necessário",
-    a: "Agora seus estudos são salvos e contados no seu plano.",
+    q: "⚡ Como gerar seu primeiro deck?",
+    a: "No painel ao lado: escreva um tema (ex: 'Fotossíntese') ou cole um texto do seu material. Escolha a quantidade e clique em GERAR AGORA.",
+  },
+  {
+    q: "🃏 Como estudar com os cards?",
+    a: "Leia a pergunta, tente lembrar a resposta mentalmente, depois vire o card. Clique ✓ se lembrou ou ✕ se não lembrou — isso registra seu desempenho.",
+  },
+  {
+    q: "⌨️ Atalhos do teclado",
+    a: "Enter ou ↑ para virar o card · ← → para navegar entre cards · Após virar: tecle 1 para 'Não lembrei' e 2 para 'Lembrei!'",
+  },
+  {
+    q: "🚀 Pronto para começar?",
+    a: "Gere seu primeiro deck com IA agora mesmo! Digite um tema no painel ao lado e clique em GERAR AGORA ⚡",
   },
 ];
 let currentIndex = 0;
@@ -39,6 +61,8 @@ onAuthStateChanged(auth, (user) => {
 // --- UI UPDATE ---
 function updateCardUI() {
   if (flipCard) flipCard.classList.remove("is-flipped");
+  isFlipped = false;
+  showFlipControls();
   setTimeout(() => {
     if (currentDeck && currentDeck[currentIndex]) {
       cardFrontText.innerText = currentDeck[currentIndex].q;
@@ -53,8 +77,65 @@ function updateCardUI() {
   }, 250);
 }
 
+function showFlipControls() {
+  if (flipControls) flipControls.style.display = "flex";
+  if (evalControls) evalControls.style.display = "none";
+}
+
+function showEvalControls() {
+  if (flipControls) flipControls.style.display = "none";
+  if (evalControls) evalControls.style.display = "flex";
+}
+
+function updateSessionUI() {
+  if (sessionRight) sessionRight.textContent = sessionRightCount;
+  if (sessionWrong) sessionWrong.textContent = sessionWrongCount;
+}
+
 function toggleFlip() {
-  if (flipCard) flipCard.classList.toggle("is-flipped");
+  if (flipCard) {
+    flipCard.classList.toggle("is-flipped");
+    isFlipped = flipCard.classList.contains("is-flipped");
+    if (isFlipped) {
+      showEvalControls();
+    } else {
+      showFlipControls();
+    }
+  }
+}
+
+// --- AVALIAÇÃO ---
+function goNext() {
+  if (currentIndex < currentDeck.length - 1) {
+    currentIndex++;
+    updateCardUI();
+  } else {
+    const total = sessionRightCount + sessionWrongCount;
+    const pct = total > 0 ? Math.round((sessionRightCount / total) * 100) : 0;
+    showToast(`Deck finalizado! ${pct}% de acerto 🎉 +50 XP`, "success");
+    if (window.awardXP) window.awardXP(50, "Flashcards Concluído");
+    currentIndex = 0;
+    sessionRightCount = 0;
+    sessionWrongCount = 0;
+    updateSessionUI();
+    setTimeout(updateCardUI, 1000);
+  }
+}
+
+if (wrongBtn) {
+  wrongBtn.addEventListener("click", () => {
+    sessionWrongCount++;
+    updateSessionUI();
+    goNext();
+  });
+}
+
+if (rightBtn) {
+  rightBtn.addEventListener("click", () => {
+    sessionRightCount++;
+    updateSessionUI();
+    goNext();
+  });
 }
 
 // --- NAVEGAÇÃO ---
@@ -68,32 +149,26 @@ if (prevBtn)
 
 if (nextBtn)
   nextBtn.addEventListener("click", () => {
-    if (currentIndex < currentDeck.length - 1) {
-      currentIndex++;
-      updateCardUI();
-    } else {
-      // FIM DO DECK
-      showToast("Deck finalizado! 🎉 +50 XP", "success");
-
-      // --- DAR XP POR COMPLETAR ---
-      if (window.awardXP) window.awardXP(50, "Flashcards Concluído");
-
-      // Reinicia para estudo contínuo se quiser
-      currentIndex = 0;
-      setTimeout(updateCardUI, 1000);
-    }
+    goNext();
   });
 
 if (flipBtn) flipBtn.addEventListener("click", toggleFlip);
-if (flipCard) flipCard.addEventListener("click", toggleFlip);
+if (flipCard)
+  flipCard.addEventListener("click", () => {
+    // Clique no card vira apenas se estiver mostrando controles de flip
+    if (!isFlipped) toggleFlip();
+  });
 
 document.addEventListener("keydown", (e) => {
   if (e.code === "ArrowUp" || e.code === "Enter") {
     e.preventDefault();
-    toggleFlip();
+    if (!isFlipped) toggleFlip();
   }
-  if (e.code === "ArrowRight") if (nextBtn) nextBtn.click();
-  if (e.code === "ArrowLeft") if (prevBtn) prevBtn.click();
+  if (e.code === "ArrowRight" && !isFlipped) if (nextBtn) nextBtn.click();
+  if (e.code === "ArrowLeft" && !isFlipped) if (prevBtn) prevBtn.click();
+  // Atalhos de avaliação: 1 = não lembrei, 2 = lembrei
+  if (e.code === "Digit1" && isFlipped) if (wrongBtn) wrongBtn.click();
+  if (e.code === "Digit2" && isFlipped) if (rightBtn) rightBtn.click();
 });
 
 // --- GERADOR BITTO ---

@@ -124,13 +124,41 @@
             </div>
           </div>
 
-          <div class="controls-container">
+          <!-- Barra de sessão: acertos / erros -->
+          <div class="session-bar" id="sessionBar">
+            <div class="session-stat">
+              <span class="session-dot dot-right"></span>
+              <span id="sessionRight">0</span> lembrei
+            </div>
+            <div class="session-divider"></div>
+            <div class="session-stat">
+              <span class="session-dot dot-wrong"></span>
+              <span id="sessionWrong">0</span> não lembrei
+            </div>
+          </div>
+
+          <!-- Controles: nav + virar (visíveis antes de virar) -->
+          <div class="controls-container" id="flipControls">
             <button class="nav-btn prev" id="prevBtn">←</button>
             <button class="action-btn" id="flipBtn">VIRAR CARD</button>
             <button class="nav-btn next" id="nextBtn">→</button>
           </div>
+
+          <!-- Avaliação: aparece só depois de virar -->
+          <div class="eval-controls" id="evalControls">
+            <button class="eval-btn eval-wrong" id="wrongBtn">
+              <span class="eval-icon">✕</span>
+              <span class="eval-label">Não lembrei</span>
+            </button>
+            <button class="eval-btn eval-right" id="rightBtn">
+              <span class="eval-icon">✓</span>
+              <span class="eval-label">Lembrei!</span>
+            </button>
+          </div>
+
           <p class="keyboard-hint">
-            Dica: Use <strong>Enter ou Seta para cima</strong> para virar
+            Dica: <strong>Enter</strong> para virar · <strong>← →</strong> para
+            navegar
           </p>
         </div>
 

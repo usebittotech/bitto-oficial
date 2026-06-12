@@ -478,6 +478,128 @@
   animation: rotation 1s linear infinite;
 }
 
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- BARRA DE SESSÃO --- */
+.session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  padding: 10px 20px;
+  background: var(--input-bg);
+  border-radius: 50px;
+  border: 1px solid var(--border-color);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+.session-stat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.session-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-right {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+.dot-wrong {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+.session-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-color);
+}
+
+/* --- CONTROLES DE AVALIAÇÃO --- */
+.eval-controls {
+  display: none;
+  justify-content: center;
+  gap: 1rem;
+  align-items: stretch;
+}
+.eval-btn {
+  flex: 1;
+  max-width: 200px;
+  min-height: 64px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.eval-btn:active {
+  transform: scale(0.96);
+}
+
+.eval-icon {
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.eval-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.eval-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+.eval-wrong:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+}
+
+.eval-right {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #16a34a;
+}
+.eval-right:hover {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: #22c55e;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .eval-wrong {
+  color: #f87171;
+}
+[data-theme="dark"] .eval-right {
+  color: #4ade80;
+}
+
 /* --- MODAL DE UPGRADE --- */
 .upgrade-overlay {
   position: fixed;
