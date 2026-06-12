@@ -186,6 +186,7 @@ h1 {
 .hero-stats {
   display: flex;
   gap: 40px;
+  flex-wrap: wrap;
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
@@ -1861,21 +1862,24 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-size: 0.95rem;
   }
   .hero-stats {
-    justify-content: center;
-    gap: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    text-align: center;
     margin-top: 1.8rem;
     padding-top: 1.4rem;
   }
   .stat-item h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
   .stat-item p {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+    line-height: 1.3;
   }
 
   /* DEPOIMENTOS */
   .social-proof-section {
-    padding: 70px 5%;
+    padding: 48px 5%;
   }
   .section-title-white {
     font-size: 1.8rem;
@@ -1890,7 +1894,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   /* FERRAMENTAS */
   .features-section {
-    padding: 56px 6%;
+    padding: 48px 6%;
   }
   .features-header {
     margin-bottom: 40px;
@@ -1957,7 +1961,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   /* DEMONSTRAÇÃO */
   .demo-section {
-    padding: 70px 5%;
+    padding: 48px 5%;
   }
   .demo-header h2 {
     font-size: 1.7rem;
@@ -1972,30 +1976,42 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   /* PLANOS */
   .pricing-section-modern {
-    padding: 70px 5% 90px;
+    padding: 48px 5% 60px;
+  }
+  .pricing-header {
+    margin-bottom: 32px;
   }
   .pricing-header h2 {
-    font-size: 1.9rem;
+    font-size: 1.7rem;
+  }
+  .pricing-header p {
+    font-size: 0.95rem;
   }
   .pricing-grid {
-    flex-direction: column;
+    flex-direction: column-reverse;
     align-items: stretch;
     gap: 16px;
   }
-  .plan-card {
+  .plan-card,
+  .plan-card.featured {
     max-width: 100%;
   }
   .plan-card.featured {
     transform: scale(1);
-    padding: 40px 28px;
+    padding: 36px 24px;
+    order: -1;
   }
   .plan-card.featured:hover {
     transform: translateY(-4px);
   }
+  .plan-toggle-btn {
+    font-size: 0.75rem;
+    padding: 8px 4px;
+  }
 
   /* FAQ */
   #faq.section-padding {
-    padding: 70px 5%;
+    padding: 48px 5%;
   }
   #faq.section-padding::before {
     font-size: 28vw;
@@ -2024,7 +2040,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   /* FINAL CTA */
   .final-cta {
-    padding: 70px 5%;
+    padding: 56px 5%;
     border-radius: 40px 40px 0 0;
   }
   .final-cta h2 {
@@ -2092,17 +2108,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-size: 0.93rem;
   }
   .hero-stats {
-    gap: 20px;
+    gap: 8px;
   }
 
   .features-section,
   .demo-section,
   .pricing-section-modern,
   .social-proof-section {
-    padding: 52px 5%;
+    padding: 44px 5%;
+  }
+  .pricing-section-modern {
+    padding: 44px 5% 56px;
   }
   #faq.section-padding {
-    padding: 52px 5%;
+    padding: 44px 5%;
   }
 
   .features-header h2 {
@@ -2154,5 +2173,385 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .social-links {
     flex-wrap: wrap;
     gap: 10px;
+  }
+}
+
+/* ==============================================
+   SEÇÃO PROBLEMA (Agitação)
+   ============================================== */
+.problem-section {
+  padding: 80px 8%;
+  background: white;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.problem-card {
+  border-radius: 24px;
+  padding: 36px;
+}
+
+.problem-icon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.problem-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+
+.problem-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.problem-list li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.problem-bad {
+  background: #fff5f5;
+  border: 2px solid #fde2e2;
+}
+.problem-bad h3 {
+  color: #e0314c;
+}
+.problem-bad .problem-list li {
+  color: #7a4a4f;
+}
+.problem-bad .problem-list li::before {
+  content: "✕";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fde2e2;
+  color: #e0314c;
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.problem-good {
+  background: var(--dark);
+  border: 2px solid rgba(204, 255, 0, 0.25);
+}
+.problem-good h3 {
+  color: var(--accent);
+}
+.problem-good .problem-list li {
+  color: rgba(255, 255, 255, 0.85);
+}
+.problem-good .problem-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(204, 255, 0, 0.2);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==============================================
+   SEÇÃO AUDIÊNCIA (Para Quem é)
+   ============================================== */
+.audience-section {
+  padding: 80px 8%;
+  background: var(--bg);
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.audience-card {
+  background: white;
+  border: 2px solid #eef0f8;
+  border-radius: 20px;
+  padding: 28px 24px;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.audience-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
+}
+
+.audience-icon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.audience-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--dark);
+}
+
+.audience-card p {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  line-height: 1.55;
+}
+
+/* Responsivo - Problema & Audiência */
+@media (max-width: 900px) {
+  .problem-section,
+  .audience-section {
+    padding: 48px 5%;
+  }
+  .problem-section .features-header,
+  .audience-section .features-header {
+    margin-bottom: 32px;
+  }
+  .problem-section .features-header h2,
+  .audience-section .features-header h2 {
+    font-size: 1.65rem;
+    line-height: 1.2;
+  }
+  .problem-section .features-header p,
+  .audience-section .features-header p {
+    font-size: 0.93rem;
+  }
+  .problem-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .problem-card {
+    padding: 24px 20px;
+  }
+  .problem-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+  }
+  .problem-list li {
+    font-size: 0.9rem;
+  }
+  .audience-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .audience-card {
+    padding: 22px 18px;
+  }
+}
+@media (max-width: 560px) {
+  .problem-section .features-header h2,
+  .audience-section .features-header h2 {
+    font-size: 1.45rem;
+  }
+  .audience-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .audience-card {
+    padding: 18px 14px;
+  }
+  .audience-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .audience-card h4 {
+    font-size: 0.98rem;
+  }
+  .audience-card p {
+    font-size: 0.83rem;
+  }
+}
+
+/* ==============================================
+   PRICING — AJUSTES (4 PLANOS + ANCORAGEM)
+   ============================================== */
+.pricing-grid {
+  gap: 18px;
+}
+.plan-card {
+  max-width: 280px;
+  padding: 36px 26px;
+}
+.plan-card.featured {
+  max-width: 300px;
+  padding: 46px 30px;
+}
+
+.plan-price-old {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  text-decoration: line-through;
+  margin-bottom: 2px;
+}
+.plan-card.featured .plan-price-old {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Badge "Melhor Valor" (plano anual) */
+.badge-value {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0, 53, 255, 0.35);
+}
+
+/* Variante azul do selo de economia (cards claros) */
+.plan-savings-blue {
+  background: rgba(0, 53, 255, 0.08);
+  color: var(--primary);
+}
+
+/* Garantia abaixo do grid de planos */
+.pricing-guarantee {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 640px;
+  margin: 44px auto 0;
+  background: white;
+  border: 2px solid #eef0f8;
+  border-radius: 18px;
+  padding: 22px 28px;
+  position: relative;
+  z-index: 1;
+}
+.pricing-guarantee-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.pricing-guarantee strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: var(--dark);
+}
+.pricing-guarantee p {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .pricing-guarantee {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
+
+/* ==============================================
+   PRICING — TOGGLE DE PERÍODO (Mensal/Trimestral/Anual)
+   ============================================== */
+.pricing-grid {
+  align-items: stretch;
+}
+.plan-card,
+.plan-card.featured {
+  max-width: 320px;
+}
+.plan-toggle-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-toggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 5px;
+  margin-bottom: 22px;
+}
+.plan-toggle-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 9px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.plan-toggle-btn:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+.plan-toggle-btn.active {
+  background: var(--accent);
+  color: var(--dark);
+}
+
+.plan-option {
+  display: none;
+}
+.plan-option.active {
+  display: block;
+  animation: fadeUp 0.35s ease;
+}
+
+.plan-cta {
+  display: none;
+}
+
+/* Garante que apenas o card de plano pago seja destacado */
+.pricing-grid .plan-card:not(.featured) {
+  justify-content: flex-start;
+}
+
+@media (max-width: 1100px) {
+  .plan-card,
+  .plan-card.featured {
+    max-width: 360px;
   }
 }
