@@ -117,7 +117,7 @@ if (generateBtn) {
     // 1. VERIFICA LIMITE DO PLANO (userManager.js)
     const canUse = await checkUsageLimit(currentUser.uid, "flashcards");
     if (!canUse) {
-      showToast("🔒 Limite mensal atingido (3/3). Faça upgrade!", "error");
+      showUpgradeModal();
       return;
     }
 
@@ -195,6 +195,31 @@ if (generateBtn) {
     }
   });
 }
+
+// --- MODAL DE UPGRADE ---
+function showUpgradeModal() {
+  const overlay = document.getElementById("upgradeOverlay");
+  if (!overlay) return;
+  overlay.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+}
+
+function hideUpgradeModal() {
+  const overlay = document.getElementById("upgradeOverlay");
+  if (!overlay) return;
+  overlay.classList.remove("is-open");
+  document.body.style.overflow = "";
+}
+
+document
+  .getElementById("upgradeClose")
+  ?.addEventListener("click", hideUpgradeModal);
+document.getElementById("upgradeOverlay")?.addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) hideUpgradeModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Escape") hideUpgradeModal();
+});
 
 // --- TEMA & TOAST ---
 themeToggle.addEventListener("click", () => {
