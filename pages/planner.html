@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script defer src="/_vercel/insights/script.js"></script>
+    <title>BITTO - Ciclo de Estudos</title>
+    <link rel="icon" type="image/png" href="/imagens/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/planner.css" />
+  </head>
+  <body>
+    <div class="crt-overlay"></div>
+    <div id="toast-container"></div>
+
+    <nav class="navbar">
+      <div class="container nav-grid">
+        <div class="nav-left">
+          <a href="dashboard.html" class="back-pill">
+            <span class="icon">←</span> Voltar
+          </a>
+        </div>
+        <div class="nav-center">
+          <span class="page-title">CICLO DE ESTUDOS</span>
+        </div>
+        <div class="nav-right">
+          <button class="icon-button" id="themeToggle" title="Alternar Tema">
+            <svg
+              class="icon-sun"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg
+              class="icon-moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="display: none"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <div
+            class="user-profile"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              margin-left: 15px;
+            "
+          >
+            <span
+              class="user-name"
+              id="navUserName"
+              style="font-size: 0.9rem; font-weight: 600"
+              >...</span
+            >
+            <div class="avatar-circle"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container main-wrapper">
+      <div class="tool-layout">
+        <div class="main-column">
+          <div
+            class="deck-header"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div class="deck-info" style="margin-bottom: 0">
+              <h2 id="toolTitle">Planejamento Semanal</h2>
+            </div>
+            <button
+              id="btnNewPlan"
+              class="back-pill"
+              style="display: none; cursor: pointer"
+            >
+              🔄 Replanejar Ciclo
+            </button>
+          </div>
+
+          <div class="paper-sheet tilt-element" style="padding: 1.5rem">
+            <div id="emptyState" class="empty-state">
+              <div
+                class="empty-icon"
+                style="font-size: 4rem; margin-bottom: 1rem"
+              >
+                🗓️
+              </div>
+              <h3>Nenhum Ciclo Ativo</h3>
+              <p>
+                Utilize o painel ao lado para definir suas matérias e gerar seu
+                ciclo de estudos Kanban.
+              </p>
+            </div>
+
+            <div id="plannerActive" style="display: none">
+              <div class="cycle-progress-board">
+                <div class="cycle-info-box">
+                  <span class="cycle-label">PROGRESSO DO CICLO</span>
+                  <div class="cycle-time-text" id="cycleTimeText">
+                    0h00min / 0h00min
+                  </div>
+                  <div
+                    class="xp-bar-bg"
+                    style="
+                      height: 10px;
+                      border-radius: 20px;
+                      background: var(--input-bg);
+                    "
+                  >
+                    <div
+                      class="xp-bar-fill"
+                      id="plannerProgressBar"
+                      style="
+                        width: 0%;
+                        background: var(--accent-green);
+                        box-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
+                      "
+                    ></div>
+                  </div>
+                </div>
+                <div class="cycle-percentage" id="plannerProgressText">0%</div>
+              </div>
+
+              <p
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  margin-bottom: 10px;
+                  margin-top: 15px;
+                "
+              >
+                Selecione o bloco na agenda para registrar o estudo e ganhar XP.
+              </p>
+
+              <div class="calendar-board-container">
+                <div id="weeklyCalendar" class="calendar-board"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-column">
+          <div class="tool-panel creator-card" id="plannerFormArea">
+            <div class="panel-header">
+              <h3>Configurar Ciclo</h3>
+              <span class="ai-badge">AUTO</span>
+            </div>
+
+            <div class="form-group">
+              <label>Horas na semana (7 dias):</label>
+              <input
+                type="number"
+                id="totalWeeklyHours"
+                placeholder="Ex: 20"
+                min="1"
+                class="input-field"
+              />
+            </div>
+
+            <div class="form-group" style="margin-top: 1.5rem">
+              <label>Adicionar Disciplinas:</label>
+              <div style="display: flex; gap: 8px; margin-bottom: 8px">
+                <input
+                  type="text"
+                  id="subjectName"
+                  placeholder="Matéria..."
+                  class="input-field"
+                  style="flex: 1"
+                />
+              </div>
+              <div style="display: flex; gap: 8px">
+                <select id="subjectWeight" class="input-field" style="flex: 1">
+                  <option value="1">Peso 1 (Fácil)</option>
+                  <option value="2" selected>Peso 2 (Média)</option>
+                  <option value="3">Peso 3 (Difícil)</option>
+                </select>
+                <button
+                  id="addSubjectBtn"
+                  class="btn-generate"
+                  style="
+                    margin-top: 0;
+                    min-height: 48px;
+                    width: 48px;
+                    padding: 0;
+                  "
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <ul id="subjectList" class="subject-list"></ul>
+
+            <button class="btn-generate" id="generatePlanBtn">
+              GERAR KANBAN 🚀
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="registerModal">
+      <div class="modal-card" style="max-width: 500px; padding: 0">
+        <div
+          class="modal-header"
+          style="background: var(--input-bg); border-bottom: none"
+        >
+          <h2 style="font-size: 1.2rem">Registro de Estudo</h2>
+          <button class="close-modal" id="closeRegisterBtn">✕</button>
+        </div>
+        <div class="modal-body" style="gap: 1.2rem; padding: 2rem">
+          <div
+            style="
+              background: rgba(0, 53, 255, 0.05);
+              padding: 15px;
+              border-radius: 12px;
+              border: 1px dashed var(--primary-blue);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <span
+                style="
+                  display: block;
+                  font-size: 0.75rem;
+                  font-weight: 700;
+                  color: var(--text-muted);
+                  margin-bottom: 5px;
+                "
+                >DISCIPLINA SELECIONADA</span
+              >
+              <strong
+                id="regSubjectDisplay"
+                style="
+                  font-family: var(--font-display);
+                  font-size: 1.1rem;
+                  color: var(--primary-blue);
+                "
+                >Matéria</strong
+              >
+            </div>
+            <div style="text-align: right">
+              <span
+                style="
+                  display: block;
+                  font-size: 0.75rem;
+                  font-weight: 700;
+                  color: var(--text-muted);
+                  margin-bottom: 5px;
+                "
+                >META</span
+              >
+              <span
+                id="regTargetTimeDisplay"
+                style="
+                  font-weight: 800;
+                  color: var(--text-main);
+                  background: var(--card-bg);
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid var(--border-color);
+                "
+                >0h00min</span
+              >
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 10px">
+            <div class="form-group" style="flex: 1">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >CATEGORIA</label
+              >
+              <select id="regCategory" class="input-field" style="width: 100%">
+                <option value="Teoria">Teoria</option>
+                <option value="Questões">Questões</option>
+                <option value="Revisão">Revisão</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >ESTUDADO (H decimais)</label
+              >
+              <input
+                type="number"
+                id="regTime"
+                class="input-field"
+                step="0.1"
+                style="width: 100%; font-weight: bold; color: var(--text-main)"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0">
+            <label
+              style="
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                font-weight: 600;
+              "
+              >TÓPICO ESTUDADO</label
+            >
+            <input
+              type="text"
+              id="regTopic"
+              class="input-field"
+              placeholder="O que você estudou nesta sessão?"
+              style="width: 100%"
+            />
+          </div>
+
+          <input type="hidden" id="regDayIndex" />
+          <input type="hidden" id="regTaskIndex" />
+        </div>
+        <div
+          class="modal-footer"
+          style="background: transparent; border-top: none; padding-top: 0"
+        >
+          <button
+            class="btn-generate"
+            id="saveRegisterBtn"
+            style="
+              width: 100%;
+              font-size: 1rem;
+              padding: 1rem;
+              margin-top: 0;
+              background: var(--primary-blue);
+              color: white;
+            "
+          >
+            ✅ Confirmar Sessão e Ganhar XP
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../js/tools-core.js"></script>
+    <script type="module" src="../js/planner.js"></script>
+  </body>
+</html>

@@ -191,133 +191,37 @@
             </div>
           </div>
 
-          <section
-            class="planner-section"
-            style="margin-top: 2rem; margin-bottom: 3rem"
-          >
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-end;
-                margin-bottom: 1.5rem;
-              "
-            >
-              <h2 class="section-title" style="margin-bottom: 0">
-                Planejamento Inteligente
-              </h2>
-              <button
-                id="btnNewPlan"
-                class="btn-new-plan"
-                style="display: none"
-              >
-                🔄 Replanejar Ciclo
-              </button>
-            </div>
-
-            <div class="planner-card tilt-element">
-              <div id="plannerFormArea">
-                <div class="planner-header-config">
-                  <div class="time-input-group" style="width: 100%">
-                    <label>Total de horas disponíveis (Ciclo de 7 dias):</label>
-                    <input
-                      type="number"
-                      id="totalWeeklyHours"
-                      placeholder="Ex: 20"
-                      min="1"
-                      class="planner-input"
-                      style="width: 100%"
-                    />
-                  </div>
-                </div>
-
-                <hr class="planner-divider" />
-
-                <div class="add-subject-group">
-                  <input
-                    type="text"
-                    id="subjectName"
-                    placeholder="Matéria (Ex: Informática, Direitos Humanos...)"
-                    class="planner-input flex-grow"
-                  />
-                  <select id="subjectWeight" class="planner-select">
-                    <option value="1">Peso 1 (Baixa Dificuldade)</option>
-                    <option value="2" selected>Peso 2 (Média)</option>
-                    <option value="3">Peso 3 (Alta Dificuldade)</option>
-                  </select>
-                  <button id="addSubjectBtn" class="btn-add-subject">+</button>
-                </div>
-
-                <ul id="subjectList" class="subject-list"></ul>
-
-                <button id="generatePlanBtn" class="btn-generate-plan">
-                  GERAR CICLO DE ESTUDOS
-                </button>
-              </div>
-
-              <div
-                id="plannerResult"
-                class="planner-result-area"
-                style="
-                  display: none;
-                  border-top: none;
-                  padding-top: 0;
-                  margin-top: 0;
-                "
-              >
-                <div class="cycle-progress-board">
-                  <div class="cycle-info-box">
-                    <span class="cycle-label">PROGRESSO DO CICLO</span>
-                    <div class="cycle-time-text" id="cycleTimeText">
-                      0h00min / 0h00min
-                    </div>
-                    <div
-                      class="xp-bar-bg"
-                      style="
-                        height: 10px;
-                        border-radius: 20px;
-                        background: var(--input-bg);
-                      "
-                    >
-                      <div
-                        class="xp-bar-fill"
-                        id="plannerProgressBar"
-                        style="
-                          width: 0%;
-                          background: var(--accent-green);
-                          box-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
-                        "
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="cycle-percentage" id="plannerProgressText">
-                    0%
-                  </div>
-                </div>
-
-                <p
-                  style="
-                    font-size: 0.8rem;
-                    color: var(--text-muted);
-                    margin-bottom: 10px;
-                    margin-top: 15px;
-                  "
-                >
-                  Selecione o bloco na agenda para registrar o estudo e ganhar
-                  XP.
-                </p>
-
-                <div class="calendar-board-container">
-                  <div id="weeklyCalendar" class="calendar-board"></div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="features-section">
+          <section class="features-section" style="margin-top: 3rem">
             <h2 class="section-title">Ferramentas de Estudo</h2>
 
             <div class="features-grid">
+              <div
+                class="feature-card tilt-element"
+                data-color="blue"
+                onclick="window.location.href = 'planner.html'"
+              >
+                <div class="feature-top">
+                  <div
+                    class="feature-icon-box"
+                    style="
+                      font-size: 1.5rem;
+                      background: rgba(255, 255, 255, 0.2);
+                    "
+                  >
+                    📅
+                  </div>
+                  <span class="arrow-icon">↗</span>
+                </div>
+                <div class="feature-content">
+                  <h3 class="feature-title">CICLO DE ESTUDOS</h3>
+                  <p class="feature-description">
+                    Organize e acompanhe as suas matérias num calendário Kanban
+                    dinâmico.
+                  </p>
+                </div>
+                <button class="feature-btn">ACESSAR</button>
+              </div>
+
               <div
                 class="feature-card tilt-element"
                 data-color="blue"
@@ -403,7 +307,9 @@
                 </div>
                 <div class="feature-content">
                   <h3 class="feature-title">QUIZ GAME</h3>
-                  <p class="feature-description">Pratique e suba de nivél.</p>
+                  <p class="feature-description">
+                    Pratique e suba de nível testando os seus conhecimentos.
+                  </p>
                 </div>
                 <button class="feature-btn">ACESSAR</button>
               </div>
@@ -549,158 +455,6 @@
             "
           >
             Sair
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="registerModal">
-      <div class="modal-card" style="max-width: 500px; padding: 0">
-        <div
-          class="modal-header"
-          style="background: var(--input-bg); border-bottom: none"
-        >
-          <h2 style="font-size: 1.2rem">Registro de Estudo</h2>
-          <button class="close-modal" id="closeRegisterBtn">✕</button>
-        </div>
-        <div class="modal-body" style="gap: 1.2rem; padding: 2rem">
-          <div
-            style="
-              background: rgba(0, 53, 255, 0.05);
-              padding: 15px;
-              border-radius: 12px;
-              border: 1px dashed var(--primary-blue);
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div>
-              <span
-                style="
-                  display: block;
-                  font-size: 0.75rem;
-                  font-weight: 700;
-                  color: var(--text-muted);
-                  margin-bottom: 5px;
-                "
-                >DISCIPLINA SELECIONADA</span
-              >
-              <strong
-                id="regSubjectDisplay"
-                style="
-                  font-family: var(--font-display);
-                  font-size: 1.1rem;
-                  color: var(--primary-blue);
-                "
-                >Matéria</strong
-              >
-            </div>
-            <div style="text-align: right">
-              <span
-                style="
-                  display: block;
-                  font-size: 0.75rem;
-                  font-weight: 700;
-                  color: var(--text-muted);
-                  margin-bottom: 5px;
-                "
-                >META</span
-              >
-              <span
-                id="regTargetTimeDisplay"
-                style="
-                  font-weight: 800;
-                  color: var(--text-main);
-                  background: var(--card-bg);
-                  padding: 4px 8px;
-                  border-radius: 6px;
-                  border: 1px solid var(--border-color);
-                "
-                >0h00min</span
-              >
-            </div>
-          </div>
-
-          <div style="display: flex; gap: 1rem; margin-top: 10px">
-            <div class="form-group" style="flex: 1">
-              <label
-                style="
-                  font-size: 0.8rem;
-                  color: var(--text-muted);
-                  font-weight: 600;
-                "
-                >CATEGORIA</label
-              >
-              <select
-                id="regCategory"
-                class="planner-select"
-                style="width: 100%"
-              >
-                <option value="Teoria">Teoria</option>
-                <option value="Questões">Questões</option>
-                <option value="Revisão">Revisão</option>
-              </select>
-            </div>
-            <div class="form-group" style="flex: 1">
-              <label
-                style="
-                  font-size: 0.8rem;
-                  color: var(--text-muted);
-                  font-weight: 600;
-                "
-                >ESTUDADO (H decimais)</label
-              >
-              <input
-                type="number"
-                id="regTime"
-                class="planner-input"
-                step="0.1"
-                style="width: 100%; font-weight: bold; color: var(--text-main)"
-              />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label
-              style="
-                font-size: 0.8rem;
-                color: var(--text-muted);
-                font-weight: 600;
-              "
-              >TÓPICO ESTUDADO</label
-            >
-            <input
-              type="text"
-              id="regTopic"
-              class="planner-input"
-              placeholder="O que você estudou nesta sessão?"
-              style="width: 100%"
-            />
-          </div>
-
-          <input type="hidden" id="regDayIndex" />
-          <input type="hidden" id="regTaskIndex" />
-        </div>
-        <div
-          class="modal-footer"
-          style="background: transparent; border-top: none; padding-top: 0"
-        >
-          <button
-            class="btn-save"
-            id="saveRegisterBtn"
-            style="
-              width: 100%;
-              font-size: 1rem;
-              padding: 1rem;
-              border-radius: 12px;
-              background: var(--primary-blue);
-              display: flex;
-              justify-content: center;
-              gap: 10px;
-            "
-          >
-            <span>✅</span> Registrar Sessão e Ganhar XP
           </button>
         </div>
       </div>
