@@ -139,9 +139,18 @@ function updateInterface(user, dbData) {
   updateGreeting(firstName);
   updateMascotImage(currentXP);
 
-  // Carrega o calendário se existir no banco de dados
+  // GESTÃO DO PLANEAMENTO: Mostra se existir, caso contrário devolve o formulário
   if (dbData.studyPlanner) {
     renderPlanner(dbData.studyPlanner);
+  } else {
+    const plannerFormArea = document.getElementById("plannerFormArea");
+    const plannerResult = document.getElementById("plannerResult");
+    const weeklyCalendar = document.getElementById("weeklyCalendar");
+    if (plannerFormArea && plannerResult) {
+      plannerFormArea.style.display = "block";
+      plannerResult.style.display = "none";
+    }
+    if (weeklyCalendar) weeklyCalendar.dataset.plannerId = "";
   }
 
   const photoURL = dbData.photoURL || user.photoURL;
@@ -532,7 +541,7 @@ if (chatInput)
   });
 
 // ==========================================
-// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (SALVANDO NO BANCO)
+// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (DOMINGO A SÁBADO + FIREBASE)
 // ==========================================
 const totalWeeklyHoursInput = document.getElementById("totalWeeklyHours");
 const subjectNameInput = document.getElementById("subjectName");
@@ -540,6 +549,10 @@ const subjectWeightSelect = document.getElementById("subjectWeight");
 const addSubjectBtn = document.getElementById("addSubjectBtn");
 const subjectListEl = document.getElementById("subjectList");
 const generatePlanBtn = document.getElementById("generatePlanBtn");
+const btnNewPlan = document.getElementById("btnNewPlan");
+const plannerFormArea = document.getElementById("plannerFormArea");
+const plannerResult = document.getElementById("plannerResult");
+const weeklyCalendar = document.getElementById("weeklyCalendar");
 
 let subjects = [];
 
@@ -596,7 +609,8 @@ if (generatePlanBtn) {
     }
 
     const totalWeight = subjects.reduce((acc, curr) => acc + curr.weight, 0);
-    // Domingo a Sábado (7 dias)
+
+    // De Domingo a Sábado (7 dias completos)
     const daysOfWeek = [
       "Domingo",
       "Segunda",
@@ -613,6 +627,7 @@ if (generatePlanBtn) {
         return {
           name: dayName,
           tasks: subjects.map((sub) => {
+            // Divide as horas totais pelos 7 dias da semana
             const dailyHours = ((sub.weight / totalWeight) * totalHours) / 7;
             const formattedDaily =
               dailyHours % 1 === 0 ? dailyHours : dailyHours.toFixed(1);
@@ -630,8 +645,8 @@ if (generatePlanBtn) {
       await updateDoc(doc(db, "users", currentUserUid), {
         studyPlanner: newPlanner,
       });
-      window.showToast("Novo calendário criado e salvo na nuvem!", "success");
-      subjects = []; // Limpa o formulário após gerar
+      window.showToast("Missão da semana criada com sucesso!", "success");
+      subjects = [];
       renderSubjectsConfig();
       totalWeeklyHoursInput.value = "";
     } catch (error) {
@@ -641,77 +656,122 @@ if (generatePlanBtn) {
   });
 }
 
-// Renderiza o Calendário Interativo na Tela
+// Lógica para voltar ao formulário e apagar a semana (botão Refazer)
+if (btnNewPlan) {
+  btnNewPlan.addEventListener("click", () => {
+    if (confirm("Quer descartar a semana atual e gerar um novo planeamento?")) {
+      plannerFormArea.style.display = "block";
+      plannerResult.style.display = "none";
+      // Limpa a base de dados para fazer o reset da visualização
+      if (currentUserUid) {
+        updateDoc(doc(db, "users", currentUserUid), { studyPlanner: null });
+      }
+    }
+  });
+}
+
+// Renderiza o Calendário Interativo no ecrã sem piscar
 function renderPlanner(plannerData) {
   window.currentPlannerData = plannerData;
-  const weeklyCalendar = document.getElementById("weeklyCalendar");
-  const plannerResult = document.getElementById("plannerResult");
-  const progressBar = document.getElementById("plannerProgressBar");
-  const progressText = document.getElementById("plannerProgressText");
 
-  weeklyCalendar.innerHTML = "";
+  // Troca os blocos visuais (esconde o formulário, mostra o resultado)
+  if (plannerFormArea && plannerResult) {
+    plannerFormArea.style.display = "none";
+    plannerResult.style.display = "block";
+  }
 
+  // Só reconstrói o HTML inteiro se for um calendário NOVO
+  // Isto evita o bug em que a checkbox perdia o foco ou piscava ao clicar
+  if (
+    weeklyCalendar &&
+    weeklyCalendar.dataset.plannerId !== plannerData.createdAt
+  ) {
+    weeklyCalendar.dataset.plannerId = plannerData.createdAt;
+    weeklyCalendar.innerHTML = "";
+
+    plannerData.days.forEach((day, dayIndex) => {
+      const dayCard = document.createElement("div");
+      dayCard.className = "day-card tilt-element";
+
+      let tasksHtml = "";
+      day.tasks.forEach((task, taskIndex) => {
+        const uniqueId = `task-${dayIndex}-${taskIndex}`;
+        tasksHtml += `
+                    <label class="task-item" id="label-${uniqueId}">
+                        <input type="checkbox" class="neon-checkbox" id="checkbox-${uniqueId}" onchange="toggleTask(${dayIndex}, ${taskIndex}, this)">
+                        <span>${task.name} <strong style="color: var(--primary-blue)">(${task.hours}h)</strong></span>
+                    </label>
+                `;
+      });
+
+      dayCard.innerHTML = `
+                <div class="day-header">${day.name}</div>
+                <div class="task-list">
+                    ${tasksHtml}
+                </div>
+            `;
+      weeklyCalendar.appendChild(dayCard);
+    });
+  }
+
+  // Sincroniza o progresso visual de forma inteligente e pontual
+  syncPlannerUI(plannerData);
+}
+
+// Atualiza o visual das checkboxes e barras de progresso sem reconstruir os componentes
+function syncPlannerUI(plannerData) {
   let totalTasks = 0;
   let completedTasks = 0;
 
   plannerData.days.forEach((day, dayIndex) => {
-    const dayCard = document.createElement("div");
-    dayCard.className = "day-card tilt-element";
-
-    let tasksHtml = "";
     day.tasks.forEach((task, taskIndex) => {
       totalTasks++;
       if (task.completed) completedTasks++;
 
       const uniqueId = `task-${dayIndex}-${taskIndex}`;
-      const checkedAttr = task.completed ? "checked" : "";
-      const completedClass = task.completed ? "completed" : "";
+      const checkbox = document.getElementById(`checkbox-${uniqueId}`);
+      const label = document.getElementById(`label-${uniqueId}`);
 
-      tasksHtml += `
-                <label class="task-item ${completedClass}" id="label-${uniqueId}">
-                    <input type="checkbox" class="neon-checkbox" ${checkedAttr} onchange="toggleTask(${dayIndex}, ${taskIndex}, this)">
-                    <span>${task.name} <strong style="color: var(--primary-blue)">(${task.hours}h)</strong></span>
-                </label>
-            `;
+      // Força o estado visual para ficar igual à base de dados
+      if (checkbox && label) {
+        checkbox.checked = task.completed;
+        if (task.completed) {
+          label.classList.add("completed");
+        } else {
+          label.classList.remove("completed");
+        }
+      }
     });
-
-    dayCard.innerHTML = `
-            <div class="day-header">${day.name}</div>
-            <div class="task-list">
-                ${tasksHtml}
-            </div>
-        `;
-    weeklyCalendar.appendChild(dayCard);
   });
 
-  // Atualiza a Barra de Progresso
+  const progressBar = document.getElementById("plannerProgressBar");
+  const progressText = document.getElementById("plannerProgressText");
   const progressPercentage =
     totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
-  progressBar.style.width = `${progressPercentage}%`;
-  progressText.innerText = `${progressPercentage}%`;
 
-  plannerResult.style.display = "block";
+  if (progressBar) progressBar.style.width = `${progressPercentage}%`;
+  if (progressText) progressText.innerText = `${progressPercentage}%`;
 }
 
-// Ação de Marcar a Tarefa (Check) e Ganhar XP
+// Ação de Marcar a Tarefa e gerar XP (Gamificação)
 window.toggleTask = async function (dayIndex, taskIndex, checkbox) {
   if (!currentUserUid || !window.currentPlannerData) return;
 
   const isCompleted = checkbox.checked;
+
+  // 1. Atualiza os dados localmente primeiro para que o utilizador sinta a resposta imediata
   window.currentPlannerData.days[dayIndex].tasks[taskIndex].completed =
     isCompleted;
+  syncPlannerUI(window.currentPlannerData);
 
-  const label = document.getElementById(`label-task-${dayIndex}-${taskIndex}`);
+  // 2. Aciona o bónus de XP
   if (isCompleted) {
-    label.classList.add("completed");
     window.showToast("+10 XP! Disciplina vence o jogo! 🔥", "success");
     await addUserXP(currentUserUid, 10);
-  } else {
-    label.classList.remove("completed");
   }
 
+  // 3. Envia os dados para a cloud (Firebase) de forma silenciosa
   try {
-    // Salva direto no Firebase o novo estado dos checkboxes
     await updateDoc(doc(db, "users", currentUserUid), {
       studyPlanner: window.currentPlannerData,
     });
