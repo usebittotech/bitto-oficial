@@ -541,7 +541,7 @@ if (chatInput)
   });
 
 // ==========================================
-// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (DOMINGO A SÁBADO + FIREBASE)
+// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (KANBAN & REGISTO)
 // ==========================================
 const totalWeeklyHoursInput = document.getElementById("totalWeeklyHours");
 const subjectNameInput = document.getElementById("subjectName");
@@ -554,7 +554,20 @@ const plannerFormArea = document.getElementById("plannerFormArea");
 const plannerResult = document.getElementById("plannerResult");
 const weeklyCalendar = document.getElementById("weeklyCalendar");
 
+// Elementos do Modal de Registo
+const registerModal = document.getElementById("registerModal");
+const closeRegisterBtn = document.getElementById("closeRegisterBtn");
+const saveRegisterBtn = document.getElementById("saveRegisterBtn");
+const regCategory = document.getElementById("regCategory");
+const regSubject = document.getElementById("regSubject");
+const regTopic = document.getElementById("regTopic");
+const regTime = document.getElementById("regTime");
+const regDayIndex = document.getElementById("regDayIndex");
+const regTaskIndex = document.getElementById("regTaskIndex");
+
 let subjects = [];
+// Contador para distribuir cores diferentes
+let colorIndexCounter = 0;
 
 if (addSubjectBtn) {
   addSubjectBtn.addEventListener("click", () => {
@@ -566,7 +579,14 @@ if (addSubjectBtn) {
       return;
     }
 
-    subjects.push({ id: Date.now(), name, weight });
+    subjects.push({
+      id: Date.now(),
+      name,
+      weight,
+      colorClass: `subject-color-${colorIndexCounter % 6}`, // Atribui cor ciclicamente
+    });
+
+    colorIndexCounter++;
     subjectNameInput.value = "";
     renderSubjectsConfig();
   });
@@ -581,9 +601,12 @@ function renderSubjectsConfig() {
     const weightLabel =
       sub.weight === 1 ? "Baixa" : sub.weight === 2 ? "Média" : "Alta";
     li.innerHTML = `
-            <span>${sub.name} <small style="color: var(--text-muted); font-size: 0.8em;">(Importância ${weightLabel})</small></span>
-            <button class="btn-remove-subject" onclick="removeSubject(${sub.id})">✕</button>
-        `;
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%;" class="${sub.colorClass}"></div>
+            <span>${sub.name} <small style="color: var(--text-muted); font-size: 0.8em;">(${weightLabel})</small></span>
+        </div>
+        <button class="btn-remove-subject" onclick="removeSubject(${sub.id})">✕</button>
+    `;
     subjectListEl.appendChild(li);
   });
 }
@@ -609,17 +632,7 @@ if (generatePlanBtn) {
     }
 
     const totalWeight = subjects.reduce((acc, curr) => acc + curr.weight, 0);
-
-    // De Domingo a Sábado (7 dias completos)
-    const daysOfWeek = [
-      "Domingo",
-      "Segunda",
-      "Terça",
-      "Quarta",
-      "Quinta",
-      "Sexta",
-      "Sábado",
-    ];
+    const daysOfWeek = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
     const newPlanner = {
       createdAt: new Date().toISOString(),
@@ -627,14 +640,16 @@ if (generatePlanBtn) {
         return {
           name: dayName,
           tasks: subjects.map((sub) => {
-            // Divide as horas totais pelos 7 dias da semana
             const dailyHours = ((sub.weight / totalWeight) * totalHours) / 7;
             const formattedDaily =
               dailyHours % 1 === 0 ? dailyHours : dailyHours.toFixed(1);
             return {
               name: sub.name,
               hours: formattedDaily,
+              colorClass: sub.colorClass,
               completed: false,
+              topic: "", // Salvará o tópico preenchido depois
+              category: "", // Salvará a categoria depois
             };
           }),
         };
@@ -647,6 +662,7 @@ if (generatePlanBtn) {
       });
       window.showToast("Missão da semana criada com sucesso!", "success");
       subjects = [];
+      colorIndexCounter = 0;
       renderSubjectsConfig();
       totalWeeklyHoursInput.value = "";
     } catch (error) {
@@ -656,13 +672,11 @@ if (generatePlanBtn) {
   });
 }
 
-// Lógica para voltar ao formulário e apagar a semana (botão Refazer)
 if (btnNewPlan) {
   btnNewPlan.addEventListener("click", () => {
     if (confirm("Quer descartar a semana atual e gerar um novo planeamento?")) {
       plannerFormArea.style.display = "block";
       plannerResult.style.display = "none";
-      // Limpa a base de dados para fazer o reset da visualização
       if (currentUserUid) {
         updateDoc(doc(db, "users", currentUserUid), { studyPlanner: null });
       }
@@ -670,18 +684,15 @@ if (btnNewPlan) {
   });
 }
 
-// Renderiza o Calendário Interativo no ecrã sem piscar
+// Renderiza as colunas e blocos de matéria
 function renderPlanner(plannerData) {
   window.currentPlannerData = plannerData;
 
-  // Troca os blocos visuais (esconde o formulário, mostra o resultado)
   if (plannerFormArea && plannerResult) {
     plannerFormArea.style.display = "none";
     plannerResult.style.display = "block";
   }
 
-  // Só reconstrói o HTML inteiro se for um calendário NOVO
-  // Isto evita o bug em que a checkbox perdia o foco ou piscava ao clicar
   if (
     weeklyCalendar &&
     weeklyCalendar.dataset.plannerId !== plannerData.createdAt
@@ -690,35 +701,34 @@ function renderPlanner(plannerData) {
     weeklyCalendar.innerHTML = "";
 
     plannerData.days.forEach((day, dayIndex) => {
-      const dayCard = document.createElement("div");
-      dayCard.className = "day-card tilt-element";
+      const dayCol = document.createElement("div");
+      dayCol.className = "kanban-column";
 
       let tasksHtml = "";
       day.tasks.forEach((task, taskIndex) => {
         const uniqueId = `task-${dayIndex}-${taskIndex}`;
+        // Usando a cor salva da matéria ou fallback
+        const bgColor = task.colorClass || "subject-color-1";
+
         tasksHtml += `
-                    <label class="task-item" id="label-${uniqueId}">
-                        <input type="checkbox" class="neon-checkbox" id="checkbox-${uniqueId}" onchange="toggleTask(${dayIndex}, ${taskIndex}, this)">
-                        <span>${task.name} <strong style="color: var(--primary-blue)">(${task.hours}h)</strong></span>
-                    </label>
+                    <div class="task-block ${bgColor}" id="block-${uniqueId}" onclick="openRegisterModal(${dayIndex}, ${taskIndex})">
+                        <div class="block-title">${task.name}</div>
+                        <div class="block-time">⏱️ ${task.hours}h</div>
+                    </div>
                 `;
       });
 
-      dayCard.innerHTML = `
+      dayCol.innerHTML = `
                 <div class="day-header">${day.name}</div>
-                <div class="task-list">
-                    ${tasksHtml}
-                </div>
+                ${tasksHtml}
             `;
-      weeklyCalendar.appendChild(dayCard);
+      weeklyCalendar.appendChild(dayCol);
     });
   }
 
-  // Sincroniza o progresso visual de forma inteligente e pontual
   syncPlannerUI(plannerData);
 }
 
-// Atualiza o visual das checkboxes e barras de progresso sem reconstruir os componentes
 function syncPlannerUI(plannerData) {
   let totalTasks = 0;
   let completedTasks = 0;
@@ -729,16 +739,13 @@ function syncPlannerUI(plannerData) {
       if (task.completed) completedTasks++;
 
       const uniqueId = `task-${dayIndex}-${taskIndex}`;
-      const checkbox = document.getElementById(`checkbox-${uniqueId}`);
-      const label = document.getElementById(`label-${uniqueId}`);
+      const block = document.getElementById(`block-${uniqueId}`);
 
-      // Força o estado visual para ficar igual à base de dados
-      if (checkbox && label) {
-        checkbox.checked = task.completed;
+      if (block) {
         if (task.completed) {
-          label.classList.add("completed");
+          block.classList.add("completed");
         } else {
-          label.classList.remove("completed");
+          block.classList.remove("completed");
         }
       }
     });
@@ -753,29 +760,68 @@ function syncPlannerUI(plannerData) {
   if (progressText) progressText.innerText = `${progressPercentage}%`;
 }
 
-// Ação de Marcar a Tarefa e gerar XP (Gamificação)
-window.toggleTask = async function (dayIndex, taskIndex, checkbox) {
-  if (!currentUserUid || !window.currentPlannerData) return;
+// --- LÓGICA DO MODAL DE REGISTO ---
+window.openRegisterModal = function (dayIndex, taskIndex) {
+  const task = window.currentPlannerData.days[dayIndex].tasks[taskIndex];
 
-  const isCompleted = checkbox.checked;
+  regSubject.value = task.name;
+  regTime.value = task.hours;
+  regTopic.value = task.topic || "";
+  regCategory.value = task.category || "Teoria";
 
-  // 1. Atualiza os dados localmente primeiro para que o utilizador sinta a resposta imediata
-  window.currentPlannerData.days[dayIndex].tasks[taskIndex].completed =
-    isCompleted;
-  syncPlannerUI(window.currentPlannerData);
+  regDayIndex.value = dayIndex;
+  regTaskIndex.value = taskIndex;
 
-  // 2. Aciona o bónus de XP
-  if (isCompleted) {
-    window.showToast("+10 XP! Disciplina vence o jogo! 🔥", "success");
-    await addUserXP(currentUserUid, 10);
-  }
-
-  // 3. Envia os dados para a cloud (Firebase) de forma silenciosa
-  try {
-    await updateDoc(doc(db, "users", currentUserUid), {
-      studyPlanner: window.currentPlannerData,
-    });
-  } catch (error) {
-    console.error("Erro ao sincronizar progresso:", error);
-  }
+  registerModal.classList.add("active");
 };
+
+if (closeRegisterBtn) {
+  closeRegisterBtn.addEventListener("click", () => {
+    registerModal.classList.remove("active");
+  });
+}
+
+if (saveRegisterBtn) {
+  saveRegisterBtn.addEventListener("click", async () => {
+    if (!currentUserUid || !window.currentPlannerData) return;
+
+    const originalText = saveRegisterBtn.innerText;
+    saveRegisterBtn.innerText = "A guardar...";
+    saveRegisterBtn.disabled = true;
+
+    const dIdx = regDayIndex.value;
+    const tIdx = regTaskIndex.value;
+    const task = window.currentPlannerData.days[dIdx].tasks[tIdx];
+
+    const wasAlreadyCompleted = task.completed;
+
+    // Atualiza os dados
+    task.completed = true;
+    task.topic = regTopic.value.trim();
+    task.category = regCategory.value;
+    task.hours = regTime.value; // Permite o aluno editar se estudou a mais/menos
+
+    // Atualiza o ecrã
+    syncPlannerUI(window.currentPlannerData);
+
+    // Dá o XP só se for a primeira vez que ele completa este bloco específico
+    if (!wasAlreadyCompleted) {
+      window.showToast("+15 XP! Estudo Registado! 🧠", "success");
+      await addUserXP(currentUserUid, 15);
+    } else {
+      window.showToast("Registo atualizado!", "success");
+    }
+
+    try {
+      await updateDoc(doc(db, "users", currentUserUid), {
+        studyPlanner: window.currentPlannerData,
+      });
+    } catch (error) {
+      console.error("Erro ao sincronizar progresso:", error);
+    } finally {
+      saveRegisterBtn.innerText = originalText;
+      saveRegisterBtn.disabled = false;
+      registerModal.classList.remove("active");
+    }
+  });
+}

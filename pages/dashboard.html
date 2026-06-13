@@ -253,7 +253,7 @@
                   <div>
                     <h3 style="margin-bottom: 2px">Sua Missão da Semana</h3>
                     <p style="font-size: 0.8rem; color: var(--text-muted)">
-                      De Domingo a Sábado
+                      Clique no bloco para registrar o estudo
                     </p>
                   </div>
                   <div style="text-align: right">
@@ -284,7 +284,7 @@
                   ></div>
                 </div>
 
-                <div id="weeklyCalendar" class="weekly-calendar"></div>
+                <div id="weeklyCalendar" class="kanban-grid"></div>
               </div>
             </div>
           </section>
@@ -524,6 +524,107 @@
             "
           >
             Sair
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="registerModal">
+      <div class="modal-card" style="max-width: 500px">
+        <div class="modal-header">
+          <h2>Registo de Estudo</h2>
+          <button class="close-modal" id="closeRegisterBtn">✕</button>
+        </div>
+        <div class="modal-body" style="gap: 1rem">
+          <div style="display: flex; gap: 1rem">
+            <div class="form-group" style="flex: 1">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >CATEGORIA</label
+              >
+              <select
+                id="regCategory"
+                class="planner-select"
+                style="width: 100%"
+              >
+                <option value="Teoria">Teoria</option>
+                <option value="Questões">Questões</option>
+                <option value="Revisão">Revisão</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 2">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >DISCIPLINA</label
+              >
+              <input
+                type="text"
+                id="regSubject"
+                class="planner-input"
+                disabled
+                style="width: 100%; opacity: 0.7"
+              />
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem">
+            <div class="form-group" style="flex: 2">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >TÓPICO ESTUDADO</label
+              >
+              <input
+                type="text"
+                id="regTopic"
+                class="planner-input"
+                placeholder="Ex: POO, Leis de Newton..."
+                style="width: 100%"
+              />
+            </div>
+            <div class="form-group" style="flex: 1">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >TEMPO (h)</label
+              >
+              <input
+                type="number"
+                id="regTime"
+                class="planner-input"
+                style="
+                  width: 100%;
+                  font-weight: bold;
+                  color: var(--primary-blue);
+                "
+              />
+            </div>
+          </div>
+
+          <input type="hidden" id="regDayIndex" />
+          <input type="hidden" id="regTaskIndex" />
+        </div>
+        <div class="modal-footer" style="background: transparent">
+          <button
+            class="btn-save"
+            id="saveRegisterBtn"
+            style="width: 100%; font-size: 1rem; padding: 1rem"
+          >
+            ✅ Registar e Ganhar XP
           </button>
         </div>
       </div>
