@@ -232,7 +232,7 @@
               <ul id="subjectList" class="subject-list"></ul>
 
               <button id="generatePlanBtn" class="btn-generate-plan">
-                GERAR CRONOGRAMA
+                GERAR NOVO CRONOGRAMA
               </button>
 
               <div
@@ -240,11 +240,41 @@
                 class="planner-result-area"
                 style="display: none"
               >
-                <h3>Seu Mapa da Semana</h3>
-                <div id="scheduleGrid" class="schedule-grid"></div>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <h3>Sua Missão da Semana</h3>
+                  <span
+                    id="plannerProgressText"
+                    style="
+                      font-weight: 800;
+                      color: var(--accent-green);
+                      font-family: var(--font-display);
+                    "
+                    >0%</span
+                  >
+                </div>
+                <div
+                  class="xp-bar-bg"
+                  style="margin-bottom: 1.5rem; height: 8px"
+                >
+                  <div
+                    class="xp-bar-fill"
+                    id="plannerProgressBar"
+                    style="width: 0%; box-shadow: 0 0 10px var(--accent-green)"
+                  ></div>
+                </div>
+
+                <div id="weeklyCalendar" class="weekly-calendar"></div>
               </div>
             </div>
           </section>
+
           <section class="features-section">
             <h2 class="section-title">Ferramentas de Estudo</h2>
 

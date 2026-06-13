@@ -10,7 +10,9 @@ import {
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { db } from "./firebase-init.js";
-import { checkMonthlyReset, calculateLevel } from "./xpSystem.js";
+import { checkMonthlyReset, calculateLevel, addUserXP } from "./xpSystem.js";
+
+let currentUserUid = null;
 
 // --- FUNÇÃO DE CORREÇÃO PARA MOBILE ---
 async function compressImage(file) {
@@ -66,6 +68,7 @@ let chatHistory = [
 // ==========================================
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    currentUserUid = user.uid;
     await checkMonthlyReset(user);
     const emailInput = document.getElementById("settingsEmailInput");
     if (emailInput) emailInput.value = user.email;
@@ -135,6 +138,11 @@ function updateInterface(user, dbData) {
 
   updateGreeting(firstName);
   updateMascotImage(currentXP);
+
+  // Carrega o calendário se existir no banco de dados
+  if (dbData.studyPlanner) {
+    renderPlanner(dbData.studyPlanner);
+  }
 
   const photoURL = dbData.photoURL || user.photoURL;
   if (photoURL) {
@@ -524,7 +532,7 @@ if (chatInput)
   });
 
 // ==========================================
-// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (NOVO)
+// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (SALVANDO NO BANCO)
 // ==========================================
 const totalWeeklyHoursInput = document.getElementById("totalWeeklyHours");
 const subjectNameInput = document.getElementById("subjectName");
@@ -532,8 +540,6 @@ const subjectWeightSelect = document.getElementById("subjectWeight");
 const addSubjectBtn = document.getElementById("addSubjectBtn");
 const subjectListEl = document.getElementById("subjectList");
 const generatePlanBtn = document.getElementById("generatePlanBtn");
-const plannerResult = document.getElementById("plannerResult");
-const scheduleGrid = document.getElementById("scheduleGrid");
 
 let subjects = [];
 
@@ -549,11 +555,11 @@ if (addSubjectBtn) {
 
     subjects.push({ id: Date.now(), name, weight });
     subjectNameInput.value = "";
-    renderSubjects();
+    renderSubjectsConfig();
   });
 }
 
-function renderSubjects() {
+function renderSubjectsConfig() {
   if (!subjectListEl) return;
   subjectListEl.innerHTML = "";
   subjects.forEach((sub) => {
@@ -569,14 +575,15 @@ function renderSubjects() {
   });
 }
 
-// Tornando a função de remover global para o onclick no HTML funcionar
 window.removeSubject = (id) => {
   subjects = subjects.filter((s) => s.id !== id);
-  renderSubjects();
+  renderSubjectsConfig();
 };
 
 if (generatePlanBtn) {
-  generatePlanBtn.addEventListener("click", () => {
+  generatePlanBtn.addEventListener("click", async () => {
+    if (!currentUserUid) return;
+
     const totalHours = parseFloat(totalWeeklyHoursInput.value);
 
     if (isNaN(totalHours) || totalHours <= 0) {
@@ -588,29 +595,127 @@ if (generatePlanBtn) {
       return;
     }
 
-    // Soma os pesos para calcular a proporção
     const totalWeight = subjects.reduce((acc, curr) => acc + curr.weight, 0);
+    // Domingo a Sábado (7 dias)
+    const daysOfWeek = [
+      "Domingo",
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado",
+    ];
 
-    scheduleGrid.innerHTML = "";
+    const newPlanner = {
+      createdAt: new Date().toISOString(),
+      days: daysOfWeek.map((dayName) => {
+        return {
+          name: dayName,
+          tasks: subjects.map((sub) => {
+            const dailyHours = ((sub.weight / totalWeight) * totalHours) / 7;
+            const formattedDaily =
+              dailyHours % 1 === 0 ? dailyHours : dailyHours.toFixed(1);
+            return {
+              name: sub.name,
+              hours: formattedDaily,
+              completed: false,
+            };
+          }),
+        };
+      }),
+    };
 
-    subjects.forEach((sub) => {
-      const hoursForSubject = (sub.weight / totalWeight) * totalHours;
-      // Arredonda para 1 casa decimal, se não for número inteiro
-      const formattedHours =
-        hoursForSubject % 1 === 0
-          ? hoursForSubject
-          : hoursForSubject.toFixed(1);
-
-      const card = document.createElement("div");
-      card.className = "schedule-card tilt-element";
-      card.innerHTML = `
-                <span style="font-weight: 600; color: var(--text-main);">${sub.name}</span>
-                <span class="schedule-time">${formattedHours}h na semana</span>
-            `;
-      scheduleGrid.appendChild(card);
-    });
-
-    plannerResult.style.display = "block";
-    window.showToast("Cronograma gerado com sucesso!", "success");
+    try {
+      await updateDoc(doc(db, "users", currentUserUid), {
+        studyPlanner: newPlanner,
+      });
+      window.showToast("Novo calendário criado e salvo na nuvem!", "success");
+      subjects = []; // Limpa o formulário após gerar
+      renderSubjectsConfig();
+      totalWeeklyHoursInput.value = "";
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      window.showToast("Erro ao criar o calendário.", "error");
+    }
   });
 }
+
+// Renderiza o Calendário Interativo na Tela
+function renderPlanner(plannerData) {
+  window.currentPlannerData = plannerData;
+  const weeklyCalendar = document.getElementById("weeklyCalendar");
+  const plannerResult = document.getElementById("plannerResult");
+  const progressBar = document.getElementById("plannerProgressBar");
+  const progressText = document.getElementById("plannerProgressText");
+
+  weeklyCalendar.innerHTML = "";
+
+  let totalTasks = 0;
+  let completedTasks = 0;
+
+  plannerData.days.forEach((day, dayIndex) => {
+    const dayCard = document.createElement("div");
+    dayCard.className = "day-card tilt-element";
+
+    let tasksHtml = "";
+    day.tasks.forEach((task, taskIndex) => {
+      totalTasks++;
+      if (task.completed) completedTasks++;
+
+      const uniqueId = `task-${dayIndex}-${taskIndex}`;
+      const checkedAttr = task.completed ? "checked" : "";
+      const completedClass = task.completed ? "completed" : "";
+
+      tasksHtml += `
+                <label class="task-item ${completedClass}" id="label-${uniqueId}">
+                    <input type="checkbox" class="neon-checkbox" ${checkedAttr} onchange="toggleTask(${dayIndex}, ${taskIndex}, this)">
+                    <span>${task.name} <strong style="color: var(--primary-blue)">(${task.hours}h)</strong></span>
+                </label>
+            `;
+    });
+
+    dayCard.innerHTML = `
+            <div class="day-header">${day.name}</div>
+            <div class="task-list">
+                ${tasksHtml}
+            </div>
+        `;
+    weeklyCalendar.appendChild(dayCard);
+  });
+
+  // Atualiza a Barra de Progresso
+  const progressPercentage =
+    totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+  progressBar.style.width = `${progressPercentage}%`;
+  progressText.innerText = `${progressPercentage}%`;
+
+  plannerResult.style.display = "block";
+}
+
+// Ação de Marcar a Tarefa (Check) e Ganhar XP
+window.toggleTask = async function (dayIndex, taskIndex, checkbox) {
+  if (!currentUserUid || !window.currentPlannerData) return;
+
+  const isCompleted = checkbox.checked;
+  window.currentPlannerData.days[dayIndex].tasks[taskIndex].completed =
+    isCompleted;
+
+  const label = document.getElementById(`label-task-${dayIndex}-${taskIndex}`);
+  if (isCompleted) {
+    label.classList.add("completed");
+    window.showToast("+10 XP! Disciplina vence o jogo! 🔥", "success");
+    await addUserXP(currentUserUid, 10);
+  } else {
+    label.classList.remove("completed");
+  }
+
+  try {
+    // Salva direto no Firebase o novo estado dos checkboxes
+    await updateDoc(doc(db, "users", currentUserUid), {
+      studyPlanner: window.currentPlannerData,
+    });
+  } catch (error) {
+    console.error("Erro ao sincronizar progresso:", error);
+  }
+};

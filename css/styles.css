@@ -1243,29 +1243,91 @@ button,
   border-top: 1px dashed var(--border-color);
 }
 
-.planner-result-area h3 {
-  color: var(--text-main);
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
+/* --- CALENDÁRIO SEMANAL DE CHECKLIST --- */
+.weekly-calendar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-.schedule-grid {
+.day-card {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  box-shadow: inset 0 0 0 transparent;
+  transition: 0.3s ease;
 }
 
-.schedule-card {
-  background: var(--input-bg);
-  padding: 1rem;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.day-card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: inset 0 0 20px rgba(0, 53, 255, 0.05);
 }
 
-.schedule-time {
-  color: var(--accent-green);
-  font-weight: 800;
+.day-header {
   font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--primary-blue);
+  text-align: center;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: 0.3s ease;
+  user-select: none;
+}
+
+.task-item.completed {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.neon-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: 0.2s ease;
+  background: var(--card-bg);
+}
+
+.neon-checkbox:checked {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+  box-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
+}
+
+.neon-checkbox:checked::after {
+  content: "✔";
+  position: absolute;
+  color: var(--primary-blue);
+  font-size: 14px;
+  font-weight: 900;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
