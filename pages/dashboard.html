@@ -191,6 +191,60 @@
             </div>
           </div>
 
+          <section
+            class="planner-section"
+            style="margin-top: 2rem; margin-bottom: 3rem"
+          >
+            <h2 class="section-title">Planejamento Inteligente</h2>
+
+            <div class="planner-card tilt-element">
+              <div class="planner-header-config">
+                <div class="time-input-group" style="width: 100%">
+                  <label>Horas disponíveis na semana:</label>
+                  <input
+                    type="number"
+                    id="totalWeeklyHours"
+                    placeholder="Ex: 12"
+                    min="1"
+                    class="planner-input"
+                    style="width: 100%"
+                  />
+                </div>
+              </div>
+
+              <hr class="planner-divider" />
+
+              <div class="add-subject-group">
+                <input
+                  type="text"
+                  id="subjectName"
+                  placeholder="Matéria (Ex: Banco de Dados, Lógica...)"
+                  class="planner-input flex-grow"
+                />
+                <select id="subjectWeight" class="planner-select">
+                  <option value="1">Baixa Importância (Peso 1)</option>
+                  <option value="2" selected>Média Importância (Peso 2)</option>
+                  <option value="3">Alta Importância (Peso 3)</option>
+                </select>
+                <button id="addSubjectBtn" class="btn-add-subject">+</button>
+              </div>
+
+              <ul id="subjectList" class="subject-list"></ul>
+
+              <button id="generatePlanBtn" class="btn-generate-plan">
+                GERAR CRONOGRAMA
+              </button>
+
+              <div
+                id="plannerResult"
+                class="planner-result-area"
+                style="display: none"
+              >
+                <h3>Seu Mapa da Semana</h3>
+                <div id="scheduleGrid" class="schedule-grid"></div>
+              </div>
+            </div>
+          </section>
           <section class="features-section">
             <h2 class="section-title">Ferramentas de Estudo</h2>
 

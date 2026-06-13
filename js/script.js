@@ -269,7 +269,6 @@ if (avatarInput) {
   });
 }
 
-// FUNÇÃO CORRIGIDA PARA EVITAR ERRO DE URL MUITO LONGA NO AUTH
 function setupSettingsSave(user) {
   if (saveSettingsBtn) {
     const newBtn = saveSettingsBtn.cloneNode(true);
@@ -287,17 +286,14 @@ function setupSettingsSave(user) {
       try {
         const updateData = { displayName: newName };
 
-        // Se houver nova imagem em Base64, salvamos apenas no Firestore
         if (hasNewImage && previewSrc.startsWith("data:image")) {
           updateData.photoURL = previewSrc;
         }
 
-        // Atualizamos apenas o Nome no Firebase Auth
         await updateProfile(user, {
           displayName: newName,
         });
 
-        // O Firestore aceita o Base64 sem problemas de limite de URL
         await updateDoc(doc(db, "users", user.uid), updateData);
 
         showToast("Perfil atualizado!", "success");
@@ -348,7 +344,7 @@ document.addEventListener("click", () => {
 });
 
 // ==========================================
-// 5. VISUAIS E CHAT (Orestante do código mantido)
+// 5. VISUAIS E CHAT
 // ==========================================
 const tiltElements = document.querySelectorAll(".tilt-element");
 document.addEventListener("mousemove", (e) => {
@@ -502,7 +498,8 @@ function removeLoadingMessage(id) {
   if (el) el.remove();
 }
 
-function showToast(message, type = "success") {
+// FUNÇÃO GLOBAL DE TOAST
+window.showToast = function (message, type = "success") {
   let container = document.getElementById("toast-container");
   if (!container) {
     container = document.createElement("div");
@@ -515,7 +512,7 @@ function showToast(message, type = "success") {
   toast.innerHTML = `<span>${icon}</span> ${message}`;
   container.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
-}
+};
 
 if (sendBtn) sendBtn.addEventListener("click", handleSend);
 if (chatInput)
@@ -525,3 +522,95 @@ if (chatInput)
       handleSend();
     }
   });
+
+// ==========================================
+// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (NOVO)
+// ==========================================
+const totalWeeklyHoursInput = document.getElementById("totalWeeklyHours");
+const subjectNameInput = document.getElementById("subjectName");
+const subjectWeightSelect = document.getElementById("subjectWeight");
+const addSubjectBtn = document.getElementById("addSubjectBtn");
+const subjectListEl = document.getElementById("subjectList");
+const generatePlanBtn = document.getElementById("generatePlanBtn");
+const plannerResult = document.getElementById("plannerResult");
+const scheduleGrid = document.getElementById("scheduleGrid");
+
+let subjects = [];
+
+if (addSubjectBtn) {
+  addSubjectBtn.addEventListener("click", () => {
+    const name = subjectNameInput.value.trim();
+    const weight = parseInt(subjectWeightSelect.value);
+
+    if (!name) {
+      window.showToast("Digite o nome da matéria!", "error");
+      return;
+    }
+
+    subjects.push({ id: Date.now(), name, weight });
+    subjectNameInput.value = "";
+    renderSubjects();
+  });
+}
+
+function renderSubjects() {
+  if (!subjectListEl) return;
+  subjectListEl.innerHTML = "";
+  subjects.forEach((sub) => {
+    const li = document.createElement("li");
+    li.className = "subject-item tilt-element";
+    const weightLabel =
+      sub.weight === 1 ? "Baixa" : sub.weight === 2 ? "Média" : "Alta";
+    li.innerHTML = `
+            <span>${sub.name} <small style="color: var(--text-muted); font-size: 0.8em;">(Importância ${weightLabel})</small></span>
+            <button class="btn-remove-subject" onclick="removeSubject(${sub.id})">✕</button>
+        `;
+    subjectListEl.appendChild(li);
+  });
+}
+
+// Tornando a função de remover global para o onclick no HTML funcionar
+window.removeSubject = (id) => {
+  subjects = subjects.filter((s) => s.id !== id);
+  renderSubjects();
+};
+
+if (generatePlanBtn) {
+  generatePlanBtn.addEventListener("click", () => {
+    const totalHours = parseFloat(totalWeeklyHoursInput.value);
+
+    if (isNaN(totalHours) || totalHours <= 0) {
+      window.showToast("Insira as horas disponíveis válidas!", "error");
+      return;
+    }
+    if (subjects.length === 0) {
+      window.showToast("Adicione pelo menos uma matéria!", "error");
+      return;
+    }
+
+    // Soma os pesos para calcular a proporção
+    const totalWeight = subjects.reduce((acc, curr) => acc + curr.weight, 0);
+
+    scheduleGrid.innerHTML = "";
+
+    subjects.forEach((sub) => {
+      const hoursForSubject = (sub.weight / totalWeight) * totalHours;
+      // Arredonda para 1 casa decimal, se não for número inteiro
+      const formattedHours =
+        hoursForSubject % 1 === 0
+          ? hoursForSubject
+          : hoursForSubject.toFixed(1);
+
+      const card = document.createElement("div");
+      card.className = "schedule-card tilt-element";
+      card.innerHTML = `
+                <span style="font-weight: 600; color: var(--text-main);">${sub.name}</span>
+                <span class="schedule-time">${formattedHours}h na semana</span>
+            `;
+      scheduleGrid.appendChild(card);
+    });
+
+    plannerResult.style.display = "block";
+    window.showToast("Cronograma gerado com sucesso!", "success");
+  });
+}
