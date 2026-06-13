@@ -541,7 +541,7 @@ if (chatInput)
   });
 
 // ==========================================
-// 6. LÓGICA DO PLANEJAMENTO INTELIGENTE (KANBAN & REGISTO)
+// 6. LÓGICA DO PLANEJAMENTO (CALENDÁRIO UNIFICADO)
 // ==========================================
 const totalWeeklyHoursInput = document.getElementById("totalWeeklyHours");
 const subjectNameInput = document.getElementById("subjectName");
@@ -559,15 +559,32 @@ const registerModal = document.getElementById("registerModal");
 const closeRegisterBtn = document.getElementById("closeRegisterBtn");
 const saveRegisterBtn = document.getElementById("saveRegisterBtn");
 const regCategory = document.getElementById("regCategory");
-const regSubject = document.getElementById("regSubject");
+const regSubjectDisplay = document.getElementById("regSubjectDisplay");
+const regTargetTimeDisplay = document.getElementById("regTargetTimeDisplay");
 const regTopic = document.getElementById("regTopic");
 const regTime = document.getElementById("regTime");
 const regDayIndex = document.getElementById("regDayIndex");
 const regTaskIndex = document.getElementById("regTaskIndex");
 
 let subjects = [];
-// Contador para distribuir cores diferentes
 let colorIndexCounter = 0;
+const glassColors = [
+  "glass-blue",
+  "glass-green",
+  "glass-orange",
+  "glass-purple",
+  "glass-pink",
+  "glass-cyan",
+];
+
+// Formatação do tempo de "1.5" para "1h30min"
+function formatTime(decimalHours) {
+  const h = Math.floor(decimalHours);
+  const m = Math.round((decimalHours - h) * 60);
+  if (h === 0) return `${m}min`;
+  if (m === 0) return `${h}h00min`;
+  return `${h}h${m.toString().padStart(2, "0")}min`;
+}
 
 if (addSubjectBtn) {
   addSubjectBtn.addEventListener("click", () => {
@@ -583,7 +600,7 @@ if (addSubjectBtn) {
       id: Date.now(),
       name,
       weight,
-      colorClass: `subject-color-${colorIndexCounter % 6}`, // Atribui cor ciclicamente
+      colorClass: glassColors[colorIndexCounter % glassColors.length],
     });
 
     colorIndexCounter++;
@@ -599,7 +616,7 @@ function renderSubjectsConfig() {
     const li = document.createElement("li");
     li.className = "subject-item tilt-element";
     const weightLabel =
-      sub.weight === 1 ? "Baixa" : sub.weight === 2 ? "Média" : "Alta";
+      sub.weight === 1 ? "Peso 1" : sub.weight === 2 ? "Peso 2" : "Peso 3";
     li.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 12px; height: 12px; border-radius: 50%;" class="${sub.colorClass}"></div>
@@ -636,20 +653,22 @@ if (generatePlanBtn) {
 
     const newPlanner = {
       createdAt: new Date().toISOString(),
+      totalTargetHours: totalHours,
       days: daysOfWeek.map((dayName) => {
         return {
           name: dayName,
           tasks: subjects.map((sub) => {
-            const dailyHours = ((sub.weight / totalWeight) * totalHours) / 7;
-            const formattedDaily =
-              dailyHours % 1 === 0 ? dailyHours : dailyHours.toFixed(1);
+            const dailyHoursDecimal =
+              ((sub.weight / totalWeight) * totalHours) / 7;
             return {
               name: sub.name,
-              hours: formattedDaily,
+              hoursDecimal: dailyHoursDecimal, // Guarda o número para cálculos
+              hoursStr: formatTime(dailyHoursDecimal), // Guarda a string formatada
               colorClass: sub.colorClass,
               completed: false,
-              topic: "", // Salvará o tópico preenchido depois
-              category: "", // Salvará a categoria depois
+              studiedDecimal: 0,
+              topic: "",
+              category: "",
             };
           }),
         };
@@ -660,7 +679,7 @@ if (generatePlanBtn) {
       await updateDoc(doc(db, "users", currentUserUid), {
         studyPlanner: newPlanner,
       });
-      window.showToast("Missão da semana criada com sucesso!", "success");
+      window.showToast("Ciclo de estudos gerado com sucesso!", "success");
       subjects = [];
       colorIndexCounter = 0;
       renderSubjectsConfig();
@@ -674,9 +693,10 @@ if (generatePlanBtn) {
 
 if (btnNewPlan) {
   btnNewPlan.addEventListener("click", () => {
-    if (confirm("Quer descartar a semana atual e gerar um novo planeamento?")) {
+    if (confirm("Isto apagará o ciclo atual. Queres replanear?")) {
       plannerFormArea.style.display = "block";
       plannerResult.style.display = "none";
+      btnNewPlan.style.display = "none";
       if (currentUserUid) {
         updateDoc(doc(db, "users", currentUserUid), { studyPlanner: null });
       }
@@ -684,13 +704,14 @@ if (btnNewPlan) {
   });
 }
 
-// Renderiza as colunas e blocos de matéria
+// Renderiza a Board Unificada
 function renderPlanner(plannerData) {
   window.currentPlannerData = plannerData;
 
   if (plannerFormArea && plannerResult) {
     plannerFormArea.style.display = "none";
     plannerResult.style.display = "block";
+    if (btnNewPlan) btnNewPlan.style.display = "inline-block";
   }
 
   if (
@@ -702,25 +723,24 @@ function renderPlanner(plannerData) {
 
     plannerData.days.forEach((day, dayIndex) => {
       const dayCol = document.createElement("div");
-      dayCol.className = "kanban-column";
+      dayCol.className = "calendar-col";
 
       let tasksHtml = "";
       day.tasks.forEach((task, taskIndex) => {
         const uniqueId = `task-${dayIndex}-${taskIndex}`;
-        // Usando a cor salva da matéria ou fallback
-        const bgColor = task.colorClass || "subject-color-1";
+        const bgColor = task.colorClass || "glass-blue";
 
         tasksHtml += `
-                    <div class="task-block ${bgColor}" id="block-${uniqueId}" onclick="openRegisterModal(${dayIndex}, ${taskIndex})">
-                        <div class="block-title">${task.name}</div>
-                        <div class="block-time">⏱️ ${task.hours}h</div>
+                    <div class="task-card-glass ${bgColor}" id="block-${uniqueId}" onclick="openRegisterModal(${dayIndex}, ${taskIndex})">
+                        <div class="card-title-glass">${task.name}</div>
+                        <div class="card-time-pill">${task.hoursStr}</div>
                     </div>
                 `;
       });
 
       dayCol.innerHTML = `
-                <div class="day-header">${day.name}</div>
-                ${tasksHtml}
+                <div class="calendar-col-header">${day.name}</div>
+                <div class="calendar-col-body">${tasksHtml}</div>
             `;
       weeklyCalendar.appendChild(dayCol);
     });
@@ -730,13 +750,15 @@ function renderPlanner(plannerData) {
 }
 
 function syncPlannerUI(plannerData) {
-  let totalTasks = 0;
-  let completedTasks = 0;
+  let targetHours = 0;
+  let completedHours = 0;
 
   plannerData.days.forEach((day, dayIndex) => {
     day.tasks.forEach((task, taskIndex) => {
-      totalTasks++;
-      if (task.completed) completedTasks++;
+      targetHours += task.hoursDecimal;
+      if (task.completed) {
+        completedHours += task.studiedDecimal;
+      }
 
       const uniqueId = `task-${dayIndex}-${taskIndex}`;
       const block = document.getElementById(`block-${uniqueId}`);
@@ -753,19 +775,30 @@ function syncPlannerUI(plannerData) {
 
   const progressBar = document.getElementById("plannerProgressBar");
   const progressText = document.getElementById("plannerProgressText");
+  const cycleTimeText = document.getElementById("cycleTimeText");
+
   const progressPercentage =
-    totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+    targetHours === 0
+      ? 0
+      : Math.min(100, Math.round((completedHours / targetHours) * 100));
 
   if (progressBar) progressBar.style.width = `${progressPercentage}%`;
   if (progressText) progressText.innerText = `${progressPercentage}%`;
+  if (cycleTimeText)
+    cycleTimeText.innerText = `${formatTime(completedHours)} / ${formatTime(targetHours)}`;
 }
 
 // --- LÓGICA DO MODAL DE REGISTO ---
 window.openRegisterModal = function (dayIndex, taskIndex) {
   const task = window.currentPlannerData.days[dayIndex].tasks[taskIndex];
 
-  regSubject.value = task.name;
-  regTime.value = task.hours;
+  regSubjectDisplay.innerText = task.name;
+  regTargetTimeDisplay.innerText = task.hoursStr;
+
+  // Mostra o tempo decimal no input para facilitar a edição
+  regTime.value = task.completed
+    ? task.studiedDecimal.toFixed(1)
+    : task.hoursDecimal.toFixed(1);
   regTopic.value = task.topic || "";
   regCategory.value = task.category || "Teoria";
 
@@ -785,8 +818,8 @@ if (saveRegisterBtn) {
   saveRegisterBtn.addEventListener("click", async () => {
     if (!currentUserUid || !window.currentPlannerData) return;
 
-    const originalText = saveRegisterBtn.innerText;
-    saveRegisterBtn.innerText = "A guardar...";
+    const originalText = saveRegisterBtn.innerHTML;
+    saveRegisterBtn.innerHTML = "A guardar...";
     saveRegisterBtn.disabled = true;
 
     const dIdx = regDayIndex.value;
@@ -794,22 +827,21 @@ if (saveRegisterBtn) {
     const task = window.currentPlannerData.days[dIdx].tasks[tIdx];
 
     const wasAlreadyCompleted = task.completed;
+    const studiedVal = parseFloat(regTime.value) || task.hoursDecimal;
 
-    // Atualiza os dados
+    // Atualiza os dados na base de dados
     task.completed = true;
     task.topic = regTopic.value.trim();
     task.category = regCategory.value;
-    task.hours = regTime.value; // Permite o aluno editar se estudou a mais/menos
+    task.studiedDecimal = studiedVal;
 
-    // Atualiza o ecrã
     syncPlannerUI(window.currentPlannerData);
 
-    // Dá o XP só se for a primeira vez que ele completa este bloco específico
     if (!wasAlreadyCompleted) {
       window.showToast("+15 XP! Estudo Registado! 🧠", "success");
       await addUserXP(currentUserUid, 15);
     } else {
-      window.showToast("Registo atualizado!", "success");
+      window.showToast("Sessão atualizada!", "success");
     }
 
     try {
@@ -819,7 +851,7 @@ if (saveRegisterBtn) {
     } catch (error) {
       console.error("Erro ao sincronizar progresso:", error);
     } finally {
-      saveRegisterBtn.innerText = originalText;
+      saveRegisterBtn.innerHTML = originalText;
       saveRegisterBtn.disabled = false;
       registerModal.classList.remove("active");
     }
