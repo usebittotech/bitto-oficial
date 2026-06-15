@@ -317,13 +317,15 @@
   background: var(--card-bg);
   scrollbar-width: thin;
   scrollbar-color: var(--primary-blue) var(--input-bg);
+  min-height: 500px;
 }
 .calendar-board {
   display: flex;
-  min-width: 800px;
+  min-width: 900px;
 }
 .calendar-col {
   flex: 1;
+  min-width: 120px;
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -482,7 +484,7 @@
 /* Grid de duas colunas: calendário esquerda, progresso direita */
 .result-main-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1.2fr 1fr;
   gap: 1.5rem;
   align-items: start;
 }
