@@ -440,6 +440,244 @@
 }
 
 /* ==========================================================================
+   LAYOUT DO RESULTADO - CARDS DE RESUMO HORIZONTAIS
+   ========================================================================== */
+.result-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.result-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-card-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.result-card-value {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  line-height: 1;
+}
+
+.result-card-hint {
+  display: block;
+}
+
+/* Grid de duas colunas: calendário esquerda, progresso direita */
+.result-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.result-left-column {
+  min-width: 0;
+}
+
+.result-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.subject-progress-section-wrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.2rem;
+}
+
+.subject-progress-section-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.subject-progress-row-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.subject-progress-header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.subject-progress-name-compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.82rem;
+}
+
+.subject-progress-count-compact {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.subject-progress-bar-bg-compact {
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.subject-progress-bar-fill-compact {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease;
+}
+
+/* Responsivo: em telas pequenas, muda para coluna única */
+@media (max-width: 1200px) {
+  .result-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .result-right-column {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .result-summary-cards {
+    grid-template-columns: 1fr;
+  }
+  .result-card {
+    padding: 1rem;
+  }
+
+  /* MOBILE: Layout mobile-first */
+  .tool-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .main-column {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sidebar-column {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .tool-panel {
+    position: static;
+    top: auto;
+  }
+
+  /* Stepper labels escondidas em mobile */
+  .stepper-label {
+    font-size: 0.5rem;
+    display: none;
+  }
+
+  .stepper-circle {
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+
+  .stepper-line {
+    margin: 0 2px;
+  }
+
+  /* Calendário com scroll horizontal em mobile */
+  .calendar-board {
+    min-width: 100vw;
+    margin-left: calc(-1.5rem - 50vw + 50%);
+    margin-right: calc(-1.5rem - 50vw + 50%);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .calendar-col {
+    min-width: 140px;
+    flex: 0 0 140px;
+  }
+
+  /* Progresso por disciplina expandido em mobile */
+  .subject-progress-section-wrapper {
+    width: 100%;
+  }
+
+  /* Resultado grid mobile */
+  .result-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Botões de navegação mobile */
+  .view-toggle-btn {
+    padding: 6px 12px;
+    font-size: 0.68rem;
+  }
+
+  .back-pill {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+
+  /* Cards do calendário maiores em mobile */
+  .task-card-glass {
+    min-height: 100px;
+  }
+
+  .card-title-glass {
+    font-size: 0.85rem;
+  }
+
+  /* Input fields full width */
+  .input-field {
+    min-height: 44px;
+    font-size: 16px; /* Evita zoom automático no iOS */
+  }
+
+  .weight-btn {
+    height: 36px;
+    font-size: 0.8rem;
+  }
+
+  .btn-step-next,
+  .btn-step-back {
+    padding: 0.55rem 1rem;
+    font-size: 0.72rem;
+    min-height: 40px;
+  }
+
+  .btn-generate {
+    min-height: 48px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ==========================================================================
    MELHORIAS DO PLANEJADOR (CICLO DE ESTUDOS)
    ========================================================================== */
 

@@ -149,18 +149,20 @@
             </div>
 
             <div id="plannerActive" style="display: none">
-              <div class="cycle-progress-board">
-                <div class="cycle-info-box">
-                  <span class="cycle-label">PROGRESSO DO CICLO</span>
-                  <div class="cycle-time-text" id="cycleTimeText">
-                    0h00min / 0h00min
+              <!-- Cards de resumo em grid horizontal -->
+              <div class="result-summary-cards">
+                <div class="result-card">
+                  <span class="result-card-label">PROGRESSO GERAL</span>
+                  <div class="result-card-value" id="plannerProgressText">
+                    0%
                   </div>
                   <div
                     class="xp-bar-bg"
                     style="
-                      height: 10px;
+                      height: 6px;
                       border-radius: 20px;
                       background: var(--input-bg);
+                      margin-top: 8px;
                     "
                   >
                     <div
@@ -174,30 +176,78 @@
                     ></div>
                   </div>
                 </div>
-                <div class="cycle-percentage" id="plannerProgressText">0%</div>
+                <div class="result-card">
+                  <span class="result-card-label">TEMPO ESTUDADO</span>
+                  <div class="result-card-value" id="cycleTimeText">
+                    0h00min / 0h00min
+                  </div>
+                  <span
+                    class="result-card-hint"
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-muted);
+                      margin-top: 8px;
+                    "
+                    >de horas planejadas</span
+                  >
+                </div>
+                <div class="result-card">
+                  <span class="result-card-label">CICLOS COMPLETOS</span>
+                  <div class="result-card-value" id="cyclesCompleted">0</div>
+                  <span
+                    class="result-card-hint"
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-muted);
+                      margin-top: 8px;
+                    "
+                    >semanas finalizadas</span
+                  >
+                </div>
               </div>
 
               <p id="plannerMotivation" class="planner-motivation"></p>
 
-              <p
-                style="
-                  font-size: 0.8rem;
-                  color: var(--text-muted);
-                  margin-bottom: 10px;
-                  margin-top: 15px;
-                "
-              >
-                Selecione o bloco na agenda para registrar o estudo e ganhar XP.
-              </p>
+              <!-- Linha com calendário + progresso por disciplina -->
+              <div class="result-main-grid">
+                <!-- Coluna esquerda: Calendário -->
+                <div class="result-left-column">
+                  <p
+                    style="
+                      font-size: 0.8rem;
+                      color: var(--text-muted);
+                      margin-bottom: 12px;
+                      font-weight: 600;
+                    "
+                  >
+                    Selecione o bloco na agenda para registrar o estudo e ganhar
+                    XP.
+                  </p>
+                  <div class="calendar-board-container">
+                    <div id="weeklyCalendar" class="calendar-board"></div>
+                  </div>
+                </div>
 
-              <div class="calendar-board-container">
-                <div id="weeklyCalendar" class="calendar-board"></div>
+                <!-- Coluna direita: Progresso por disciplina + Gráfico -->
+                <div class="result-right-column">
+                  <div class="subject-progress-section-wrapper">
+                    <h4
+                      style="
+                        font-size: 0.9rem;
+                        font-weight: 700;
+                        margin-bottom: 12px;
+                        color: var(--text-main);
+                      "
+                    >
+                      Sequência dos Estudos
+                    </h4>
+                    <div
+                      id="subjectProgressSection"
+                      class="subject-progress-section-compact"
+                    ></div>
+                  </div>
+                </div>
               </div>
-
-              <div
-                id="subjectProgressSection"
-                class="subject-progress-section"
-              ></div>
             </div>
           </div>
         </div>

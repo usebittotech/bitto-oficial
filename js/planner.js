@@ -680,7 +680,7 @@ function getMotivationMessage(pct) {
 }
 
 // ==========================================
-// PROGRESSO POR MATÉRIA
+// PROGRESSO POR MATÉRIA (LAYOUT COMPACTO)
 // ==========================================
 function renderSubjectProgress(subjectStats) {
   if (!subjectProgressSection) return;
@@ -691,7 +691,7 @@ function renderSubjectProgress(subjectStats) {
     return;
   }
 
-  let html = `<p class="subject-progress-section-title">📈 Progresso por disciplina</p>`;
+  let html = "";
   names.forEach((name) => {
     const stat = subjectStats[name];
     const pct =
@@ -702,13 +702,13 @@ function renderSubjectProgress(subjectStats) {
         ? `${stat.done}/${stat.total} ✓`
         : `${stat.done}/${stat.total}`;
     html += `
-      <div class="subject-progress-row">
-        <div class="subject-progress-header">
-          <span class="subject-progress-name"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;" class="${colorClass}"></span>${name}</span>
-          <span class="subject-progress-count">${countLabel}</span>
+      <div class="subject-progress-row-compact">
+        <div class="subject-progress-header-compact">
+          <span class="subject-progress-name-compact"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;" class="${colorClass}"></span>${name}</span>
+          <span class="subject-progress-count-compact">${countLabel}</span>
         </div>
-        <div class="subject-progress-bar-bg">
-          <div class="subject-progress-bar-fill ${colorClass}" style="width:${pct}%;"></div>
+        <div class="subject-progress-bar-bg-compact">
+          <div class="subject-progress-bar-fill-compact ${colorClass}" style="width:${pct}%;"></div>
         </div>
       </div>
     `;
