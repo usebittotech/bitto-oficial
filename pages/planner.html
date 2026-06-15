@@ -98,13 +98,39 @@
             <div class="deck-info" style="margin-bottom: 0">
               <h2 id="toolTitle">Planejamento Semanal</h2>
             </div>
-            <button
-              id="btnNewPlan"
-              class="back-pill"
-              style="display: none; cursor: pointer"
-            >
-              🔄 Replanejar Ciclo
-            </button>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <div class="view-toggle" id="viewToggle" style="display: none">
+                <button
+                  class="view-toggle-btn active"
+                  id="btnViewWeek"
+                  title="Ver semana completa"
+                >
+                  📅 Semana
+                </button>
+                <button
+                  class="view-toggle-btn"
+                  id="btnViewToday"
+                  title="Focar no dia de hoje"
+                >
+                  ⚡ Hoje
+                </button>
+              </div>
+              <button
+                id="btnExportCopy"
+                class="back-pill"
+                style="display: none; cursor: pointer"
+                title="Copiar cronograma"
+              >
+                📋 Exportar
+              </button>
+              <button
+                id="btnNewPlan"
+                class="back-pill"
+                style="display: none; cursor: pointer"
+              >
+                🔄 Replanejar Ciclo
+              </button>
+            </div>
           </div>
 
           <div class="paper-sheet tilt-element" style="padding: 1.5rem">
@@ -151,6 +177,8 @@
                 <div class="cycle-percentage" id="plannerProgressText">0%</div>
               </div>
 
+              <p id="plannerMotivation" class="planner-motivation"></p>
+
               <p
                 style="
                   font-size: 0.8rem;
@@ -165,6 +193,11 @@
               <div class="calendar-board-container">
                 <div id="weeklyCalendar" class="calendar-board"></div>
               </div>
+
+              <div
+                id="subjectProgressSection"
+                class="subject-progress-section"
+              ></div>
             </div>
           </div>
         </div>
@@ -176,54 +209,142 @@
               <span class="ai-badge">AUTO</span>
             </div>
 
-            <div class="form-group">
-              <label>Horas na semana (7 dias):</label>
-              <input
-                type="number"
-                id="totalWeeklyHours"
-                placeholder="Ex: 20"
-                min="1"
-                class="input-field"
-              />
+            <!-- Indicador de etapas -->
+            <div class="stepper-header">
+              <div class="stepper-step active" id="step-indicator-1">
+                <div class="stepper-circle">1</div>
+                <span class="stepper-label">Horas</span>
+              </div>
+              <div class="stepper-line" id="stepper-line-1"></div>
+              <div class="stepper-step" id="step-indicator-2">
+                <div class="stepper-circle">2</div>
+                <span class="stepper-label">Matérias</span>
+              </div>
+              <div class="stepper-line" id="stepper-line-2"></div>
+              <div class="stepper-step" id="step-indicator-3">
+                <div class="stepper-circle">3</div>
+                <span class="stepper-label">Revisão</span>
+              </div>
             </div>
 
-            <div class="form-group" style="margin-top: 1.5rem">
-              <label>Adicionar Disciplinas:</label>
-              <div style="display: flex; gap: 8px; margin-bottom: 8px">
+            <!-- ETAPA 1: Horas -->
+            <div class="stepper-panel active" id="stepper-panel-1">
+              <p class="stepper-panel-title">
+                Quanto tempo você tem disponível?
+              </p>
+              <div class="form-group">
+                <label for="totalWeeklyHours"
+                  >⏱️ Horas na semana (7 dias)</label
+                >
                 <input
-                  type="text"
-                  id="subjectName"
-                  placeholder="Matéria..."
+                  type="number"
+                  id="totalWeeklyHours"
+                  placeholder="Ex: 20"
+                  min="1"
                   class="input-field"
-                  style="flex: 1"
                 />
               </div>
-              <div style="display: flex; gap: 8px">
-                <select id="subjectWeight" class="input-field" style="flex: 1">
-                  <option value="1">Peso 1 (Fácil)</option>
-                  <option value="2" selected>Peso 2 (Média)</option>
-                  <option value="3">Peso 3 (Difícil)</option>
-                </select>
-                <button
-                  id="addSubjectBtn"
-                  class="btn-generate"
-                  style="
-                    margin-top: 0;
-                    min-height: 48px;
-                    width: 48px;
-                    padding: 0;
-                  "
-                >
-                  +
+              <div
+                id="step1-summary"
+                class="stepper-summary"
+                style="display: none"
+              ></div>
+              <div class="stepper-nav">
+                <span></span>
+                <button class="btn-step-next" id="step1NextBtn" disabled>
+                  Próximo → Matérias
                 </button>
               </div>
             </div>
 
-            <ul id="subjectList" class="subject-list"></ul>
+            <!-- ETAPA 2: Matérias -->
+            <div class="stepper-panel" id="stepper-panel-2">
+              <p class="stepper-panel-title">
+                Quais disciplinas você vai estudar?
+              </p>
 
-            <button class="btn-generate" id="generatePlanBtn">
-              GERAR KANBAN 🚀
-            </button>
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="subjectName"
+                  placeholder="Ex: Banco de Dados"
+                  class="input-field"
+                />
+              </div>
+              <div class="weight-picker" id="weightPicker">
+                <button
+                  class="weight-btn"
+                  data-weight="1"
+                  title="Peso 1 (Fácil)"
+                >
+                  1
+                </button>
+                <button
+                  class="weight-btn active"
+                  data-weight="2"
+                  title="Peso 2 (Média)"
+                >
+                  2
+                </button>
+                <button
+                  class="weight-btn"
+                  data-weight="3"
+                  title="Peso 3 (Difícil)"
+                >
+                  3
+                </button>
+                <button
+                  id="addSubjectBtn"
+                  class="weight-btn weight-btn-add"
+                  title="Adicionar matéria"
+                >
+                  +
+                </button>
+              </div>
+              <p class="planner-weight-hint" id="weightHint">
+                Peso: <strong>2 (Média)</strong> — distribuição equilibrada
+              </p>
+
+              <ul id="subjectList" class="subject-list">
+                <!-- Estado vazio -->
+                <li class="subject-empty-state" id="subjectEmptyState">
+                  <span class="subject-empty-icon">📚</span>
+                  <span class="subject-empty-title"
+                    >Nenhuma disciplina ainda</span
+                  >
+                  <span class="subject-empty-hint"
+                    >Digite acima e pressione Enter ou +</span
+                  >
+                </li>
+              </ul>
+
+              <div class="stepper-nav">
+                <button class="btn-step-back" id="step2BackBtn">
+                  ← Voltar
+                </button>
+                <button class="btn-step-next" id="step2NextBtn" disabled>
+                  Revisar →
+                </button>
+              </div>
+            </div>
+
+            <!-- ETAPA 3: Revisão -->
+            <div class="stepper-panel" id="stepper-panel-3">
+              <p class="stepper-panel-title">Confirme seu ciclo de estudos</p>
+              <div id="reviewSummary" class="review-summary"></div>
+              <div class="stepper-nav">
+                <button class="btn-step-back" id="step3BackBtn">
+                  ← Editar
+                </button>
+                <button
+                  class="btn-generate"
+                  id="generatePlanBtn"
+                  style="margin-top: 0"
+                >
+                  GERAR KANBAN 🚀
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -438,3 +438,510 @@
 .modal-card {
   overflow: visible;
 }
+
+/* ==========================================================================
+   MELHORIAS DO PLANEJADOR (CICLO DE ESTUDOS)
+   ========================================================================== */
+
+/* ---------- STEPPER HEADER ---------- */
+.stepper-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.stepper-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.stepper-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.3s;
+  text-align: center;
+}
+.stepper-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  margin: 0 4px;
+  margin-bottom: 16px;
+  transition: background 0.4s ease;
+}
+.stepper-step.active .stepper-circle {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: white;
+}
+.stepper-step.active .stepper-label {
+  color: var(--primary-blue);
+}
+.stepper-step.done .stepper-circle {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: #000;
+}
+.stepper-step.done .stepper-circle::after {
+  content: "✓";
+}
+.stepper-step.done .stepper-label {
+  color: #3a8800;
+}
+.stepper-line.done {
+  background: var(--accent-green);
+}
+
+/* ---------- STEPPER PANELS ---------- */
+.stepper-panel {
+  display: none;
+  animation: stepFadeIn 0.25s ease forwards;
+}
+.stepper-panel.active {
+  display: block;
+}
+@keyframes stepFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.stepper-panel-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+.stepper-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.1rem;
+  gap: 0.6rem;
+}
+.btn-step-next {
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-step-next:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btn-step-next:not(:disabled):hover {
+  box-shadow: 0 0 16px rgba(0, 53, 255, 0.35);
+  transform: translateY(-1px);
+}
+.btn-step-back {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.6rem 1.1rem;
+  border-radius: 50px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-step-back:hover {
+  background: var(--input-bg);
+  color: var(--text-main);
+}
+
+/* Step 1 — caixa de resumo */
+.stepper-summary {
+  background: var(--input-bg);
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+  line-height: 1.6;
+}
+.stepper-summary strong {
+  color: var(--primary-blue);
+}
+
+/* ---------- STEP 2 — disciplinas ---------- */
+.weight-picker {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.6rem;
+}
+.weight-btn {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  height: 40px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.weight-btn.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+.weight-btn:hover:not(.active) {
+  border-color: var(--primary-blue);
+  color: var(--text-main);
+}
+.weight-btn-add {
+  flex: 0 0 40px;
+  background: var(--accent-green);
+  color: #000;
+  border-color: var(--accent-green);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.weight-btn-add:hover {
+  transform: scale(1.06);
+}
+
+.planner-weight-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+.planner-weight-hint strong {
+  color: var(--primary-blue);
+}
+
+/* Lista de matérias com scroll + drag-and-drop */
+.subject-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+/* Estado vazio */
+.subject-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 1.25rem;
+  border: 1.5px dashed var(--border-color);
+  border-radius: 12px;
+  text-align: center;
+  animation: stepFadeIn 0.3s ease;
+}
+.subject-empty-icon {
+  font-size: 1.4rem;
+}
+.subject-empty-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.subject-empty-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* Item de matéria arrastável */
+.subject-item {
+  cursor: grab;
+  user-select: none;
+  gap: 0.5rem;
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+.subject-item:active {
+  cursor: grabbing;
+}
+.subject-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+.subject-item.drag-over {
+  box-shadow: 0 0 0 2px var(--primary-blue);
+}
+.subject-drag-handle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding-right: 2px;
+  flex-shrink: 0;
+}
+.subject-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+.subject-item-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.subject-item-hours {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  flex-shrink: 0;
+  padding-right: 4px;
+}
+
+/* ---------- STEP 3 — revisão ---------- */
+.review-summary {
+  background: var(--input-bg);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.25rem;
+}
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+.review-row:last-child {
+  border-bottom: none;
+}
+.review-row-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.review-row-value {
+  font-weight: 700;
+  color: var(--text-main);
+}
+.review-subject-list {
+  margin-top: 0.55rem;
+}
+.review-subject-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4px 0;
+  font-size: 0.8rem;
+}
+.review-subject-item span:first-child {
+  flex: 0 0 80px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.review-subject-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.review-subject-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+.review-subject-item span:last-child {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ---------- VIEW TOGGLE (Semana / Hoje) ---------- */
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  overflow: hidden;
+  background: var(--card-bg);
+}
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: 0.15s;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+}
+.view-toggle-btn.active {
+  background: var(--primary-blue);
+  color: white;
+}
+
+/* ---------- MENSAGEM MOTIVACIONAL ---------- */
+.planner-motivation {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0.75rem 0 0;
+  min-height: 1.1rem;
+}
+
+/* ---------- CALENDÁRIO: DIA ATUAL + DIA COMPLETO ---------- */
+.calendar-col.today-col {
+  background: rgba(0, 53, 255, 0.04);
+}
+.calendar-col.today-col .calendar-col-header {
+  border-bottom-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+.col-today-badge {
+  background: var(--primary-blue);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  margin-left: 6px;
+  vertical-align: middle;
+  display: none;
+}
+.calendar-col.today-col .col-today-badge {
+  display: inline-block;
+}
+
+.col-complete-badge {
+  background: var(--accent-green);
+  color: #000;
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  margin-left: 6px;
+  vertical-align: middle;
+  display: none;
+}
+.calendar-col.day-complete .col-complete-badge {
+  display: inline-block;
+}
+.calendar-col.day-complete .col-today-badge {
+  display: none;
+}
+.calendar-col.day-complete {
+  animation: colComplete 0.5s ease;
+}
+@keyframes colComplete {
+  0% {
+    box-shadow: inset 0 0 0 0 rgba(204, 255, 0, 0.4);
+  }
+  70% {
+    box-shadow: inset 0 0 30px 0 rgba(204, 255, 0, 0);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+/* Visão "Foco do dia": esconde outras colunas */
+.calendar-board.focus-mode .calendar-col {
+  display: none;
+}
+.calendar-board.focus-mode .calendar-col.today-col {
+  display: flex;
+  flex: 1 1 100%;
+}
+.calendar-board.focus-mode {
+  min-width: 0;
+}
+
+/* ---------- PROGRESSO POR MATÉRIA ---------- */
+.subject-progress-section {
+  margin-top: 1.25rem;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.subject-progress-section:empty {
+  display: none;
+}
+.subject-progress-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 0 0.25rem;
+  letter-spacing: 0.02em;
+}
+.subject-progress-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.subject-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+.subject-progress-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.subject-progress-count {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.subject-progress-bar-bg {
+  height: 5px;
+  background: var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.subject-progress-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease;
+}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 600px) {
+  .stepper-label {
+    font-size: 0.58rem;
+  }
+  .deck-header > div:last-child {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .view-toggle-btn {
+    padding: 7px 10px;
+    font-size: 0.7rem;
+  }
+}
