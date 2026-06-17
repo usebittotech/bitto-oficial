@@ -97,7 +97,7 @@
 .main-column {
   flex: 1;
   min-width: 300px;
-  max-width: 900px;
+  max-width: none;
   min-width: 0;
 }
 .sidebar-column {
@@ -321,7 +321,7 @@
 }
 .calendar-board {
   display: flex;
-  min-width: 900px;
+  min-width: 100%;
 }
 .calendar-col {
   flex: 1;
@@ -611,18 +611,39 @@
     margin: 0 2px;
   }
 
-  /* Calendário com scroll horizontal em mobile */
-  .calendar-board {
-    min-width: 100vw;
-    margin-left: calc(-1.5rem - 50vw + 50%);
-    margin-right: calc(-1.5rem - 50vw + 50%);
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+  /* Calendário COMPACTO em mobile */
+  .calendar-board-container {
+    min-height: 350px;
   }
 
   .calendar-col {
-    min-width: 140px;
-    flex: 0 0 140px;
+    min-width: 100px;
+    flex: 1;
+  }
+
+  .calendar-col-header {
+    padding: 8px 4px;
+    font-size: 0.7rem;
+  }
+
+  .calendar-col-body {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .task-card-glass {
+    min-height: 80px;
+    padding: 8px;
+  }
+
+  .card-title-glass {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+
+  .card-time-pill {
+    font-size: 0.6rem;
+    padding: 2px 4px;
   }
 
   /* Progresso por disciplina expandido em mobile */
@@ -644,15 +665,6 @@
   .back-pill {
     padding: 6px 12px;
     font-size: 0.75rem;
-  }
-
-  /* Cards do calendário maiores em mobile */
-  .task-card-glass {
-    min-height: 100px;
-  }
-
-  .card-title-glass {
-    font-size: 0.85rem;
   }
 
   /* Input fields full width */
