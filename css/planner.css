@@ -12,16 +12,12 @@
 
 /* =====================================================
    OVERRIDE GLOBAL CONTAINER — planner usa largura total
+   O styles.css global define .container { max-width: 1000px }
+   Aqui sobrescrevemos para a página do planner usar tela cheia
    ===================================================== */
-.main-wrapper.container,
-.container.main-wrapper,
-nav .container,
-.navbar .container {
-  max-width: 100% !important;
-  width: 100% !important;
-  padding-left: 2.5rem !important;
-  padding-right: 2.5rem !important;
-  box-sizing: border-box !important;
+.container {
+  max-width: 1400px !important;
+  padding: 0 2.5rem !important;
 }
 
 /* --- NAVBAR PADRONIZADA --- */
@@ -100,12 +96,6 @@ nav .container,
   padding-top: 2rem;
   padding-bottom: 4rem;
   min-height: calc(100vh - 70px);
-  /* Override any global .container max-width */
-  max-width: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box;
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
 }
 
 .tool-layout {
@@ -127,9 +117,8 @@ nav .container,
 }
 
 @media (max-width: 1000px) {
-  .main-wrapper {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .container {
+    padding: 0 1rem !important;
   }
   .tool-layout {
     flex-direction: column-reverse; /* sidebar vai para cima no mobile */
@@ -160,6 +149,9 @@ nav .container,
   border-radius: 20px;
   min-height: 460px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* garante que border-radius aparece */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .empty-state {
@@ -344,10 +336,10 @@ nav .container,
   scrollbar-color: var(--primary-blue) var(--input-bg);
   min-height: 500px;
 }
-/* Ensure calendar columns use all available space */
 .calendar-board {
-  min-width: 100%;
-  table-layout: fixed;
+  display: flex;
+  min-width: 700px; /* 7 cols × 100px mínimo — força scroll antes de cortar */
+  width: 100%;
 }
 .calendar-board {
   display: flex;
@@ -355,7 +347,7 @@ nav .container,
 }
 .calendar-col {
   flex: 1;
-  min-width: 120px;
+  min-width: 100px;
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -520,7 +512,7 @@ nav .container,
 /* Grid de duas colunas: calendário esquerda, progresso direita */
 .result-main-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 260px;
   gap: 1.5rem;
   align-items: start;
 }
