@@ -25,7 +25,7 @@
 /* Navbar também usa .container */
 .navbar .container {
   max-width: 1600px !important;
-  padding: 0 !important;
+  padding: 0 2rem !important;
 }
 
 /* --- NAVBAR PADRONIZADA --- */
