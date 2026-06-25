@@ -13,9 +13,17 @@
 /* =====================================================
    OVERRIDE GLOBAL CONTAINER — planner usa largura total
    O styles.css global define .container { max-width: 1000px }
-   Aqui sobrescrevemos para a página do planner usar tela cheia
+   A div do planner tem class="container main-wrapper", então
+   sobrescrevemos só essa combinação específica.
    ===================================================== */
-.container {
+.container.main-wrapper {
+  max-width: 1600px !important;
+  padding-left: 3rem !important;
+  padding-right: 3rem !important;
+}
+
+/* Navbar também usa .container */
+.navbar .container {
   max-width: 1600px !important;
   padding: 0 !important;
 }
@@ -94,8 +102,6 @@
 .main-wrapper {
   padding-top: 2rem;
   padding-bottom: 4rem;
-  padding-left: 3rem;
-  padding-right: 3rem;
   min-height: calc(100vh - 70px);
   box-sizing: border-box;
 }
@@ -119,9 +125,9 @@
 }
 
 @media (max-width: 1000px) {
-  .main-wrapper {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+  .container.main-wrapper {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
   }
   .tool-layout {
     flex-direction: column-reverse; /* sidebar vai para cima no mobile */
