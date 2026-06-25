@@ -16,8 +16,8 @@
    Aqui sobrescrevemos para a página do planner usar tela cheia
    ===================================================== */
 .container {
-  max-width: 1400px !important;
-  padding: 0 2.5rem !important;
+  max-width: 1600px !important;
+  padding: 0 2rem !important;
 }
 
 /* --- NAVBAR PADRONIZADA --- */
@@ -142,6 +142,9 @@
 }
 
 /* --- PAPER SHEET (Área de Conteúdo) --- */
+#plannerActive {
+  padding: 1.5rem;
+}
 .paper-sheet {
   background: var(--paper-bg);
   color: var(--paper-text);
@@ -149,9 +152,9 @@
   border-radius: 20px;
   min-height: 460px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-  overflow: hidden; /* garante que border-radius aparece */
   width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .empty-state {
@@ -338,7 +341,7 @@
 }
 .calendar-board {
   display: flex;
-  min-width: 700px; /* 7 cols × 100px mínimo — força scroll antes de cortar */
+  min-width: 630px; /* 7 cols × 90px */
   width: 100%;
 }
 .calendar-board {
@@ -347,7 +350,7 @@
 }
 .calendar-col {
   flex: 1;
-  min-width: 100px;
+  min-width: 90px;
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -512,8 +515,8 @@
 /* Grid de duas colunas: calendário esquerda, progresso direita */
 .result-main-grid {
   display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: 1.5rem;
+  grid-template-columns: 1fr 240px;
+  gap: 1rem;
   align-items: start;
 }
 
