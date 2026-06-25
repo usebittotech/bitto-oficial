@@ -83,6 +83,11 @@
   padding-top: 2rem;
   padding-bottom: 4rem;
   min-height: calc(100vh - 70px);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
 }
 
 .tool-layout {
@@ -90,22 +95,23 @@
   flex-direction: row;
   gap: 2.5rem;
   align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
 .main-column {
   flex: 1;
-  min-width: 300px;
-  max-width: none;
   min-width: 0;
 }
 .sidebar-column {
-  width: 320px;
+  width: 340px;
   flex-shrink: 0;
 }
 
 @media (max-width: 1000px) {
+  .main-wrapper {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
   .tool-layout {
     flex-direction: column-reverse; /* sidebar vai para cima no mobile */
     align-items: stretch;
@@ -446,9 +452,15 @@
    ========================================================================== */
 .result-summary-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+
+@media (max-width: 860px) {
+  .result-summary-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
 .result-card {
@@ -556,7 +568,7 @@
 }
 
 /* Responsivo: em telas pequenas, muda para coluna única */
-@media (max-width: 1200px) {
+@media (max-width: 860px) {
   .result-main-grid {
     grid-template-columns: 1fr;
   }
@@ -566,9 +578,6 @@
 }
 
 @media (max-width: 768px) {
-  .result-summary-cards {
-    grid-template-columns: 1fr;
-  }
   .result-card {
     padding: 1rem;
   }
@@ -649,11 +658,6 @@
   /* Progresso por disciplina expandido em mobile */
   .subject-progress-section-wrapper {
     width: 100%;
-  }
-  
-  /* Resultado grid mobile */
-  .result-main-grid {
-    grid-template-columns: 1fr;
   }
   
   /* Botões de navegação mobile */
