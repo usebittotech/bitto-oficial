@@ -10,6 +10,20 @@
   --paper-text: #ededed;
 }
 
+/* =====================================================
+   OVERRIDE GLOBAL CONTAINER — planner usa largura total
+   ===================================================== */
+.main-wrapper.container,
+.container.main-wrapper,
+nav .container,
+.navbar .container {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+  box-sizing: border-box !important;
+}
+
 /* --- NAVBAR PADRONIZADA --- */
 .navbar {
   height: 70px;
@@ -26,6 +40,9 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   width: 100%;
+  max-width: 100% !important;
+  padding: 0 2.5rem;
+  box-sizing: border-box;
 }
 .nav-left {
   display: flex;
@@ -83,19 +100,21 @@
   padding-top: 2rem;
   padding-bottom: 4rem;
   min-height: calc(100vh - 70px);
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-left: 2rem;
-  padding-right: 2rem;
+  /* Override any global .container max-width */
+  max-width: 100% !important;
+  width: 100% !important;
   box-sizing: border-box;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
 }
 
 .tool-layout {
   display: flex;
   flex-direction: row;
-  gap: 2.5rem;
+  gap: 2rem;
   align-items: flex-start;
   width: 100%;
+  max-width: 100%;
 }
 
 .main-column {
@@ -325,6 +344,11 @@
   scrollbar-color: var(--primary-blue) var(--input-bg);
   min-height: 500px;
 }
+/* Ensure calendar columns use all available space */
+.calendar-board {
+  min-width: 100%;
+  table-layout: fixed;
+}
 .calendar-board {
   display: flex;
   min-width: 100%;
@@ -496,7 +520,7 @@
 /* Grid de duas colunas: calendário esquerda, progresso direita */
 .result-main-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
   align-items: start;
 }
@@ -581,114 +605,114 @@
   .result-card {
     padding: 1rem;
   }
-  
+
   /* MOBILE: Layout mobile-first */
   .tool-layout {
     flex-direction: column;
     gap: 1.5rem;
     align-items: stretch;
   }
-  
+
   .main-column {
     width: 100%;
     max-width: 100%;
   }
-  
+
   .sidebar-column {
     width: 100%;
     max-width: 100%;
   }
-  
+
   .tool-panel {
     position: static;
     top: auto;
   }
-  
+
   /* Stepper labels escondidas em mobile */
   .stepper-label {
     font-size: 0.5rem;
     display: none;
   }
-  
+
   .stepper-circle {
     width: 24px;
     height: 24px;
     font-size: 0.65rem;
   }
-  
+
   .stepper-line {
     margin: 0 2px;
   }
-  
+
   /* Calendário COMPACTO em mobile */
   .calendar-board-container {
     min-height: 350px;
   }
-  
+
   .calendar-col {
     min-width: 100px;
     flex: 1;
   }
-  
+
   .calendar-col-header {
     padding: 8px 4px;
     font-size: 0.7rem;
   }
-  
+
   .calendar-col-body {
     padding: 6px;
     gap: 6px;
   }
-  
+
   .task-card-glass {
     min-height: 80px;
     padding: 8px;
   }
-  
+
   .card-title-glass {
     font-size: 0.75rem;
     margin-bottom: 4px;
   }
-  
+
   .card-time-pill {
     font-size: 0.6rem;
     padding: 2px 4px;
   }
-  
+
   /* Progresso por disciplina expandido em mobile */
   .subject-progress-section-wrapper {
     width: 100%;
   }
-  
+
   /* Botões de navegação mobile */
   .view-toggle-btn {
     padding: 6px 12px;
     font-size: 0.68rem;
   }
-  
+
   .back-pill {
     padding: 6px 12px;
     font-size: 0.75rem;
   }
-  
+
   /* Input fields full width */
   .input-field {
     min-height: 44px;
     font-size: 16px; /* Evita zoom automático no iOS */
   }
-  
+
   .weight-btn {
     height: 36px;
     font-size: 0.8rem;
   }
-  
+
   .btn-step-next,
   .btn-step-back {
     padding: 0.55rem 1rem;
     font-size: 0.72rem;
     min-height: 40px;
   }
-  
+
   .btn-generate {
     min-height: 48px;
     font-size: 0.85rem;
@@ -747,25 +771,41 @@
   border-color: var(--primary-blue);
   color: white;
 }
-.stepper-step.active .stepper-label { color: var(--primary-blue); }
+.stepper-step.active .stepper-label {
+  color: var(--primary-blue);
+}
 .stepper-step.done .stepper-circle {
   background: var(--accent-green);
   border-color: var(--accent-green);
   color: #000;
 }
-.stepper-step.done .stepper-circle::after { content: "✓"; }
-.stepper-step.done .stepper-label { color: #3a8800; }
-.stepper-line.done { background: var(--accent-green); }
+.stepper-step.done .stepper-circle::after {
+  content: "✓";
+}
+.stepper-step.done .stepper-label {
+  color: #3a8800;
+}
+.stepper-line.done {
+  background: var(--accent-green);
+}
 
 /* ---------- STEPPER PANELS ---------- */
 .stepper-panel {
   display: none;
   animation: stepFadeIn 0.25s ease forwards;
 }
-.stepper-panel.active { display: block; }
+.stepper-panel.active {
+  display: block;
+}
 @keyframes stepFadeIn {
-  from { opacity: 0; transform: translateX(10px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .stepper-panel-title {
   font-size: 0.92rem;
@@ -792,9 +832,12 @@
   cursor: pointer;
   transition: 0.2s;
 }
-.btn-step-next:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-step-next:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 .btn-step-next:not(:disabled):hover {
-  box-shadow: 0 0 16px rgba(0,53,255,0.35);
+  box-shadow: 0 0 16px rgba(0, 53, 255, 0.35);
   transform: translateY(-1px);
 }
 .btn-step-back {
@@ -824,7 +867,9 @@
   margin-top: 0.6rem;
   line-height: 1.6;
 }
-.stepper-summary strong { color: var(--primary-blue); }
+.stepper-summary strong {
+  color: var(--primary-blue);
+}
 
 /* ---------- STEP 2 — disciplinas ---------- */
 .weight-picker {
@@ -844,8 +889,15 @@
   cursor: pointer;
   transition: 0.15s;
 }
-.weight-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
-.weight-btn:hover:not(.active) { border-color: var(--primary-blue); color: var(--text-main); }
+.weight-btn.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+.weight-btn:hover:not(.active) {
+  border-color: var(--primary-blue);
+  color: var(--text-main);
+}
 .weight-btn-add {
   flex: 0 0 40px;
   background: var(--accent-green);
@@ -854,14 +906,18 @@
   font-size: 1.2rem;
   font-weight: 800;
 }
-.weight-btn-add:hover { transform: scale(1.06); }
+.weight-btn-add:hover {
+  transform: scale(1.06);
+}
 
 .planner-weight-hint {
   font-size: 0.74rem;
   color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
-.planner-weight-hint strong { color: var(--primary-blue); }
+.planner-weight-hint strong {
+  color: var(--primary-blue);
+}
 
 /* Lista de matérias com scroll + drag-and-drop */
 .subject-list {
@@ -880,20 +936,38 @@
   text-align: center;
   animation: stepFadeIn 0.3s ease;
 }
-.subject-empty-icon { font-size: 1.4rem; }
-.subject-empty-title { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
-.subject-empty-hint { font-size: 0.74rem; color: var(--text-muted); }
+.subject-empty-icon {
+  font-size: 1.4rem;
+}
+.subject-empty-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.subject-empty-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
 
 /* Item de matéria arrastável */
 .subject-item {
   cursor: grab;
   user-select: none;
   gap: 0.5rem;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
 }
-.subject-item:active { cursor: grabbing; }
-.subject-item.dragging { opacity: 0.5; transform: scale(0.98); }
-.subject-item.drag-over { box-shadow: 0 0 0 2px var(--primary-blue); }
+.subject-item:active {
+  cursor: grabbing;
+}
+.subject-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+.subject-item.drag-over {
+  box-shadow: 0 0 0 2px var(--primary-blue);
+}
 .subject-drag-handle {
   color: var(--text-muted);
   font-size: 0.8rem;
@@ -935,10 +1009,20 @@
   font-size: 0.85rem;
   border-bottom: 1px dashed var(--border-color);
 }
-.review-row:last-child { border-bottom: none; }
-.review-row-label { color: var(--text-muted); font-weight: 500; }
-.review-row-value { font-weight: 700; color: var(--text-main); }
-.review-subject-list { margin-top: 0.55rem; }
+.review-row:last-child {
+  border-bottom: none;
+}
+.review-row-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.review-row-value {
+  font-weight: 700;
+  color: var(--text-main);
+}
+.review-subject-list {
+  margin-top: 0.55rem;
+}
 .review-subject-item {
   display: flex;
   align-items: center;
@@ -960,7 +1044,11 @@
   border-radius: 10px;
   overflow: hidden;
 }
-.review-subject-bar { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+.review-subject-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
 .review-subject-item span:last-child {
   flex-shrink: 0;
   color: var(--text-muted);
@@ -1020,7 +1108,9 @@
   vertical-align: middle;
   display: none;
 }
-.calendar-col.today-col .col-today-badge { display: inline-block; }
+.calendar-col.today-col .col-today-badge {
+  display: inline-block;
+}
 
 .col-complete-badge {
   background: var(--accent-green);
@@ -1034,15 +1124,25 @@
   vertical-align: middle;
   display: none;
 }
-.calendar-col.day-complete .col-complete-badge { display: inline-block; }
-.calendar-col.day-complete .col-today-badge { display: none; }
+.calendar-col.day-complete .col-complete-badge {
+  display: inline-block;
+}
+.calendar-col.day-complete .col-today-badge {
+  display: none;
+}
 .calendar-col.day-complete {
   animation: colComplete 0.5s ease;
 }
 @keyframes colComplete {
-  0%   { box-shadow: inset 0 0 0 0 rgba(204,255,0,0.4); }
-  70%  { box-shadow: inset 0 0 30px 0 rgba(204,255,0,0); }
-  100% { box-shadow: none; }
+  0% {
+    box-shadow: inset 0 0 0 0 rgba(204, 255, 0, 0.4);
+  }
+  70% {
+    box-shadow: inset 0 0 30px 0 rgba(204, 255, 0, 0);
+  }
+  100% {
+    box-shadow: none;
+  }
 }
 
 /* Visão "Foco do dia": esconde outras colunas */
@@ -1066,7 +1166,9 @@
   flex-direction: column;
   gap: 0.6rem;
 }
-.subject-progress-section:empty { display: none; }
+.subject-progress-section:empty {
+  display: none;
+}
 .subject-progress-section-title {
   font-size: 0.85rem;
   font-weight: 700;
@@ -1074,7 +1176,11 @@
   margin: 0 0 0.25rem;
   letter-spacing: 0.02em;
 }
-.subject-progress-row { display: flex; flex-direction: column; gap: 4px; }
+.subject-progress-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .subject-progress-header {
   display: flex;
   justify-content: space-between;
@@ -1107,7 +1213,15 @@
 
 /* ---------- RESPONSIVO ---------- */
 @media (max-width: 600px) {
-  .stepper-label { font-size: 0.58rem; }
-  .deck-header > div:last-child { flex-wrap: wrap; justify-content: flex-end; }
-  .view-toggle-btn { padding: 7px 10px; font-size: 0.7rem; }
+  .stepper-label {
+    font-size: 0.58rem;
+  }
+  .deck-header > div:last-child {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .view-toggle-btn {
+    padding: 7px 10px;
+    font-size: 0.7rem;
+  }
 }
