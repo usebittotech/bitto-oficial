@@ -1,59 +1,88 @@
 // Arquivo: api/generate.js
-export default async function handler(req, res) {
-    // 1. Configuração de CORS
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+
+// 1. Avisa a Vercel para rodar este arquivo no ambiente super leve (Edge)
+export const config = {
+  runtime: "edge",
+};
+
+export default async function handler(req) {
+  // 2. Configuração de CORS para Edge (usando Headers nativos)
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+    "Access-Control-Allow-Headers":
+      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+  };
+
+  // Responde ao preflight do navegador imediatamente
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 200, headers: corsHeaders });
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: "Chave de API não configurada." }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      },
+    );
+  }
+
+  try {
+    // No Edge, precisamos ler o body da requisição de forma assíncrona
+    const body = await req.json();
+    const { contents, model } = body;
+
+    const modelName = model || "gemini-2.5-flash-lite";
+
+    const googleResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_NONE",
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_NONE",
+            },
+          ],
+        }),
+      },
     );
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+    const data = await googleResponse.json();
+
+    if (!googleResponse.ok) {
+      return new Response(JSON.stringify(data), {
+        status: googleResponse.status,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-        return res.status(500).json({ error: 'Chave de API não configurada.' });
-    }
-
-    const { contents, model } = req.body;
-    // Garante que usa o -exp se o front não mandar, ou usa o que vier
-    const modelName = model || "gemini-2.5-flash"; 
-
-    try {
-        const googleResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    contents,
-                    // ADICIONAMOS ISSO AQUI PARA EVITAR RESPOSTA VAZIA 👇
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-                    ]
-                })
-            }
-        );
-
-        const data = await googleResponse.json();
-
-        // Se o Google der erro (ex: 400 ou 500), repassa para o front saber
-        if (!googleResponse.ok) {
-            return res.status(googleResponse.status).json(data);
-        }
-
-        res.status(200).json(data);
-
-    } catch (error) {
-        console.error("Erro no Backend:", error);
-        res.status(500).json({ error: 'Erro interno ao processar solicitação.' });
-    }
+    // Retorna sucesso para o Frontend
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  } catch (error) {
+    console.error("Erro no Backend Edge:", error);
+    return new Response(
+      JSON.stringify({ error: "Erro interno ao processar solicitação." }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      },
+    );
+  }
 }
