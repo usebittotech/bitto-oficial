@@ -155,7 +155,6 @@ if (nextBtn)
 if (flipBtn) flipBtn.addEventListener("click", toggleFlip);
 if (flipCard)
   flipCard.addEventListener("click", () => {
-    // Clique no card vira apenas se estiver mostrando controles de flip
     if (!isFlipped) toggleFlip();
   });
 
@@ -166,7 +165,6 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code === "ArrowRight" && !isFlipped) if (nextBtn) nextBtn.click();
   if (e.code === "ArrowLeft" && !isFlipped) if (prevBtn) prevBtn.click();
-  // Atalhos de avaliação: 1 = não lembrei, 2 = lembrei
   if (e.code === "Digit1" && isFlipped) if (wrongBtn) wrongBtn.click();
   if (e.code === "Digit2" && isFlipped) if (rightBtn) rightBtn.click();
 });
@@ -175,7 +173,17 @@ document.addEventListener("keydown", (e) => {
 if (generateBtn) {
   generateBtn.addEventListener("click", async () => {
     const topic = document.getElementById("deckTopic").value;
-    const content = document.getElementById("aiContent").value;
+    const contentRaw = document.getElementById("aiContent").value;
+
+    // ✂️ Limitação de Caracteres do Conteúdo (Máximo 5000 caracteres)
+    const content = contentRaw.substring(0, 5000);
+    if (contentRaw.length > 5000) {
+      showToast(
+        "Texto longo! Limitado aos primeiros 5000 caracteres.",
+        "warning",
+      );
+    }
+
     const qtyInput = document.querySelector('input[name="cardQty"]:checked');
     const quantity = qtyInput ? parseInt(qtyInput.value) : 5;
 
@@ -189,14 +197,12 @@ if (generateBtn) {
       return;
     }
 
-    // 1. VERIFICA LIMITE DO PLANO (userManager.js)
     const canUse = await checkUsageLimit(currentUser.uid, "flashcards");
     if (!canUse) {
       showUpgradeModal();
       return;
     }
 
-    // UI Loading
     const originalText = generateBtn.innerHTML;
     generateBtn.innerHTML = '<span class="loader"></span> CONSULTANDO BITTO...';
     generateBtn.classList.add("btn-loading");
@@ -216,11 +222,11 @@ if (generateBtn) {
                 Idioma: Português BR. a Resposta deve ser curta e pratica JSON PURO.
             `;
 
-      const response = await fetch("../api/generate", {
+      // 🛠️ ROTA CORRIGIDA
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "gemini-3.5-flash-lite",
           contents: [{ parts: [{ text: prompt }] }],
         }),
       });
@@ -236,18 +242,14 @@ if (generateBtn) {
         .trim();
       const newDeck = JSON.parse(rawText);
 
-      // Sucesso
       currentDeck = newDeck;
       currentIndex = 0;
 
-      // 2. DESCONTA DO PLANO
       await incrementUsage(currentUser.uid, "flashcards");
 
-      // --- 3. ATUALIZA ESTATÍSTICAS E XP (NOVO) ---
-      // O CORRETO:
       if (window.recordActivity)
-        window.recordActivity("flashcards", parseInt(quantity)); // Conta cards gerados
-      if (window.awardXP) window.awardXP(10, "Criação de Deck"); // XP por criar
+        window.recordActivity("flashcards", parseInt(quantity));
+      if (window.awardXP) window.awardXP(10, "Criação de Deck");
 
       if (deckTitle) deckTitle.innerText = topic || "Deck Gerado";
       showToast(`Sucesso! ${newDeck.length} cards criados.`, "success");

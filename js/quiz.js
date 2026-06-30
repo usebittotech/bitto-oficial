@@ -28,7 +28,7 @@ let questions = [];
 let currentQuestionIndex = 0;
 let score = 0;
 let currentUser = null;
-let TOTAL_QUESTIONS = 5; // atualizado dinamicamente ao iniciar
+let TOTAL_QUESTIONS = 5;
 const OPTION_LABELS = ["A", "B", "C", "D"];
 
 // --- AUTH ---
@@ -115,11 +115,11 @@ async function fetchQuestions(topic, difficulty) {
         FORMATO JSON: [{"q": "...", "options": ["A", "B", "C", "D"], "correct": 0, "why": "..."}]
         Regras: JSON PURO. Português.
     `;
-  const response = await fetch("../api/generate", {
+  // 🛠️ ROTA CORRIGIDA
+  const response = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gemini-3.5-flash",
       contents: [{ parts: [{ text: prompt }] }],
     }),
   });
@@ -159,7 +159,6 @@ function updateProgress(isCorrect = null) {
 function loadQuestion() {
   const q = questions[currentQuestionIndex];
 
-  // Atualiza contador textual
   if (questionCounter) {
     questionCounter.innerText = `Questão ${currentQuestionIndex + 1} de ${TOTAL_QUESTIONS}`;
   }
@@ -169,7 +168,6 @@ function loadQuestion() {
   feedbackArea.style.display = "none";
   updateProgress(null);
 
-  // Botão próxima: desabilitado até o usuário responder
   if (nextBtn) {
     nextBtn.disabled = true;
     nextBtn.style.opacity = "0.45";
@@ -196,7 +194,6 @@ function checkAnswer(selectedIdx, btnElement) {
   const correctIdx = q.correct;
   const buttons = optionsContainer.querySelectorAll(".option-btn");
 
-  // Desabilita todas as opções
   buttons.forEach((btn) => btn.classList.add("disabled"));
 
   const isCorrect = selectedIdx === correctIdx;
@@ -221,7 +218,6 @@ function checkAnswer(selectedIdx, btnElement) {
 
   updateProgress(isCorrect);
 
-  // Habilita botão "Próxima" agora que respondeu
   if (nextBtn) {
     nextBtn.disabled = false;
     nextBtn.style.opacity = "1";
@@ -255,9 +251,6 @@ if (nextBtn) {
 
 // --- FIM DE JOGO ---
 function finishGame() {
-  // Marca último passo
-  const steps = document.querySelectorAll(".step");
-  // já marcado por updateProgress no checkAnswer
   gameActive.style.display = "none";
   gameResult.style.display = "block";
   finalScoreEl.innerText = score;

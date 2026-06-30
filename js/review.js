@@ -25,7 +25,16 @@ onAuthStateChanged(auth, (user) => {
 if (generateBtn) {
   generateBtn.addEventListener("click", async () => {
     const topic = topicInput ? topicInput.value : "";
-    const content = contentInput ? contentInput.value : "";
+    const contentRaw = contentInput ? contentInput.value : "";
+
+    // ✂️ Limitação de Caracteres do Conteúdo (Máximo 5000 caracteres)
+    const content = contentRaw.substring(0, 5000);
+    if (contentRaw.length > 5000) {
+      showToast(
+        "Texto longo! Limitado aos primeiros 5000 caracteres.",
+        "warning",
+      );
+    }
 
     if (!content.trim() && !topic.trim()) {
       showToast("Cole um texto ou defina um tema!", "error");
@@ -56,11 +65,11 @@ if (generateBtn) {
                 Formato: Markdown bonito. Idioma: PT-BR.
             `;
 
-      const response = await fetch("../api/generate", {
+      // 🛠️ ROTA CORRIGIDA
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "gemini-3.5-flash-lite",
           contents: [{ parts: [{ text: prompt }] }],
         }),
       });
@@ -117,38 +126,35 @@ if (downloadPdfBtn) {
     });
     const source = document.getElementById("reviewOutput");
 
-    // ── Dimensões ──────────────────────────────────────────────
-    const pageW = doc.internal.pageSize.getWidth(); // 210 mm
-    const pageH = doc.internal.pageSize.getHeight(); // 297 mm
-    const mL = 16; // margem esquerda
-    const mR = 16; // margem direita
-    const mTop = 16; // margem topo (páginas 2+)
-    const footerH = 14; // altura reservada ao rodapé
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const mL = 16;
+    const mR = 16;
+    const mTop = 16;
+    const footerH = 14;
     const maxW = pageW - mL - mR;
     let y = mTop;
     let pageNum = 1;
 
-    // ── Paleta de cores ────────────────────────────────────────
     const C = {
-      blue: [0, 45, 180], // azul principal
-      blueDark: [0, 20, 90], // azul escuro (cover)
-      blueMid: [30, 80, 210], // azul médio
-      bluePale: [235, 241, 255], // azul pálido (fundo H1)
-      blueLight: [210, 225, 255], // azul bem claro (borda questão)
-      questionBg: [248, 250, 255], // fundo questão
-      green: [160, 195, 0], // verde accent
-      greenBright: [180, 220, 0], // verde brilhante
-      greenPale: [243, 252, 215], // verde pálido (blockquote)
-      answerBg: [237, 252, 230], // fundo gabarito
-      answerText: [30, 120, 30], // texto check
-      dark: [22, 22, 22], // texto principal
-      mid: [70, 70, 70], // texto corpo
-      muted: [130, 130, 130], // texto secundário
-      hairline: [215, 215, 215], // linhas finas
+      blue: [0, 45, 180],
+      blueDark: [0, 20, 90],
+      blueMid: [30, 80, 210],
+      bluePale: [235, 241, 255],
+      blueLight: [210, 225, 255],
+      questionBg: [248, 250, 255],
+      green: [160, 195, 0],
+      greenBright: [180, 220, 0],
+      greenPale: [243, 252, 215],
+      answerBg: [237, 252, 230],
+      answerText: [30, 120, 30],
+      dark: [22, 22, 22],
+      mid: [70, 70, 70],
+      muted: [130, 130, 130],
+      hairline: [215, 215, 215],
       white: [255, 255, 255],
     };
 
-    // ── Utilitários ────────────────────────────────────────────
     function sanitize(str) {
       return (str || "")
         .replace(/[\u{1F000}-\u{1FFFF}]/gu, "")
@@ -162,7 +168,7 @@ if (downloadPdfBtn) {
 
     function lh(fs) {
       return fs * 0.44;
-    } // line-height proporcional ao font-size
+    }
 
     function checkY(needed) {
       if (y + needed > pageH - footerH - 4) {
@@ -174,14 +180,11 @@ if (downloadPdfBtn) {
       }
     }
 
-    // ── Rodapé ─────────────────────────────────────────────────
     function drawFooter() {
       const fy = pageH - footerH + 5;
-      // linha topo rodapé
       doc.setDrawColor(...C.hairline);
       doc.setLineWidth(0.25);
       doc.line(mL, fy - 4, pageW - mR, fy - 4);
-      // acento verde pequeno
       doc.setDrawColor(...C.green);
       doc.setLineWidth(1);
       doc.line(mL, fy - 4, mL + 12, fy - 4);
@@ -202,7 +205,6 @@ if (downloadPdfBtn) {
       doc.text(String(pageNum), pageW - mR, fy, { align: "right" });
     }
 
-    // ── Cabeçalho páginas 2+ (faixa fina) ─────────────────────
     function drawPageHeader() {
       doc.setFillColor(...C.blueDark);
       doc.rect(0, 0, pageW, 6, "F");
@@ -210,23 +212,18 @@ if (downloadPdfBtn) {
       doc.rect(0, 5.2, pageW, 1.2, "F");
     }
 
-    // ── Cover da primeira página ───────────────────────────────
     function drawCoverHeader(title) {
-      // Fundo gradiente simulado com dois retângulos
       doc.setFillColor(...C.blueDark);
       doc.rect(0, 0, pageW, 50, "F");
 
-      // Bloco decorativo direito (geometria)
       doc.setFillColor(0, 35, 120);
       doc.rect(pageW - 45, 0, 45, 50, "F");
       doc.setFillColor(0, 28, 100);
       doc.rect(pageW - 25, 0, 25, 50, "F");
 
-      // Linha accent verde
       doc.setFillColor(...C.greenBright);
       doc.rect(0, 47, pageW, 3, "F");
 
-      // Tag "BITTO AI"
       doc.setFillColor(...C.green);
       doc.roundedRect(mL, 8, 28, 7, 1.5, 1.5, "F");
       doc.setFont("helvetica", "bold");
@@ -234,20 +231,17 @@ if (downloadPdfBtn) {
       doc.setTextColor(...C.blueDark);
       doc.text("BITTO AI", mL + 14, 13, { align: "center" });
 
-      // "GUIA DE ESTUDO" label
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
       doc.setTextColor(170, 195, 255);
       doc.text("GUIA DE ESTUDO", mL + 32, 13);
 
-      // Título principal
       doc.setFont("helvetica", "bold");
       doc.setFontSize(17);
       doc.setTextColor(...C.white);
       const tLines = doc.splitTextToSize(title, maxW - 30);
       doc.text(tLines, mL, 28);
 
-      // Data geração (canto direito)
       const now = new Date();
       const dateStr = now.toLocaleDateString("pt-BR", {
         day: "2-digit",
@@ -259,10 +253,9 @@ if (downloadPdfBtn) {
       doc.setTextColor(170, 195, 255);
       doc.text(dateStr, pageW - mR, 44, { align: "right" });
 
-      y = 58; // cursor após o cover
+      y = 58;
     }
 
-    // ── H1 — fundo azul pálido com barra lateral ───────────────
     function drawH1(text) {
       if (!text) return;
       y += 5;
@@ -272,17 +265,14 @@ if (downloadPdfBtn) {
       const lines = doc.splitTextToSize(text, maxW - 8);
       const blockH = lines.length * lh(12.5) + 7;
       checkY(blockH + 5);
-      // fundo
       doc.setFillColor(...C.bluePale);
       doc.roundedRect(mL, y - 5, maxW, blockH, 2.5, 2.5, "F");
-      // barra lateral azul
       doc.setFillColor(...C.blue);
       doc.roundedRect(mL, y - 5, 3.5, blockH, 1.5, 1.5, "F");
       doc.text(lines, mL + 7, y);
       y += blockH + 3;
     }
 
-    // ── H2 — texto azul + sublinhado duplo verde→cinza ─────────
     function drawH2(text) {
       if (!text) return;
       y += 6;
@@ -293,7 +283,6 @@ if (downloadPdfBtn) {
       const lines = doc.splitTextToSize(text, maxW - 4);
       doc.text(lines, mL, y);
       y += lines.length * lh(11) + 2;
-      // sublinhado: trecho verde + trecho cinza
       const split = maxW * 0.35;
       doc.setDrawColor(...C.greenBright);
       doc.setLineWidth(1);
@@ -304,12 +293,10 @@ if (downloadPdfBtn) {
       y += 5;
     }
 
-    // ── H3 — bolinha verde + texto bold escuro ──────────────────
     function drawH3(text) {
       if (!text) return;
       y += 4;
       checkY(12);
-      // bolinha accent
       doc.setFillColor(...C.green);
       doc.circle(mL + 1.8, y - 1.8, 1.8, "F");
       doc.setFont("helvetica", "bold");
@@ -320,7 +307,6 @@ if (downloadPdfBtn) {
       y += lines.length * lh(10.5) + 4;
     }
 
-    // ── Parágrafo ───────────────────────────────────────────────
     function drawP(text) {
       if (!text) return;
       doc.setFont("helvetica", "normal");
@@ -332,7 +318,6 @@ if (downloadPdfBtn) {
       y += lines.length * lh(10) + 4;
     }
 
-    // ── Li normal ───────────────────────────────────────────────
     function drawLi(text, ordered, index) {
       if (!text) return;
       const indent = 9;
@@ -343,7 +328,6 @@ if (downloadPdfBtn) {
       checkY(lines.length * lh(10) + 3);
 
       if (ordered) {
-        // Círculo azul com número branco
         doc.setFillColor(...C.blue);
         doc.circle(mL + 3, y - 1.8, 2.8, "F");
         doc.setFont("helvetica", "bold");
@@ -351,7 +335,6 @@ if (downloadPdfBtn) {
         doc.setTextColor(...C.white);
         doc.text(String(index), mL + 3, y - 0.4, { align: "center" });
       } else {
-        // Quadrado azul sólido
         doc.setFillColor(...C.blue);
         doc.rect(mL + 1.2, y - 2.8, 2.2, 2.2, "F");
       }
@@ -363,7 +346,6 @@ if (downloadPdfBtn) {
       y += lines.length * lh(10) + 3;
     }
 
-    // ── Questão do simulado (caixa com borda suave) ─────────────
     let questaoNum = 0;
     function drawQuestaoLi(text) {
       if (!text) return;
@@ -375,13 +357,11 @@ if (downloadPdfBtn) {
       const blockH = lines.length * lh(9.5) + 9;
       checkY(blockH + 3);
 
-      // Caixa fundo azul clarinho com borda
       doc.setFillColor(...C.questionBg);
       doc.setDrawColor(...C.blueLight);
       doc.setLineWidth(0.4);
       doc.roundedRect(mL, y - 5, maxW, blockH, 2, 2, "FD");
 
-      // Badge número da questão
       doc.setFillColor(...C.blueMid);
       doc.roundedRect(mL + 2, y - 3.5, 10, 5.5, 1.5, 1.5, "F");
       doc.setFont("helvetica", "bold");
@@ -389,7 +369,6 @@ if (downloadPdfBtn) {
       doc.setTextColor(...C.white);
       doc.text(`Q${questaoNum}`, mL + 7, y, { align: "center" });
 
-      // Texto da questão
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9.5);
       doc.setTextColor(...C.dark);
@@ -397,7 +376,6 @@ if (downloadPdfBtn) {
       y += blockH + 2;
     }
 
-    // ── Gabarito li (fundo verde clarinho + check) ──────────────
     let gabaritoNum = 0;
     function drawAnswerLi(text) {
       if (!text) return;
@@ -409,25 +387,21 @@ if (downloadPdfBtn) {
       const blockH = lines.length * lh(9.5) + 8;
       checkY(blockH + 2);
 
-      // Caixa verde clara
       doc.setFillColor(...C.answerBg);
       doc.setDrawColor(170, 220, 160);
       doc.setLineWidth(0.35);
       doc.roundedRect(mL, y - 4, maxW, blockH, 2, 2, "FD");
 
-      // Número da questão
       doc.setFont("helvetica", "bold");
       doc.setFontSize(6.5);
       doc.setTextColor(...C.muted);
       doc.text(`${gabaritoNum}.`, mL + 2.5, y, { align: "center" });
 
-      // Check "v" em verde
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
       doc.setTextColor(...C.answerText);
       doc.text("v", mL + 7, y);
 
-      // Resposta
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9.5);
       doc.setTextColor(...C.dark);
@@ -435,7 +409,6 @@ if (downloadPdfBtn) {
       y += blockH + 2;
     }
 
-    // ── Blockquote ──────────────────────────────────────────────
     function drawBlockquote(text) {
       if (!text) return;
       doc.setFont("helvetica", "italic");
@@ -452,12 +425,10 @@ if (downloadPdfBtn) {
       y += blockH + 4;
     }
 
-    // ── Detectar contexto (gabarito / simulado) ─────────────────
     let inGabarito = false;
     let inSimulado = false;
     let olCounter = 0;
 
-    // ── Processar nós DOM ───────────────────────────────────────
     function processNode(node, parentTag = "") {
       if (node.nodeType === Node.TEXT_NODE) return;
       const tag = node.tagName ? node.tagName.toLowerCase() : "";
@@ -524,7 +495,6 @@ if (downloadPdfBtn) {
           y += 7;
           break;
 
-        // inline — já processado pelo innerText do pai
         case "strong":
         case "b":
         case "em":
@@ -541,25 +511,18 @@ if (downloadPdfBtn) {
       }
     }
 
-    // ── Renderizar ──────────────────────────────────────────────
     const topicText = sanitize(
       document.getElementById("reviewTitle")?.innerText || "Revisão Bitto",
     );
 
-    // Cover page
     drawCoverHeader(topicText);
-
-    // Conteúdo
     source.childNodes.forEach((node) => processNode(node));
-
-    // Rodapé última página
     drawFooter();
 
     doc.save("Bitto_Resumo.pdf");
   });
 }
 
-// ── Copy ────────────────────────────────────────────────────────
 if (copyBtn) {
   copyBtn.addEventListener("click", () => {
     navigator.clipboard
@@ -568,7 +531,6 @@ if (copyBtn) {
   });
 }
 
-// ── Theme toggle ────────────────────────────────────────────────
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const html = document.documentElement;
@@ -579,7 +541,6 @@ if (themeToggle) {
   });
 }
 
-// ── Toast ───────────────────────────────────────────────────────
 function showToast(message, type = "success") {
   let container = document.getElementById("toast-container");
   if (!container) {
