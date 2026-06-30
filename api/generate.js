@@ -51,17 +51,14 @@ export default async function handler(req) {
     // 🚀 PIPELINE DE FALLBACK (Tier 1 a Tier 6)
     const pipeline = [
       // Modelos do Gemini (Gratuitos / Atuais)
-      { provider: "gemini", id: "gemini-3.5-flash" },
-      { provider: "gemini", id: "gemini-1.5-flash" },
-      { provider: "gemini", id: "gemini-1.5-flash-8b" },
+      { provider: "gemini", id: "gemini-3.1-flash-lite" },
+      { provider: "gemini", id: "gemini-2.5-pro" },
+      { provider: "gemini", id: "gemini-2.5-flash" },
 
       // Modelos do OpenRouter (Com a tag :free para garantir gratuidade)
-      { provider: "openrouter", id: "meta-llama/llama-3.1-8b-instruct:free" },
-      { provider: "openrouter", id: "mistralai/mistral-7b-instruct:free" },
-      {
-        provider: "openrouter",
-        id: "nousresearch/hermes-3-llama-3.1-405b:free",
-      },
+      { provider: "openrouter", id: "cohere/north-mini-code:free" },
+      { provider: "openrouter", id: "nvidia/nemotron-3.5-content-safety:free" },
+      { provider: "openrouter", id: "google/gemma-4-26b-a4b-it:free" },
     ];
 
     let lastError = null;
