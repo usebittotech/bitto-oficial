@@ -36,7 +36,7 @@ export default async function handler(req) {
     const body = await req.json();
     const { contents, model } = body;
 
-    const modelName = model || "gemini-2.5-flash-lite";
+    const modelName = model || "gemini-3.5-flash-lite";
 
     const googleResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,

@@ -119,7 +119,7 @@ async function fetchQuestions(topic, difficulty) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash",
       contents: [{ parts: [{ text: prompt }] }],
     }),
   });
