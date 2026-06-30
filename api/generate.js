@@ -51,7 +51,7 @@ export default async function handler(req) {
     // 🚀 PIPELINE DE FALLBACK (Tier 1 a Tier 6)
     const pipeline = [
       // Modelos do Gemini (Gratuitos / Atuais)
-      { provider: "gemini", id: "gemini-2.0-flash" },
+      { provider: "gemini", id: "gemini-3.5-flash" },
       { provider: "gemini", id: "gemini-1.5-flash" },
       { provider: "gemini", id: "gemini-1.5-flash-8b" },
 
