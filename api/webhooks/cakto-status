@@ -1,0 +1,90 @@
+import admin from "firebase-admin";
+
+// Inicializar Firebase
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+  });
+}
+
+const db = admin.firestore();
+
+/**
+ * GET /api/webhooks/cakto-status?userId=abc123
+ *
+ * Retorna o status de assinatura do usuário
+ */
+export default async function handler(req, res) {
+  // Permitir apenas GET
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  // Extrair userId da query
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required" });
+  }
+
+  try {
+    // Buscar documento do usuário
+    const userDoc = await db.collection("users").doc(userId).get();
+
+    // Usuário não encontrado
+    if (!userDoc.exists()) {
+      return res.json({
+        status: "not_found",
+        plan: "free",
+        subscriptionEnd: null,
+        daysLeft: 0,
+        isActive: false,
+        name: null,
+        email: null,
+      });
+    }
+
+    const userData = userDoc.data();
+    const now = new Date();
+
+    // Verificar se assinatura está ativa
+    const endDate = userData.subscriptionEnd?.toDate();
+    const isActive = endDate && now < endDate;
+
+    // Calcular dias restantes
+    let daysLeft = 0;
+    if (isActive) {
+      daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+    }
+
+    // Montar resposta
+    const response = {
+      status: isActive ? "active" : "expired",
+      plan: userData.plan || "free",
+      subscriptionEnd: endDate?.toISOString() || null,
+      daysLeft: daysLeft,
+      isActive: isActive,
+      name: userData.name || null,
+      email: userData.email || null,
+      billingCycle: userData.billingCycle || null,
+      lastPaymentDate: userData.lastPaymentDate?.toISOString() || null,
+      usage: userData.usage || { flashcards: 0, quiz: 0, review: 0 },
+      xp: userData.xp || 0,
+    };
+
+    console.log(
+      `📊 Status consultado: ${userId} - ${response.status} (${response.plan})`,
+    );
+
+    return res.json(response);
+  } catch (error) {
+    console.error(`❌ Erro ao consultar status: ${error.message}`);
+    return res.status(500).json({
+      error: error.message,
+    });
+  }
+}
