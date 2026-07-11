@@ -1,426 +1,292 @@
-import { auth } from "./firebase-init.js";
-import {
-  onAuthStateChanged,
-  signOut,
-  updateProfile,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  doc,
-  onSnapshot,
-  updateDoc,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db } from "./firebase-init.js";
-import { checkMonthlyReset, calculateLevel } from "./xpSystem.js";
+import { auth, onAuthStateChanged } from "./firebase-init.js";
+import { checkUsageLimit, incrementUsage } from "./userManager.js";
 
-// --- FUNÇÃO DE CORREÇÃO PARA MOBILE ---
-async function compressImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 400;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
-      };
-      img.onerror = reject;
-    };
-    reader.onerror = reject;
-  });
-}
-
-// ==========================================
-// 1. ELEMENTOS UI E INICIALIZAÇÃO
-// ==========================================
-const chatMessages = document.getElementById("chatMessages");
-const chatInput = document.getElementById("chatInput");
-const sendBtn = document.getElementById("sendBtn");
 const themeToggle = document.getElementById("themeToggle");
-
-let chatHistory = [
-  {
-    role: "user",
-    parts: [
-      {
-        text: "Você é o Bitto, um assistente de estudos universitário inteligente, motivador e direto. Suas respostas devem ser curtas e úteis. Use emojis ocasionalmente para deixar o papo leve.",
-      },
-    ],
-  },
-  {
-    role: "model",
-    parts: [
-      { text: "Entendido! Sou o Bitto. Vamos dominar os estudos juntos? 🚀" },
-    ],
-  },
-];
-
-// ==========================================
-// 2. AUTENTICAÇÃO E DADOS
-// ==========================================
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    await checkMonthlyReset(user);
-    const emailInput = document.getElementById("settingsEmailInput");
-    if (emailInput) emailInput.value = user.email;
-
-    onSnapshot(doc(db, "users", user.uid), (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        updateInterface(user, docSnapshot.data());
-      }
-    });
-
-    setupSettingsSave(user);
-  } else {
-    window.location.href = "../index.html";
-  }
-});
-
-function updateInterface(user, dbData) {
-  const currentXP = dbData.xp || 0;
-  const levelData = calculateLevel(currentXP);
-  const displayName = dbData.displayName || user.displayName || "Estudante";
-  const firstName = displayName.split(" ")[0];
-
-  const planNav = document.getElementById("userPlanNav");
-  const planMobile = document.getElementById("userPlanMobile");
-  const userPlan = dbData.plan || "free";
-
-  if (planNav) {
-    planNav.innerText = userPlan.toUpperCase();
-    if (userPlan === "free") {
-      planNav.style.background = "var(--border-color)";
-      planNav.style.color = "var(--text-muted)";
-      planNav.style.boxShadow = "none";
-    } else {
-      planNav.style.background = "var(--accent-green)";
-      planNav.style.color = "var(--primary-blue)";
-      planNav.style.boxShadow = "0 0 10px rgba(204, 255, 0, 0.2)";
-    }
-  }
-
-  if (planMobile) {
-    planMobile.innerText = userPlan === "free" ? "Plano Gratuito" : "Plano Pro";
-  }
-
-  document.getElementById("navUserName").innerText = firstName;
-  document.getElementById("ddUserName").innerText = displayName;
-  document.getElementById("userXP").innerText = currentXP;
-  document.getElementById("xpText").innerText =
-    `${currentXP} / ${levelData.limit} XP`;
-  document.getElementById("ddLevel").innerText = `Nível ${levelData.level}`;
-  document.getElementById("mascotLevelText").innerText =
-    `Nível ${levelData.level}`;
-
-  const stats = dbData.stats || {};
-  const generatedCount = stats.cardsGeneratedMonth || 0;
-  const generatedCountEl = document.getElementById("generatedCount");
-  if (generatedCountEl) {
-    generatedCountEl.innerText = `${generatedCount} Cards`;
-    generatedCountEl.style.color =
-      generatedCount > 50 ? "var(--accent-green)" : "var(--primary-blue)";
-  }
-
-  let range = levelData.limit - levelData.min;
-  let progress = currentXP - levelData.min;
-  let percentage = Math.max(0, Math.min(100, (progress / range) * 100));
-  const bar = document.getElementById("xpBarFill");
-  if (bar) bar.style.width = `${percentage}%`;
-
-  updateGreeting(firstName);
-  updateMascotImage(currentXP);
-
-  const photoURL = dbData.photoURL || user.photoURL;
-  if (photoURL) {
-    document
-      .querySelectorAll(".avatar-circle, .avatar-placeholder-large")
-      .forEach((el) => {
-        el.innerHTML = `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-      });
-    const preview = document.getElementById("settingsAvatarPreview");
-    if (preview) {
-      preview.src = photoURL;
-      preview.style.display = "block";
-    }
-    const placeholder = document.getElementById("settingsAvatarPlaceholder");
-    if (placeholder) placeholder.style.display = "none";
-  }
-
-  const nameInput = document.getElementById("settingsNameInput");
-  if (nameInput) nameInput.value = displayName;
-}
-
-function updateMascotImage(xp) {
-  const mascotImg = document.getElementById("mascotImage");
-  if (!mascotImg) return;
-  let imageName = "bittinho-0";
-  if (xp >= 5800) imageName = "bittinho-5800";
-  else if (xp >= 4200) imageName = "bittinho-4200";
-  else if (xp >= 3000) imageName = "bittinho-3000";
-  else if (xp >= 2100) imageName = "bittinho-2100";
-  else if (xp >= 1400) imageName = "bittinho-1400";
-  else if (xp >= 900) imageName = "bittinho-900";
-  else if (xp >= 500) imageName = "bittinho-500";
-  else if (xp >= 250) imageName = "bittinho-250";
-  else if (xp >= 100) imageName = "bittinho-100";
-  mascotImg.src = `../bittinhos/${imageName}.png`;
-}
-
-function updateGreeting(name) {
-  const hour = new Date().getHours();
-  const greetingElement = document.getElementById("greetingText");
-  if (greetingElement) {
-    let greeting =
-      hour >= 5 && hour < 12
-        ? "Bom dia"
-        : hour >= 12 && hour < 18
-          ? "Boa tarde"
-          : "Boa noite";
-    greetingElement.innerText = `${greeting}, ${name}! 👋`;
-  }
-}
-
-// ==========================================
-// 3. MENU MOBILE & NAVEGAÇÃO
-// ==========================================
+const profileBtn = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const logoutBtn = document.getElementById("logoutBtn");
 const hamburgerBtn = document.getElementById("hamburgerBtn");
-const mobileMenu = document.getElementById("mobileMenu");
 const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+const mobileMenu = document.getElementById("mobileMenu");
 const closeMenuBtn = document.getElementById("closeMenuBtn");
-const mobileConfigBtn = document.getElementById("mobileConfigBtn");
 const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
-
-function toggleMobileMenu() {
-  mobileMenu.classList.toggle("active");
-  mobileMenuOverlay.classList.toggle("active");
-}
-
-if (hamburgerBtn) hamburgerBtn.addEventListener("click", toggleMobileMenu);
-if (closeMenuBtn) closeMenuBtn.addEventListener("click", toggleMobileMenu);
-if (mobileMenuOverlay)
-  mobileMenuOverlay.addEventListener("click", toggleMobileMenu);
-
-if (mobileConfigBtn)
-  mobileConfigBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    toggleMobileMenu();
-    openSettings();
-  });
-if (mobileLogoutBtn)
-  mobileLogoutBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    toggleMobileMenu();
-    openLogoutModal();
-  });
-
-// ==========================================
-// 4. CONFIGURAÇÕES E LOGOUT
-// ==========================================
-const settingsModal = document.getElementById("settingsModal");
+const mobileConfigBtn = document.getElementById("mobileConfigBtn");
 const navConfigBtn = document.getElementById("navConfigBtn");
-const ddAccountBtn = document.getElementById("ddAccountBtn");
+const settingsModal = document.getElementById("settingsModal");
 const closeSettingsBtn = document.getElementById("closeSettingsBtn");
 const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-const avatarInput = document.getElementById("avatarInput");
-
-function openSettings() {
-  settingsModal.classList.add("active");
-}
-function closeSettings() {
-  settingsModal.classList.remove("active");
-}
-
-if (navConfigBtn)
-  navConfigBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openSettings();
-  });
-if (ddAccountBtn)
-  ddAccountBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openSettings();
-  });
-if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", closeSettings);
-
-if (avatarInput) {
-  avatarInput.addEventListener("change", async function (e) {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        const compressedSrc = await compressImage(file);
-        const preview = document.getElementById("settingsAvatarPreview");
-        const placeholder = document.getElementById(
-          "settingsAvatarPlaceholder",
-        );
-        preview.src = compressedSrc;
-        preview.style.display = "block";
-        placeholder.style.display = "none";
-      } catch (err) {
-        console.error("Erro ao processar imagem:", err);
-        showToast("Erro ao carregar imagem no celular.", "error");
-      }
-    }
-  });
-}
-
-function setupSettingsSave(user) {
-  if (saveSettingsBtn) {
-    const newBtn = saveSettingsBtn.cloneNode(true);
-    saveSettingsBtn.parentNode.replaceChild(newBtn, saveSettingsBtn);
-    newBtn.addEventListener("click", async () => {
-      const newName = document.getElementById("settingsNameInput").value;
-      const previewSrc = document.getElementById("settingsAvatarPreview").src;
-      const hasNewImage =
-        document.getElementById("settingsAvatarPreview").style.display !==
-        "none";
-      const originalText = newBtn.innerText;
-      newBtn.innerText = "Salvando...";
-      newBtn.disabled = true;
-
-      try {
-        const updateData = { displayName: newName };
-
-        if (hasNewImage && previewSrc.startsWith("data:image")) {
-          updateData.photoURL = previewSrc;
-        }
-
-        await updateProfile(user, {
-          displayName: newName,
-        });
-
-        await updateDoc(doc(db, "users", user.uid), updateData);
-
-        showToast("Perfil atualizado!", "success");
-        closeSettings();
-      } catch (error) {
-        console.error(error);
-        showToast("Erro ao atualizar.", "error");
-      } finally {
-        newBtn.innerText = originalText;
-        newBtn.disabled = false;
-      }
-    });
-  }
-}
-
-const logoutBtn = document.getElementById("logoutBtn");
 const modalLogoutBtn = document.getElementById("modalLogoutBtn");
 const confirmModal = document.getElementById("confirmModal");
 const acceptConfirmBtn = document.getElementById("acceptConfirmBtn");
 const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
+const settingsNameInput = document.getElementById("settingsNameInput");
+const settingsEmailInput = document.getElementById("settingsEmailInput");
+const xpBarFill = document.getElementById("xpBarFill");
+const xpText = document.getElementById("xpText");
+const ddLevel = document.getElementById("ddLevel");
+const ddUserName = document.getElementById("ddUserName");
+const userXP = document.getElementById("userXP");
+const userPlanNav = document.getElementById("userPlanNav");
+const userPlanMobile = document.getElementById("userPlanMobile");
+const navUserName = document.getElementById("navUserName");
+const greetingText = document.getElementById("greetingText");
+const mascotImage = document.getElementById("mascotImage");
+const mascotLevelText = document.getElementById("mascotLevelText");
+const generatedCount = document.getElementById("generatedCount");
+const generatedDetails = document.getElementById("generatedDetails");
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const ddAccountBtn = document.getElementById("ddAccountBtn");
+const settingsAvatarPreview = document.getElementById("settingsAvatarPreview");
+const settingsAvatarPlaceholder = document.getElementById("settingsAvatarPlaceholder");
+const avatarInput = document.getElementById("avatarInput");
 
-function openLogoutModal(e) {
-  if (e) e.preventDefault();
-  confirmModal.classList.add("active");
-}
-if (logoutBtn) logoutBtn.addEventListener("click", openLogoutModal);
-if (modalLogoutBtn) modalLogoutBtn.addEventListener("click", openLogoutModal);
-if (cancelConfirmBtn)
-  cancelConfirmBtn.addEventListener("click", () =>
-    confirmModal.classList.remove("active"),
-  );
+let currentUser = null;
+let chatHistory = [];
+const mascotLevels = [
+  "../bittinhos/bittinho-0.png",
+  "../bittinhos/bittinho-1.png",
+  "../bittinhos/bittinho-2.png",
+  "../bittinhos/bittinho-3.png",
+];
 
-if (acceptConfirmBtn)
-  acceptConfirmBtn.addEventListener("click", async () => {
-    await signOut(auth);
-    window.location.href = "../index.html";
-  });
-
-const profileDropdown = document.getElementById("profileDropdown");
-const profileBtn = document.getElementById("profileBtn");
-if (profileBtn)
-  profileBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    profileDropdown.classList.toggle("active");
-  });
-document.addEventListener("click", () => {
-  if (profileDropdown) profileDropdown.classList.remove("active");
-});
-
-// ==========================================
-// 5. VISUAIS E CHATBOT
-// ==========================================
-const tiltElements = document.querySelectorAll(".tilt-element");
-document.addEventListener("mousemove", (e) => {
-  if (window.innerWidth > 900) {
-    tiltElements.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      if (
-        x >= -50 &&
-        x <= rect.width + 50 &&
-        y >= -50 &&
-        y <= rect.height + 50
-      ) {
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -3;
-        const rotateY = ((x - centerX) / centerX) * 3;
-        el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-      } else {
-        el.style.transform =
-          "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)";
-      }
-    });
+// --- AUTH STATE ---
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    settingsEmailInput.value = user.email;
+    settingsNameInput.value = user.displayName || "Aluno";
+    navUserName.textContent = user.displayName || "Aluno";
+    greetingText.textContent = `Boa noite, ${user.displayName || "Aluno"}! 👋`;
+    ddUserName.textContent = user.displayName || "Aluno";
+    updatePlanDisplay();
+    loadUserStats();
+    loadUserAvatar();
+    const greetingHour = new Date().getHours();
+    if (greetingHour < 12) {
+      greetingText.textContent = `Bom dia, ${user.displayName || "Aluno"}! 🌅`;
+    } else if (greetingHour < 18) {
+      greetingText.textContent = `Boa tarde, ${user.displayName || "Aluno"}! ☀️`;
+    }
+  } else {
+    window.location.href = "login.html";
   }
 });
 
+// --- PLAN DISPLAY ---
+async function updatePlanDisplay() {
+  if (!currentUser) return;
+  const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+  if (!userDoc.exists()) return;
+  const plan = userDoc.data().plan || "free";
+  const planText =
+    plan === "free"
+      ? "FREE"
+      : plan === "monthly"
+        ? "MONTHLY"
+        : plan === "quarterly"
+          ? "QUARTERLY"
+          : "ANNUAL";
+  userPlanNav.textContent = planText;
+  userPlanMobile.textContent = planText;
+}
+
+// --- THEME TOGGLE ---
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const html = document.documentElement;
-    const current = html.getAttribute("data-theme");
-    const newTheme = current === "dark" ? "light" : "dark";
-    html.setAttribute("data-theme", newTheme);
-    localStorage.setItem("bitto_theme", newTheme);
-    updateThemeIcons(newTheme);
+    const sunIcon = document.querySelector(".icon-sun");
+    const moonIcon = document.querySelector(".icon-moon");
+    if (html.getAttribute("data-theme") === "dark") {
+      html.setAttribute("data-theme", "light");
+      if (sunIcon) sunIcon.style.display = "block";
+      if (moonIcon) moonIcon.style.display = "none";
+    } else {
+      html.setAttribute("data-theme", "dark");
+      if (sunIcon) sunIcon.display = "none";
+      if (moonIcon) moonIcon.style.display = "block";
+    }
   });
 }
 
-function updateThemeIcons(theme) {
-  const sun = document.querySelector(".icon-sun");
-  const moon = document.querySelector(".icon-moon");
-  if (theme === "dark" && sun && moon) {
-    sun.style.display = "none";
-    moon.style.display = "block";
-  } else if (sun && moon) {
-    sun.style.display = "block";
-    moon.style.display = "none";
-  }
+// --- PROFILE DROPDOWN ---
+if (profileBtn) {
+  profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileDropdown.style.display =
+      profileDropdown.style.display === "block" ? "none" : "block";
+  });
 }
 
-if (localStorage.getItem("bitto_theme") === "dark") updateThemeIcons("dark");
-else updateThemeIcons("light");
-
-function typeWriter(text, i) {
-  if (i < text.length) {
-    const target = document.getElementById("typewriterText");
-    if (target) {
-      target.innerHTML = text.substring(0, i + 1);
-      setTimeout(() => typeWriter(text, i + 1), 30);
-    }
-  }
-}
-document.addEventListener("DOMContentLoaded", () => {
-  typeWriter("Oi! Sou o Bitto. Vamos evoluir juntos?", 0);
+document.addEventListener("click", () => {
+  if (profileDropdown) profileDropdown.style.display = "none";
 });
 
-window.sendChip = (text) => {
-  if (chatInput) {
-    chatInput.value = text;
-    handleSend();
-  }
-};
+// --- MENU MOBILE ---
+if (hamburgerBtn) {
+  hamburgerBtn.addEventListener("click", () => {
+    mobileMenuOverlay.style.display = "block";
+    mobileMenu.style.display = "flex";
+  });
+}
 
+if (closeMenuBtn) {
+  closeMenuBtn.addEventListener("click", () => {
+    mobileMenuOverlay.style.display = "none";
+    mobileMenu.style.display = "none";
+  });
+}
+
+if (mobileMenuOverlay) {
+  mobileMenuOverlay.addEventListener("click", () => {
+    mobileMenuOverlay.style.display = "none";
+    mobileMenu.style.display = "none";
+  });
+}
+
+// --- SETTINGS MODAL ---
+if (navConfigBtn) {
+  navConfigBtn.addEventListener("click", () => {
+    settingsModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  });
+}
+
+if (mobileConfigBtn) {
+  mobileConfigBtn.addEventListener("click", () => {
+    mobileMenuOverlay.style.display = "none";
+    mobileMenu.style.display = "none";
+    settingsModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  });
+}
+
+if (closeSettingsBtn) {
+  closeSettingsBtn.addEventListener("click", () => {
+    settingsModal.style.display = "none";
+    document.body.style.overflow = "";
+  });
+}
+
+if (saveSettingsBtn) {
+  saveSettingsBtn.addEventListener("click", async () => {
+    if (!currentUser) return;
+    const newName = settingsNameInput.value;
+    try {
+      await updateProfile(currentUser, { displayName: newName });
+      await updateDoc(doc(db, "users", currentUser.uid), { name: newName });
+      navUserName.textContent = newName;
+      greetingText.textContent = `Boa noite, ${newName}! 👋`;
+      showToast("Perfil atualizado com sucesso!", "success");
+      settingsModal.style.display = "none";
+      document.body.style.overflow = "";
+    } catch (error) {
+      showToast("Erro ao salvar: " + error.message, "error");
+    }
+  });
+}
+
+// --- AVATAR ---
+if (avatarInput) {
+  avatarInput.addEventListener("change", async (e) => {
+    if (!currentUser || !e.target.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const dataURL = event.target.result;
+      settingsAvatarPreview.src = dataURL;
+      settingsAvatarPreview.style.display = "block";
+      if (settingsAvatarPlaceholder)
+        settingsAvatarPlaceholder.style.display = "none";
+      try {
+        await updateProfile(currentUser, { photoURL: dataURL });
+        loadUserAvatar();
+      } catch (error) {
+        showToast("Erro ao atualizar avatar: " + error.message, "error");
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  });
+}
+
+function loadUserAvatar() {
+  if (!currentUser) return;
+  const photoURL = currentUser.photoURL;
+  if (photoURL) {
+    settingsAvatarPreview.src = photoURL;
+    settingsAvatarPreview.style.display = "block";
+    if (settingsAvatarPlaceholder) settingsAvatarPlaceholder.style.display = "none";
+  } else {
+    settingsAvatarPreview.style.display = "none";
+    if (settingsAvatarPlaceholder)
+      settingsAvatarPlaceholder.style.display = "flex";
+  }
+}
+
+// --- LOGOUT ---
+function openConfirmLogout() {
+  confirmModal.style.display = "flex";
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", openConfirmLogout);
+}
+
+if (modalLogoutBtn) {
+  modalLogoutBtn.addEventListener("click", openConfirmLogout);
+}
+
+if (mobileLogoutBtn) {
+  mobileLogoutBtn.addEventListener("click", openConfirmLogout);
+}
+
+if (acceptConfirmBtn) {
+  acceptConfirmBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      window.location.href = "login.html";
+    } catch (error) {
+      showToast("Erro ao sair: " + error.message, "error");
+    }
+  });
+}
+
+if (cancelConfirmBtn) {
+  cancelConfirmBtn.addEventListener("click", () => {
+    confirmModal.style.display = "none";
+  });
+}
+
+// --- USER STATS ---
+async function loadUserStats() {
+  if (!currentUser) return;
+  const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+  if (!userDoc.exists()) return;
+  const userData = userDoc.data();
+  const xp = userData.xp || 0;
+  const level = Math.floor(xp / 100) + 1;
+  const xpProgress = xp % 100;
+  userXP.textContent = xp;
+  ddLevel.textContent = `Nível ${level}`;
+  mascotLevelText.textContent = `Nível ${level}`;
+  if (xpBarFill) xpBarFill.style.width = `${xpProgress}%`;
+  if (xpText) xpText.textContent = `${xpProgress} / 100 XP`;
+  if (mascotImage && mascotLevels[level - 1])
+    mascotImage.src = mascotLevels[level - 1];
+  const monthKey = new Date().toISOString().slice(0, 7);
+  const totalUsos =
+    (userData[`usage_flashcards_${monthKey}`] || 0) +
+    (userData[`usage_quiz_${monthKey}`] || 0) +
+    (userData[`usage_review_${monthKey}`] || 0);
+  generatedCount.textContent = `${totalUsos} Usos`;
+  generatedDetails.textContent = `${10 - (userData[`usage_flashcards_${monthKey}`] || 0)} Flashcards • ${3 - (userData[`usage_quiz_${monthKey}`] || 0)} Quiz • ${5 - (userData[`usage_review_${monthKey}`] || 0)} Review`;
+}
+
+// --- CHAT ---
 async function handleSend() {
+  if (!sendBtn || sendBtn.disabled) return;
   const text = chatInput.value.trim();
-  if (!text || sendBtn.disabled) return;
+  if (!text) return;
   sendBtn.disabled = true;
   chatInput.disabled = true;
   const originalBtnText = sendBtn.innerText;
@@ -524,21 +390,260 @@ if (chatInput)
   });
 
 // ========================================
+// 🎁 MODAL DE PLANOS - ASSINATURA
+// ========================================
+
+// Criar Modal de Planos
+function createPlansModal() {
+    const modal = document.createElement('div');
+    modal.id = 'plansModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(5px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        ">
+            <!-- CLOSE BUTTON -->
+            <button onclick="document.getElementById('plansModal').remove()" style="
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #666;
+            ">✕</button>
+
+            <!-- HEADER -->
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="color: #333; margin: 0 0 10px 0; font-size: 28px;">🚀 Escolha seu Plano</h1>
+                <p style="color: #666; margin: 0; font-size: 14px;">Efetue a assinatura com o email da sua conta para ativar seu plano</p>
+                <div style="background: #e3f2fd; color: #1976d2; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px; font-weight: 500;">
+                    📧 Email de assinatura: <strong>${currentUser?.email || 'Carregando...'}</strong>
+                </div>
+            </div>
+
+            <!-- AVISO IMPORTANTE -->
+            <div style="
+                background: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 15px;
+                border-radius: 6px;
+                margin-bottom: 30px;
+                font-size: 13px;
+                color: #856404;
+            ">
+                ⚠️ <strong>Importante:</strong> Use o email acima ao fazer a assinatura. Após o pagamento, seu plano será ativado automaticamente em até 2 minutos.
+            </div>
+
+            <!-- PLANS GRID -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                
+                <!-- PLANO MENSAL -->
+                <div style="
+                    border: 2px solid #4db6ac;
+                    border-radius: 12px;
+                    padding: 25px;
+                    text-align: center;
+                    background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+                ">
+                    <h2 style="color: #00695c; margin: 0 0 10px 0; font-size: 22px;">📅 Mensal</h2>
+                    <div style="font-size: 32px; color: #00897b; font-weight: bold; margin: 15px 0;">R\$ 29,90</div>
+                    <p style="color: #00695c; font-size: 12px; margin: 0 0 20px 0;">/mês</p>
+                    
+                    <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
+                        <li style="padding: 8px 0; color: #00695c; font-size: 13px;">✅ Flashcards Ilimitados</li>
+                        <li style="padding: 8px 0; color: #00695c; font-size: 13px;">✅ Quizzes Ilimitados</li>
+                        <li style="padding: 8px 0; color: #00695c; font-size: 13px;">✅ Reviews Ilimitados</li>
+                        <li style="padding: 8px 0; color: #00695c; font-size: 13px;">✅ IA Sem Limite</li>
+                        <li style="padding: 8px 0; color: #00695c; font-size: 13px;">✅ Suporte Prioritário</li>
+                    </ul>
+                    
+                    <a href="https://pay.cakto.com.br/ar6yxop_697009" target="_blank" style="
+                        display: inline-block;
+                        background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);
+                        color: white;
+                        padding: 12px 30px;
+                        border-radius: 6px;
+                        text-decoration: none;
+                        font-weight: bold;
+                        margin-top: 15px;
+                        transition: all 0.3s;
+                        border: none;
+                        cursor: pointer;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(77, 182, 172, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        Assinar Agora →
+                    </a>
+                </div>
+
+                <!-- PLANO TRIMESTRAL (RECOMENDADO) -->
+                <div style="
+                    border: 3px solid #ff9800;
+                    border-radius: 12px;
+                    padding: 25px;
+                    text-align: center;
+                    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+                    position: relative;
+                ">
+                    <div style="
+                        position: absolute;
+                        top: -12px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: #ff9800;
+                        color: white;
+                        padding: 4px 16px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: bold;
+                    ">⭐ MAIS ECONOMICO</div>
+                    
+                    <h2 style="color: #e65100; margin: 15px 0 10px 0; font-size: 22px;">📆 Trimestral</h2>
+                    <div style="font-size: 32px; color: #f57c00; font-weight: bold; margin: 15px 0;">R\$ 69,90</div>
+                    <p style="color: #e65100; font-size: 12px; margin: 0 0 20px 0;">3 meses (R\$ 23,30/mês)</p>
+                    
+                    <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
+                        <li style="padding: 8px 0; color: #e65100; font-size: 13px;">✅ Flashcards Ilimitados</li>
+                        <li style="padding: 8px 0; color: #e65100; font-size: 13px;">✅ Quizzes Ilimitados</li>
+                        <li style="padding: 8px 0; color: #e65100; font-size: 13px;">✅ Reviews Ilimitados</li>
+                        <li style="padding: 8px 0; color: #e65100; font-size: 13px;">✅ IA Sem Limite</li>
+                        <li style="padding: 8px 0; color: #e65100; font-size: 13px;">✅ Suporte Prioritário</li>
+                        <li style="padding: 8px 0; color: #e65100; font-size: 13px; font-weight: bold;">🎁 Economize R\$ 19,80</li>
+                    </ul>
+                    
+                    <a href="https://pay.cakto.com.br/emb9kxo_700051" target="_blank" style="
+                        display: inline-block;
+                        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                        color: white;
+                        padding: 12px 30px;
+                        border-radius: 6px;
+                        text-decoration: none;
+                        font-weight: bold;
+                        margin-top: 15px;
+                        transition: all 0.3s;
+                        border: none;
+                        cursor: pointer;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(255, 152, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        Assinar Agora →
+                    </a>
+                </div>
+
+                <!-- PLANO ANUAL -->
+                <div style="
+                    border: 2px solid #9c27b0;
+                    border-radius: 12px;
+                    padding: 25px;
+                    text-align: center;
+                    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+                ">
+                    <h2 style="color: #6a1b9a; margin: 0 0 10px 0; font-size: 22px;">📅 Anual</h2>
+                    <div style="font-size: 32px; color: #7b1fa2; font-weight: bold; margin: 15px 0;">R\$ 199,90</div>
+                    <p style="color: #6a1b9a; font-size: 12px; margin: 0 0 20px 0;">12 meses (R\$ 16,66/mês)</p>
+                    
+                    <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
+                        <li style="padding: 8px 0; color: #6a1b9a; font-size: 13px;">✅ Flashcards Ilimitados</li>
+                        <li style="padding: 8px 0; color: #6a1b9a; font-size: 13px;">✅ Quizzes Ilimitados</li>
+                        <li style="padding: 8px 0; color: #6a1b9a; font-size: 13px;">✅ Reviews Ilimitados</li>
+                        <li style="padding: 8px 0; color: #6a1b9a; font-size: 13px;">✅ IA Sem Limite</li>
+                        <li style="padding: 8px 0; color: #6a1b9a; font-size: 13px;">✅ Suporte Prioritário</li>
+                        <li style="padding: 8px 0; color: #6a1b9a; font-size: 13px; font-weight: bold;">🎁 Economize R\$ 158,80</li>
+                    </ul>
+                    
+                    <a href="https://pay.cakto.com.br/4mobwhi" target="_blank" style="
+                        display: inline-block;
+                        background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+                        color: white;
+                        padding: 12px 30px;
+                        border-radius: 6px;
+                        text-decoration: none;
+                        font-weight: bold;
+                        margin-top: 15px;
+                        transition: all 0.3s;
+                        border: none;
+                        cursor: pointer;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(156, 39, 176, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        Assinar Agora →
+                    </a>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div style="
+                background: #f5f5f5;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                font-size: 12px;
+                color: #666;
+            ">
+                ✅ Pagamento seguro com PIX ou Cartão de Crédito<br/>
+                ✅ Cancelamento a qualquer momento<br/>
+                ✅ Acesso imediato após confirmação do pagamento
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    // Fechar ao clicar fora
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+// Função para abrir modal de planos
+window.openPlansModal = function() {
+    createPlansModal();
+};
+
+// ========================================
 // 🔐 FUNÇÕES DE ASSINATURA E STATUS
 // ========================================
 
 // Carregar e exibir status de assinatura
 async function loadSubscriptionStatus(userId) {
-  try {
-    const response = await fetch(`/api/webhooks/cakto-status?userId=${userId}`);
-    const data = await response.json();
-
-    const statusEl = document.getElementById("subscription-status");
-
-    if (!statusEl) return;
-
-    if (data.isActive) {
-      statusEl.innerHTML = `
+    try {
+        console.log("📊 Carregando status para usuário:", userId);
+        
+        const response = await fetch(`/api/webhooks/cakto-status?userId=${userId}`);
+        const data = await response.json();
+        
+        console.log("📊 Dados recebidos:", data);
+        
+        const statusEl = document.getElementById('subscription-status');
+        
+        if (!statusEl) {
+            console.error("❌ Elemento 'subscription-status' não encontrado!");
+            return;
+        }
+        
+        if (data.isActive) {
+            console.log("✅ Usuário com plano ATIVO:", data.plan);
+            statusEl.innerHTML = `
                 <div style="
                     padding: 15px; 
                     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
@@ -552,8 +657,9 @@ async function loadSubscriptionStatus(userId) {
                     <small style="color: #689f38;">Acesso: ILIMITADO • Flashcards + Quiz + Review</small>
                 </div>
             `;
-    } else {
-      statusEl.innerHTML = `
+        } else {
+            console.log("⏳ Usuário com plano GRATUITO");
+            statusEl.innerHTML = `
                 <div style="
                     padding: 15px; 
                     background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); 
@@ -564,7 +670,7 @@ async function loadSubscriptionStatus(userId) {
                 ">
                     <strong style="color: #e65100; font-size: 16px;">⏳ Plano GRATUITO</strong><br/>
                     <small style="color: #bf360c; font-size: 13px;">📊 Limite: <strong>10 Flashcards/mês</strong> • <strong>3 Quizzes/mês</strong> • <strong>5 Reviews/mês</strong></small><br/>
-                    <button onclick="window.location.href='https://pay.cakto.com.br/ar6yxop_697009'" style="
+                    <button onclick="openPlansModal()" style="
                         margin-top: 10px; 
                         padding: 10px 20px; 
                         background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);
@@ -581,15 +687,30 @@ async function loadSubscriptionStatus(userId) {
                     </button>
                 </div>
             `;
+        }
+    } catch (error) {
+        console.error("❌ Erro ao carregar status de assinatura:", error);
     }
-  } catch (error) {
-    console.error("Erro ao carregar status de assinatura:", error);
-  }
 }
 
-// Chamar quando usuário faz login
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    loadSubscriptionStatus(user.uid);
-  }
+// Chamar quando página carrega e usuário está logado
+console.log("🔄 Script carregado, aguardando usuário...");
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("✅ Usuário detectado:", user.uid, user.email);
+        console.log("⏳ Carregando status de assinatura...");
+        
+        // Pequeno delay para garantir que o elemento existe
+        setTimeout(() => {
+            loadSubscriptionStatus(user.uid);
+        }, 500);
+    } else {
+        console.log("❌ Nenhum usuário logado");
+    }
 });
+
+// Adicionar Firebase imports no topo do arquivo
+import { db } from "./firebase-init.js";
+import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { updateProfile, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
