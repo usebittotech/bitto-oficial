@@ -522,3 +522,74 @@ if (chatInput)
       handleSend();
     }
   });
+
+// ========================================
+// 🔐 FUNÇÕES DE ASSINATURA E STATUS
+// ========================================
+
+// Carregar e exibir status de assinatura
+async function loadSubscriptionStatus(userId) {
+  try {
+    const response = await fetch(`/api/webhooks/cakto-status?userId=${userId}`);
+    const data = await response.json();
+
+    const statusEl = document.getElementById("subscription-status");
+
+    if (!statusEl) return;
+
+    if (data.isActive) {
+      statusEl.innerHTML = `
+                <div style="
+                    padding: 15px; 
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
+                    border-radius: 8px; 
+                    margin: 15px 0;
+                    border-left: 4px solid #4db6ac;
+                    box-shadow: 0 2px 8px rgba(77, 182, 172, 0.2);
+                ">
+                    <strong style="color: #2e7d32; font-size: 16px;">✅ Plano ${data.plan.toUpperCase()} ATIVO</strong><br/>
+                    <span style="color: #558b2f; font-size: 14px;">⏳ Válido por ${data.daysLeft} dias</span><br/>
+                    <small style="color: #689f38;">Acesso: ILIMITADO • Flashcards + Quiz + Review</small>
+                </div>
+            `;
+    } else {
+      statusEl.innerHTML = `
+                <div style="
+                    padding: 15px; 
+                    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); 
+                    border-radius: 8px; 
+                    margin: 15px 0;
+                    border-left: 4px solid #ff9800;
+                    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+                ">
+                    <strong style="color: #e65100; font-size: 16px;">⏳ Plano GRATUITO</strong><br/>
+                    <small style="color: #bf360c; font-size: 13px;">📊 Limite: <strong>10 Flashcards/mês</strong> • <strong>3 Quizzes/mês</strong> • <strong>5 Reviews/mês</strong></small><br/>
+                    <button onclick="window.location.href='https://pay.cakto.com.br/ar6yxop_697009'" style="
+                        margin-top: 10px; 
+                        padding: 10px 20px; 
+                        background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);
+                        color: white; 
+                        border: none; 
+                        border-radius: 6px; 
+                        cursor: pointer;
+                        font-weight: bold;
+                        font-size: 14px;
+                        box-shadow: 0 4px 12px rgba(77, 182, 172, 0.3);
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(77, 182, 172, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(77, 182, 172, 0.3)'">
+                        🚀 Assinar Agora →
+                    </button>
+                </div>
+            `;
+    }
+  } catch (error) {
+    console.error("Erro ao carregar status de assinatura:", error);
+  }
+}
+
+// Chamar quando usuário faz login
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    loadSubscriptionStatus(user.uid);
+  }
+});
