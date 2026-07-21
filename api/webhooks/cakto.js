@@ -1,6 +1,5 @@
 import admin from "firebase-admin";
 
-// ========== INICIALIZAR FIREBASE ==========
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -14,28 +13,21 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const auth = admin.auth();
 
-// ========== HANDLER PRINCIPAL ==========
 export default async function handler(req, res) {
-  // 1. VERIFICAR MÉTODO HTTP
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
-
-  // NOTA: A Cakto NÃO envia o "Chave secreta do webhook" em nenhum header.
-  // O campo existe na UI da Cakto mas não é usado para assinar os requests.
-  // Segurança garantida pela URL privada do endpoint.
 
   const payload = req.body;
   const data = payload.data || payload;
   const eventName = payload.event || data.event || "";
   const status = data.status || data.state || "";
 
-  // 2. EXTRAIR DADOS DO CLIENTE
   const userEmail =
     data.customer?.email || data.client?.email || data.payer?.email;
   const userName =
     data.customer?.name || data.client?.name || "Estudante BITTO";
-  const customerId = data.customer?.id || data.client?.id;
+  const customerId = data.customer?.id || data.client?.id || null;
 
   console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -47,13 +39,12 @@ export default async function handler(req, res) {
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   `);
 
-  // 3. VALIDAR EMAIL
   if (!userEmail) {
     console.log("❌ Ignorado: Email não encontrado no payload");
     return res.json({ message: "Email missing" });
   }
 
-  // 4. ========== LÓGICA DE REVOGAÇÃO ==========
+  // ========== REVOGAÇÃO ==========
   if (
     ["refund", "chargeback", "purchase_refused"].includes(eventName) ||
     status === "refunded" ||
@@ -78,7 +69,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // 5. ========== VERIFICAR SE É PAGAMENTO APROVADO ==========
+  // ========== VERIFICAR APROVAÇÃO ==========
   const isApproved =
     eventName === "purchase_approved" ||
     eventName === "subscription_renewed" ||
@@ -86,20 +77,20 @@ export default async function handler(req, res) {
     status === "approved";
 
   if (!isApproved) {
-    console.log(`⏳ Evento [${eventName}] recebido — aguardando pagamento`);
+    console.log(`⏳ Evento [${eventName}] — aguardando pagamento`);
     return res.json({ message: "Payment pending" });
   }
 
-  // 6. ========== PROCESSAR PAGAMENTO APROVADO ==========
+  // ========== PROCESSAR PAGAMENTO APROVADO ==========
   try {
     const productName = data.product?.name || data.offer?.name || "";
-    const orderId = data.id || data.order_id;
+    const orderId = data.id || data.order_id || `webhook_${Date.now()}`;
 
     console.log(
       `💰 PAGAMENTO CONFIRMADO! Produto: "${productName}" | Order: ${orderId}`,
     );
 
-    // ===== DETERMINAR TIPO DE PLANO =====
+    // DETERMINAR PLANO
     let monthsToAdd = 1;
     let planType = "monthly";
 
@@ -121,7 +112,6 @@ export default async function handler(req, res) {
       planType = "annual";
     }
 
-    // ===== CALCULAR DATA DE EXPIRAÇÃO =====
     const now = new Date();
     const endDate = new Date(
       now.getTime() + monthsToAdd * 30 * 24 * 60 * 60 * 1000,
@@ -131,7 +121,7 @@ export default async function handler(req, res) {
       `📅 Plano: ${planType.toUpperCase()} | ${monthsToAdd} mês(es) | Vence: ${endDate.toLocaleDateString("pt-BR")}`,
     );
 
-    // ===== BUSCAR OU CRIAR USUÁRIO NO FIREBASE =====
+    // BUSCAR OU CRIAR USUÁRIO
     let userRecord;
     let isNewUser = false;
 
@@ -153,7 +143,14 @@ export default async function handler(req, res) {
       }
     }
 
-    // ===== MONTAR DADOS DO USUÁRIO =====
+    // Histórico usa ISO string — serverTimestamp() não funciona dentro de arrays
+    const historyEntry = {
+      plan: planType,
+      startDate: now.toISOString(),
+      endDate: endDate.toISOString(),
+      orderId: orderId,
+    };
+
     const userData = {
       name: userName,
       email: userEmail,
@@ -161,35 +158,20 @@ export default async function handler(req, res) {
       subscriptionEnd: admin.firestore.Timestamp.fromDate(endDate),
       subscriptionStatus: "active",
       billingCycle: planType,
-      customerId: customerId || null,
+      customerId: customerId,
       lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
-      lastPaymentId: orderId || `webhook_${Date.now()}`,
+      lastPaymentId: orderId,
       lastPaymentEvent: eventName,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      subscriptionHistory: admin.firestore.FieldValue.arrayUnion(historyEntry),
     };
 
     if (isNewUser) {
       userData.createdAt = admin.firestore.FieldValue.serverTimestamp();
       userData.usage = { flashcards: 0, quiz: 0, review: 0 };
       userData.xp = 0;
-      userData.subscriptionHistory = [
-        {
-          plan: planType,
-          startDate: admin.firestore.FieldValue.serverTimestamp(),
-          endDate: admin.firestore.Timestamp.fromDate(endDate),
-          orderId: orderId || null,
-        },
-      ];
-    } else {
-      userData.subscriptionHistory = admin.firestore.FieldValue.arrayUnion({
-        plan: planType,
-        startDate: admin.firestore.FieldValue.serverTimestamp(),
-        endDate: admin.firestore.Timestamp.fromDate(endDate),
-        orderId: orderId || null,
-      });
     }
 
-    // ===== SALVAR NO FIRESTORE =====
     await db
       .collection("users")
       .doc(userRecord.uid)
