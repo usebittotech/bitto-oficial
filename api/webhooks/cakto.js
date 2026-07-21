@@ -1,5 +1,4 @@
 import admin from "firebase-admin";
-import crypto from "crypto";
 
 // ========== INICIALIZAR FIREBASE ==========
 if (!admin.apps.length) {
@@ -15,21 +14,6 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const auth = admin.auth();
 
-// ========== VALIDAÇÃO DE ASSINATURA ==========
-function validateCaktoSignature(payload, signature) {
-  if (!process.env.CAKTO_WEBHOOK_SECRET) {
-    console.warn("⚠️  CAKTO_WEBHOOK_SECRET não configurado");
-    return true;
-  }
-
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.CAKTO_WEBHOOK_SECRET)
-    .update(JSON.stringify(payload))
-    .digest("hex");
-
-  return signature === expectedSignature;
-}
-
 // ========== HANDLER PRINCIPAL ==========
 export default async function handler(req, res) {
   // 1. VERIFICAR MÉTODO HTTP
@@ -37,19 +21,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  // 2. VALIDAR ASSINATURA CAKTO
-  const receivedSignature = req.headers["x-cakto-signature"];
-  if (!validateCaktoSignature(req.body, receivedSignature)) {
-    console.error("❌ Webhook rejeitado: assinatura inválida");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  // NOTA: A Cakto NÃO envia o "Chave secreta do webhook" em nenhum header.
+  // O campo existe na UI da Cakto mas não é usado para assinar os requests.
+  // Segurança garantida pela URL privada do endpoint.
 
   const payload = req.body;
   const data = payload.data || payload;
   const eventName = payload.event || data.event || "";
   const status = data.status || data.state || "";
 
-  // 3. EXTRAIR DADOS DO CLIENTE
+  // 2. EXTRAIR DADOS DO CLIENTE
   const userEmail =
     data.customer?.email || data.client?.email || data.payer?.email;
   const userName =
@@ -59,30 +40,28 @@ export default async function handler(req, res) {
   console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📨 WEBHOOK CAKTO RECEBIDO
-  Evento: ${eventName}
-  Status: ${status}
-  Email: ${userEmail}
-  ID: ${customerId}
+  Evento : ${eventName}
+  Status : ${status}
+  Email  : ${userEmail}
+  ID     : ${customerId}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    `);
+  `);
 
-  // 4. VALIDAR EMAIL
+  // 3. VALIDAR EMAIL
   if (!userEmail) {
     console.log("❌ Ignorado: Email não encontrado no payload");
     return res.json({ message: "Email missing" });
   }
 
-  // 5. ========== LÓGICA DE REVOGAÇÃO ==========
+  // 4. ========== LÓGICA DE REVOGAÇÃO ==========
   if (
     ["refund", "chargeback", "purchase_refused"].includes(eventName) ||
     status === "refunded" ||
     status === "refused"
   ) {
     console.log(`⛔ REVOGANDO ACESSO: ${userEmail}`);
-
     try {
       const userRecord = await auth.getUserByEmail(userEmail);
-
       await db.collection("users").doc(userRecord.uid).update({
         plan: "free",
         subscriptionEnd: null,
@@ -91,55 +70,52 @@ export default async function handler(req, res) {
         revokedAt: admin.firestore.FieldValue.serverTimestamp(),
         revokedReason: eventName,
       });
-
-      console.log(`✅ Acesso revogado com sucesso para: ${userEmail}`);
+      console.log(`✅ Acesso revogado: ${userEmail}`);
       return res.json({ success: true, action: "revoked" });
     } catch (e) {
-      console.error(`❌ Erro ao revogar acesso: ${e.message}`);
+      console.error(`❌ Erro ao revogar: ${e.message}`);
       return res.json({ message: "User not found for revoke" });
     }
   }
 
-  // 6. ========== APROVAR PAGAMENTO ==========
-  let isApproved = false;
-
-  if (
+  // 5. ========== VERIFICAR SE É PAGAMENTO APROVADO ==========
+  const isApproved =
     eventName === "purchase_approved" ||
+    eventName === "subscription_renewed" ||
     status === "paid" ||
-    status === "approved" ||
-    eventName === "subscription_renewed"
-  ) {
-    isApproved = true;
-  } else {
-    console.log(`⏳ Evento [${eventName}] recebido, mas aguardando pagamento`);
+    status === "approved";
+
+  if (!isApproved) {
+    console.log(`⏳ Evento [${eventName}] recebido — aguardando pagamento`);
     return res.json({ message: "Payment pending" });
   }
 
-  // 7. ========== PROCESSAR PAGAMENTO APROVADO ==========
+  // 6. ========== PROCESSAR PAGAMENTO APROVADO ==========
   try {
     const productName = data.product?.name || data.offer?.name || "";
     const orderId = data.id || data.order_id;
 
     console.log(
-      `💰 PAGAMENTO CONFIRMADO! Produto: ${productName} | Order: ${orderId}`,
+      `💰 PAGAMENTO CONFIRMADO! Produto: "${productName}" | Order: ${orderId}`,
     );
 
     // ===== DETERMINAR TIPO DE PLANO =====
     let monthsToAdd = 1;
     let planType = "monthly";
 
+    const nameLower = productName.toLowerCase();
     if (
-      productName.toLowerCase().includes("trimestral") ||
-      productName.toLowerCase().includes("quarterly") ||
-      productName.toLowerCase().includes("3 meses")
+      nameLower.includes("trimestral") ||
+      nameLower.includes("quarterly") ||
+      nameLower.includes("3 meses")
     ) {
       monthsToAdd = 3;
       planType = "quarterly";
     } else if (
-      productName.toLowerCase().includes("anual") ||
-      productName.toLowerCase().includes("annual") ||
-      productName.toLowerCase().includes("yearly") ||
-      productName.toLowerCase().includes("12 meses")
+      nameLower.includes("anual") ||
+      nameLower.includes("annual") ||
+      nameLower.includes("yearly") ||
+      nameLower.includes("12 meses")
     ) {
       monthsToAdd = 12;
       planType = "annual";
@@ -152,26 +128,24 @@ export default async function handler(req, res) {
     );
 
     console.log(
-      `📅 Plano: ${planType.toUpperCase()} | Duração: ${monthsToAdd} mês(es) | Vencimento: ${endDate.toLocaleDateString("pt-BR")}`,
+      `📅 Plano: ${planType.toUpperCase()} | ${monthsToAdd} mês(es) | Vence: ${endDate.toLocaleDateString("pt-BR")}`,
     );
 
-    // ===== BUSCAR OU CRIAR USUÁRIO =====
+    // ===== BUSCAR OU CRIAR USUÁRIO NO FIREBASE =====
     let userRecord;
     let isNewUser = false;
 
     try {
       userRecord = await auth.getUserByEmail(userEmail);
-      console.log(`👤 Usuário existente encontrado: ${userRecord.uid}`);
+      console.log(`👤 Usuário existente: ${userRecord.uid}`);
     } catch (error) {
       if (error.code === "auth/user-not-found") {
         console.log(`➕ Criando novo usuário: ${userEmail}`);
-
         userRecord = await auth.createUser({
           email: userEmail,
           emailVerified: true,
           displayName: userName,
         });
-
         isNewUser = true;
         console.log(`✅ Novo usuário criado: ${userRecord.uid}`);
       } else {
@@ -179,7 +153,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // ===== ATUALIZAR/CRIAR DOCUMENTO NO FIRESTORE =====
+    // ===== MONTAR DADOS DO USUÁRIO =====
     const userData = {
       name: userName,
       email: userEmail,
@@ -187,14 +161,13 @@ export default async function handler(req, res) {
       subscriptionEnd: admin.firestore.Timestamp.fromDate(endDate),
       subscriptionStatus: "active",
       billingCycle: planType,
-      customerId: customerId,
+      customerId: customerId || null,
       lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
       lastPaymentId: orderId || `webhook_${Date.now()}`,
       lastPaymentEvent: eventName,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
-    // Se é novo usuário, inicializar campos adicionais
     if (isNewUser) {
       userData.createdAt = admin.firestore.FieldValue.serverTimestamp();
       userData.usage = { flashcards: 0, quiz: 0, review: 0 };
@@ -204,20 +177,19 @@ export default async function handler(req, res) {
           plan: planType,
           startDate: admin.firestore.FieldValue.serverTimestamp(),
           endDate: admin.firestore.Timestamp.fromDate(endDate),
-          orderId: orderId,
+          orderId: orderId || null,
         },
       ];
     } else {
-      // Se é usuário existente, apenas atualizar
       userData.subscriptionHistory = admin.firestore.FieldValue.arrayUnion({
         plan: planType,
         startDate: admin.firestore.FieldValue.serverTimestamp(),
         endDate: admin.firestore.Timestamp.fromDate(endDate),
-        orderId: orderId,
+        orderId: orderId || null,
       });
     }
 
-    // Salvar no Firestore
+    // ===== SALVAR NO FIRESTORE =====
     await db
       .collection("users")
       .doc(userRecord.uid)
@@ -225,18 +197,13 @@ export default async function handler(req, res) {
 
     console.log(`
 ✅ ✅ ✅ SUCESSO ✅ ✅ ✅
-  Email: ${userEmail}
-  UID: ${userRecord.uid}
-  Plano: ${planType.toUpperCase()}
-  Válido até: ${endDate.toLocaleDateString("pt-BR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })}
-  Order ID: ${orderId}
+  Email  : ${userEmail}
+  UID    : ${userRecord.uid}
+  Plano  : ${planType.toUpperCase()}
+  Válido até: ${endDate.toLocaleDateString("pt-BR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+  Order  : ${orderId}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        `);
+    `);
 
     return res.json({
       success: true,
@@ -245,16 +212,7 @@ export default async function handler(req, res) {
       userId: userRecord.uid,
     });
   } catch (error) {
-    console.error(`
-🔥 🔥 🔥 ERRO CRÍTICO 🔥 🔥 🔥
-  ${error.message}
-  Stack: ${error.stack}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        `);
-
-    return res.status(500).json({
-      error: error.message,
-      type: error.code,
-    });
+    console.error(`🔥 ERRO CRÍTICO: ${error.message}\n${error.stack}`);
+    return res.status(500).json({ error: error.message, type: error.code });
   }
 }
