@@ -1911,12 +1911,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .features-list {
     gap: 44px;
   }
-  .feature-row {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    direction: ltr;
-  }
+  .feature-row,
   .feature-row-reverse {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     direction: ltr;
   }
   .feature-text {
@@ -1928,6 +1927,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     min-height: auto;
     padding: 28px 20px;
     border-radius: 20px;
+  }
+  .feature-visual-screenshots {
+    order: 2;
   }
   .feature-badge {
     font-size: 0.76rem;
@@ -2553,5 +2555,237 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .plan-card,
   .plan-card.featured {
     max-width: 360px;
+  }
+}
+
+/* ==============================================
+   GALERIA DE SCREENSHOTS — FERRAMENTAS
+   ============================================== */
+
+/* Substitui o feature-visual por screenshots reais */
+.feature-visual-screenshots {
+  width: 100%;
+}
+
+.screenshots-gallery {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.13);
+  background: #f0f2fa;
+}
+
+.screenshot-main {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: #e8eaf4;
+}
+
+.screenshot-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: block;
+}
+
+.screenshot-img.active {
+  opacity: 1;
+}
+
+.screenshot-thumbs {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  background: #f0f2fa;
+}
+
+.thumb-btn {
+  flex: 1;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  aspect-ratio: 16/10;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  display: block;
+}
+
+.thumb-btn:hover {
+  border-color: rgba(0, 53, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.thumb-btn.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* ==============================================
+   CTA APÓS SEÇÃO DE FERRAMENTAS
+   ============================================== */
+.features-cta-block {
+  text-align: center;
+  margin: 64px auto 0;
+  padding: 48px 32px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 53, 255, 0.05) 0%,
+    rgba(204, 255, 0, 0.07) 100%
+  );
+  border-radius: 24px;
+  border: 1px solid rgba(0, 53, 255, 0.1);
+  max-width: 700px;
+}
+
+.features-cta-block p {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 24px;
+}
+
+.features-cta-block .btn-main {
+  font-size: 1.05rem;
+  padding: 1.1rem 2.5rem;
+}
+
+/* ==============================================
+   DEMO GRID — 5 VÍDEOS (2+3 ou wrap)
+   ============================================== */
+
+/* Grade flexível: os 2 destaques ficam maiores */
+.demo-grid-5 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Os 2 primeiros da segunda linha ficam em linha separada */
+.demo-grid-5 .demo-card:nth-child(1) {
+  grid-column: 1 / 2;
+}
+.demo-grid-5 .demo-card:nth-child(2) {
+  grid-column: 2 / 3;
+}
+.demo-grid-5 .demo-card:nth-child(3) {
+  grid-column: 3 / 4;
+}
+.demo-grid-5 .demo-card:nth-child(4) {
+  grid-column: 1 / 2;
+}
+.demo-grid-5 .demo-card:nth-child(5) {
+  grid-column: 2 / 3;
+}
+
+/* Cards de destaque */
+.demo-card-featured {
+  border-color: rgba(204, 255, 0, 0.25) !important;
+  background: rgba(204, 255, 0, 0.04) !important;
+  position: relative;
+}
+
+.demo-card-featured::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 24px;
+  border: 1px solid rgba(204, 255, 0, 0.3);
+  pointer-events: none;
+}
+
+.demo-badge-hot {
+  background: rgba(204, 255, 0, 0.2);
+  color: var(--accent);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* iFrame YouTube dentro dos demo-cards */
+.demo-video-wrap iframe {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 14px;
+  border: none;
+  display: block;
+  background: #000;
+}
+
+/* ==============================================
+   BADGE LARANJA — PLANNER
+   ============================================== */
+.badge-orange {
+  background: rgba(251, 146, 60, 0.12);
+  color: #c2550a;
+}
+
+/* ==============================================
+   RESPONSIVO — GALERIA E DEMO 5
+   ============================================== */
+@media (max-width: 900px) {
+  .demo-grid-5 {
+    grid-template-columns: 1fr;
+  }
+  .demo-grid-5 .demo-card:nth-child(n) {
+    grid-column: auto;
+  }
+
+  .features-cta-block {
+    padding: 32px 20px;
+    margin: 40px auto 0;
+  }
+  .features-cta-block p {
+    font-size: 1.1rem;
+  }
+  .features-cta-block .btn-main {
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .screenshot-thumbs {
+    gap: 4px;
+    padding: 8px;
+  }
+  .thumb-btn {
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .demo-badge-hot {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+  }
+  .features-cta-block p {
+    font-size: 1rem;
+  }
+  .screenshot-thumbs {
+    padding: 6px;
+    gap: 3px;
   }
 }
