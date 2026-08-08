@@ -3,449 +3,1084 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Embaixadores Bitto | Programa de Parceria</title>
+    <title>Embaixadores Bitto | Ganhe Comissão Recorrente</title>
     <link rel="icon" type="image/png" href="/imagens/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="loading.css" />
+    <style>
+      :root {
+        --bg: #08090c;
+        --surface: #0f1117;
+        --surface-2: #16191f;
+        --border: rgba(255, 255, 255, 0.07);
+        --text: #f0f2f8;
+        --muted: #6b7280;
+        --muted-2: #9ca3af;
+        --blue: #0035ff;
+        --accent: #ccff00;
+        --accent-dim: rgba(204, 255, 0, 0.12);
+        --font-h: "Outfit", sans-serif;
+        --font-b: "Inter", sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-b);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 100;
+        background: rgba(8, 9, 12, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        height: 68px;
+        display: flex;
+        align-items: center;
+      }
+      .nav-inner {
+        max-width: 1100px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .logo {
+        font-family: var(--font-h);
+        font-weight: 900;
+        font-size: 1.5rem;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .logo span {
+        color: var(--blue);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .nav-link {
+        font-size: 0.85rem;
+        color: var(--muted-2);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .nav-link:hover {
+        color: var(--text);
+      }
+      .btn-nav {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-size: 0.83rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .btn-nav:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        background: #1e2230;
+      }
+
+      /* FOMO TICKER */
+      .ticker {
+        background: rgba(204, 255, 0, 0.06);
+        border-bottom: 1px solid rgba(204, 255, 0, 0.15);
+        overflow: hidden;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        margin-top: 68px;
+      }
+      .ticker-track {
+        display: flex;
+        gap: 0;
+        animation: ticker 28s linear infinite;
+        white-space: nowrap;
+      }
+      .ticker-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--muted-2);
+        padding: 0 40px;
+      }
+      .ticker-item .hi {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      @keyframes ticker {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* HERO */
+      .hero {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 100px 24px 80px;
+        text-align: center;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(204, 255, 0, 0.25);
+        color: var(--accent);
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 32px;
+      }
+      .hero h1 {
+        font-family: var(--font-h);
+        font-size: clamp(2.6rem, 5vw, 4rem);
+        font-weight: 900;
+        line-height: 1.08;
+        margin-bottom: 20px;
+        letter-spacing: -0.02em;
+      }
+      .hero h1 .accent {
+        color: var(--accent);
+      }
+      .hero p {
+        font-size: 1.1rem;
+        color: var(--muted-2);
+        max-width: 520px;
+        margin: 0 auto 40px;
+        line-height: 1.7;
+      }
+      .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: #08090c;
+        padding: 16px 36px;
+        border-radius: 12px;
+        font-family: var(--font-h);
+        font-size: 1rem;
+        font-weight: 800;
+        text-decoration: none;
+        transition: all 0.2s;
+        letter-spacing: 0.01em;
+      }
+      .btn-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(204, 255, 0, 0.25);
+      }
+
+      /* NÚMEROS */
+      .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        max-width: 580px;
+        margin: 64px auto 0;
+        background: var(--surface);
+      }
+      .stat-box {
+        flex: 1;
+        padding: 28px 20px;
+        text-align: center;
+        border-right: 1px solid var(--border);
+      }
+      .stat-box:last-child {
+        border-right: none;
+      }
+      .stat-val {
+        font-family: var(--font-h);
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--accent);
+        display: block;
+        margin-bottom: 4px;
+      }
+      .stat-lbl {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      /* CALCULADORA */
+      .section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 80px 24px;
+      }
+      .section-label {
+        text-align: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+      .section-title {
+        font-family: var(--font-h);
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 48px;
+        line-height: 1.2;
+      }
+
+      .calc-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .calc-result {
+        background: rgba(204, 255, 0, 0.06);
+        border: 1px solid rgba(204, 255, 0, 0.2);
+        border-radius: 14px;
+        padding: 28px;
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .calc-label-sm {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+      }
+      .calc-big {
+        font-family: var(--font-h);
+        font-size: 3.2rem;
+        font-weight: 900;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .calc-big span {
+        font-size: 1.4rem;
+        opacity: 0.7;
+      }
+      .calc-note {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      .range-group {
+        margin-bottom: 8px;
+      }
+      .range-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .range-lbl {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .range-val {
+        font-size: 0.85rem;
+        color: var(--accent);
+        font-weight: 700;
+        font-family: var(--font-h);
+      }
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+        height: 4px;
+        background: var(--surface-2);
+        border-radius: 4px;
+        cursor: pointer;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent);
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(204, 255, 0, 0.5);
+      }
+
+      /* BENEFÍCIOS */
+      .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .benefit-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px 24px;
+        transition: border-color 0.2s;
+      }
+      .benefit-card:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+      .benefit-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(204, 255, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 16px;
+      }
+      .benefit-card h3 {
+        font-family: var(--font-h);
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .benefit-card p {
+        font-size: 0.85rem;
+        color: var(--muted-2);
+        line-height: 1.6;
+      }
+
+      /* COMO FUNCIONA */
+      .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        position: relative;
+      }
+      .step-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px 20px;
+        position: relative;
+      }
+      .step-num {
+        font-family: var(--font-h);
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .step-num::before {
+        content: "";
+        width: 24px;
+        height: 1px;
+        background: rgba(204, 255, 0, 0.4);
+      }
+      .step-card h4 {
+        font-family: var(--font-h);
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .step-card p {
+        font-size: 0.82rem;
+        color: var(--muted-2);
+        line-height: 1.6;
+      }
+
+      /* REGRAS */
+      .rules-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .rule-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+      }
+      .rule-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 100px;
+        margin-bottom: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .pill-red {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+      .pill-green {
+        background: rgba(34, 197, 94, 0.1);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+      }
+      .pill-yellow {
+        background: rgba(234, 179, 8, 0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(234, 179, 8, 0.2);
+      }
+      .rule-card h4 {
+        font-family: var(--font-h);
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .rule-card p {
+        font-size: 0.82rem;
+        color: var(--muted-2);
+        line-height: 1.6;
+      }
+
+      /* FORMULÁRIO */
+      .form-wrapper {
+        max-width: 560px;
+        margin: 0 auto;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 48px 40px;
+      }
+      .form-header {
+        text-align: center;
+        margin-bottom: 36px;
+      }
+      .form-header h2 {
+        font-family: var(--font-h);
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+      .form-header p {
+        font-size: 0.85rem;
+        color: var(--muted-2);
+      }
+
+      .form-info {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        background: rgba(0, 53, 255, 0.08);
+        border: 1px solid rgba(0, 53, 255, 0.2);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 28px;
+        font-size: 0.82rem;
+        color: #93b4ff;
+        line-height: 1.5;
+      }
+      .form-info-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .field {
+        margin-bottom: 18px;
+      }
+      .field label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted-2);
+        margin-bottom: 6px;
+        letter-spacing: 0.03em;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 0.88rem;
+        color: var(--text);
+        font-family: var(--font-b);
+        outline: none;
+        transition: border-color 0.2s;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(0, 53, 255, 0.15);
+      }
+      .field input::placeholder {
+        color: var(--muted);
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .btn-submit {
+        width: 100%;
+        background: var(--accent);
+        color: #08090c;
+        border: none;
+        border-radius: 12px;
+        padding: 16px;
+        font-family: var(--font-h);
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.2s;
+        letter-spacing: 0.01em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(204, 255, 0, 0.2);
+      }
+      .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .form-note {
+        text-align: center;
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 14px;
+      }
+
+      /* FOOTER */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 40px 24px;
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .benefits-grid,
+        .steps-grid,
+        .rules-grid {
+          grid-template-columns: 1fr;
+        }
+        .stats-row {
+          flex-direction: column;
+        }
+        .stat-box {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .stat-box:last-child {
+          border-bottom: none;
+        }
+        .form-wrapper {
+          padding: 32px 24px;
+        }
+        .field-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .hero {
+          padding: 64px 20px 60px;
+        }
+        .hero h1 {
+          font-size: 2.2rem;
+        }
+        .calc-big {
+          font-size: 2.4rem;
+        }
+      }
+
+      /* DIVIDER */
+      .divider {
+        height: 1px;
+        background: var(--border);
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+    </style>
   </head>
-  <body style="background-color: var(--dark)">
+  <body>
+    <!-- NAV -->
     <nav>
-      <div class="nav-container">
-        <a href="../index.html" class="btn-nav-back">← Voltar para o Site</a>
-
+      <div class="nav-inner">
         <a href="../index.html" class="logo">BITTO<span>.</span></a>
-
-        <a
-          href="../pages/login.html"
-          class="btn-back"
-          style="
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-          "
-          >Login</a
-        >
+        <div class="nav-right">
+          <a href="../index.html" class="nav-link">← Voltar ao site</a>
+          <a href="../pages/login.html" class="btn-nav">Entrar</a>
+        </div>
       </div>
     </nav>
 
-    <main>
-      <div class="fomo-bar-sticky">
-        <div class="fomo-track">
-          <div class="fomo-item">
-            🔥 <span>@mari.studies</span> acabou de entrar
-          </div>
-          <div class="fomo-item">
-            💸 Pix Recebido: <span>R$ 130,90</span> por Lucas
-          </div>
-          <div class="fomo-item">🚀 <span>+18</span> novos parceiros hoje</div>
-          <div class="fomo-item">
-            💎 Pedro atingiu o nível <span>Ouro</span>
-          </div>
-          <div class="fomo-item">
-            🔥 <span>@med.joao</span> fez sua 1ª venda
-          </div>
-          <div class="fomo-item">
-            💸 Pix Recebido: <span>R$ 45,00</span> por Ana
-          </div>
-          <div class="fomo-item">
-            🔥 <span>@mari.studies</span> acabou de entrar
-          </div>
-          <div class="fomo-item">
-            💸 Pix Recebido: <span>R$ 130,90</span> por Lucas
-          </div>
+    <!-- TICKER -->
+    <div class="ticker">
+      <div class="ticker-track">
+        <span class="ticker-item"
+          >🔥 <span class="hi">@mari.studies</span> acabou de entrar</span
+        >
+        <span class="ticker-item"
+          >💸 Pix recebido: <span class="hi">R$ 130,90</span> — Lucas</span
+        >
+        <span class="ticker-item"
+          >🚀 <span class="hi">+18</span> novos parceiros hoje</span
+        >
+        <span class="ticker-item"
+          >💎 Pedro atingiu o nível <span class="hi">Ouro</span></span
+        >
+        <span class="ticker-item"
+          >🔥 <span class="hi">@med.joao</span> fez sua 1ª venda</span
+        >
+        <span class="ticker-item"
+          >💸 Pix recebido: <span class="hi">R$ 45,00</span> — Ana</span
+        >
+        <span class="ticker-item"
+          >📲 <span class="hi">@estudos.sara</span> gerou 12 vendas este
+          mês</span
+        >
+        <span class="ticker-item"
+          >🔥 <span class="hi">@mari.studies</span> acabou de entrar</span
+        >
+        <span class="ticker-item"
+          >💸 Pix recebido: <span class="hi">R$ 130,90</span> — Lucas</span
+        >
+        <span class="ticker-item"
+          >🚀 <span class="hi">+18</span> novos parceiros hoje</span
+        >
+        <span class="ticker-item"
+          >💎 Pedro atingiu o nível <span class="hi">Ouro</span></span
+        >
+        <span class="ticker-item"
+          >🔥 <span class="hi">@med.joao</span> fez sua 1ª venda</span
+        >
+        <span class="ticker-item"
+          >💸 Pix recebido: <span class="hi">R$ 45,00</span> — Ana</span
+        >
+        <span class="ticker-item"
+          >📲 <span class="hi">@estudos.sara</span> gerou 12 vendas este
+          mês</span
+        >
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-badge">👑 Programa de Embaixadores</div>
+      <h1>
+        Sua audiência<br />vale <span class="accent">PIX recorrente</span>
+      </h1>
+      <p>
+        Indique a Bitto, ganhe 35% de comissão em cada renovação. Quanto mais
+        alunos você traz, mais você recebe — todo mês, automaticamente.
+      </p>
+      <a href="#candidatura" class="btn-cta">Quero ser embaixador →</a>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <span class="stat-val">35%</span>
+          <span class="stat-lbl">Comissão recorrente</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val">R$13</span>
+          <span class="stat-lbl">Por aluno/mês</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val">Pix</span>
+          <span class="stat-lbl">Pagamento mensal</span>
         </div>
       </div>
+    </section>
 
-      <section class="partner-hero-split">
-        <div class="hero-split-container">
-          <div class="hero-left">
-            <div class="neon-brand-title">👑 EMBAIXADORES BITTO</div>
+    <div class="divider"></div>
 
-            <h1>
-              Sua influência vale <br /><span style="color: var(--accent)"
-                >PIX NA CONTA</span
-              >
-            </h1>
-            <p>
-              Indique a Bitto para seus seguidores e receba comissões
-              recorrentes. O programa de afiliados mais transparente da
-              educação.
-            </p>
-            <a
-              href="#apply-form"
-              class="btn-banner-link"
-              style="background: var(--accent); color: var(--dark)"
-              >QUERO SER EMBAIXADOR</a
-            >
+    <!-- CALCULADORA -->
+    <div class="section">
+      <p class="section-label">Simule seus ganhos</p>
+      <h2 class="section-title">Quanto você pode ganhar?</h2>
+
+      <div class="calc-box">
+        <div class="calc-result">
+          <div class="calc-label-sm">Sua comissão mensal estimada</div>
+          <div class="calc-big">
+            <span>R$</span> <span id="calcVal">0</span>
           </div>
-
-          <div class="hero-right">
-            <div class="mockup-wrapper">
-              <div class="mockup-phone">
-                <div class="notif-card">
-                  <div class="notif-icon">🤑</div>
-                  <div class="notif-text">
-                    <h5>Venda Aprovada!</h5>
-                    <p>
-                      Você recebeu <span class="badge-money">+ R$ 13,09</span>
-                    </p>
-                  </div>
-                </div>
-                <div class="notif-card secondary">
-                  <div class="notif-icon">🔄</div>
-                  <div class="notif-text">
-                    <h5>Renovação Assinatura</h5>
-                    <p>
-                      Recorrência <span class="badge-money">+ R$ 5,92</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        class="section-padding"
-        style="
-          padding-top: 0;
-          margin-top: -50px;
-          position: relative;
-          z-index: 10;
-        "
-      >
-        <div class="calc-section-dark">
-          <h2
-            style="
-              text-align: center;
-              font-family: var(--font-heading);
-              margin-bottom: 10px;
-            "
-          >
-            Simulador de Ganhos
-          </h2>
-          <p
-            style="
-              text-align: center;
-              color: var(--text-gray);
-              margin-bottom: 30px;
-            "
-          >
-            Baseado no Plano Trimestral (O mais vendido)
-          </p>
-
-          <div class="calc-screen">
-            <div class="calc-label">Sua Comissão Mensal Estimada</div>
-            <div class="calc-big-number">
-              R$ <span id="display-earnings">0,00</span>
-            </div>
-            <div
-              class="calc-label"
-              style="color: var(--accent); font-weight: bold"
-            >
-              + Bônus por Performance
-            </div>
-          </div>
-
-          <div class="range-container">
-            <div
-              class="range-label"
-              style="
-                display: flex;
-                justify-content: space-between;
-                font-weight: bold;
-              "
-            >
-              <span>Vendas Ativas</span>
-              <span id="display-sales" style="color: var(--primary)"
-                >0 alunos</span
-              >
-            </div>
-            <input
-              type="range"
-              id="sales-range"
-              min="0"
-              max="200"
-              value="0"
-              step="1"
-            />
+          <div class="calc-note">
+            Baseado no Plano Trimestral · 35% de comissão
           </div>
         </div>
 
-        <div class="benefits-simple-grid">
-          <div class="benefit-card">
-            <span class="benefit-icon">💸</span>
-            <h3 style="font-family: var(--font-heading); margin-bottom: 10px">
-              35% de Comissão
-            </h3>
-            <p style="color: var(--text-gray)">
-              A maior comissão do mercado. Ganhe sobre a primeira venda e sobre
-              todas as renovações.
-            </p>
+        <div class="range-group">
+          <div class="range-row">
+            <span class="range-lbl">Alunos ativos indicados</span>
+            <span class="range-val" id="rangeLabel">0 alunos</span>
           </div>
-          <div class="benefit-card">
-            <span class="benefit-icon">🎫</span>
-            <h3 style="font-family: var(--font-heading); margin-bottom: 10px">
-              Cupom de 5% OFF
-            </h3>
-            <p style="color: var(--text-gray)">
-              Seus seguidores ganham desconto real. Você entrega valor para sua
-              audiência.
-            </p>
-          </div>
-          <div class="benefit-card">
-            <span class="benefit-icon">📱</span>
-            <h3 style="font-family: var(--font-heading); margin-bottom: 10px">
-              Grupo Exclusivo
-            </h3>
-            <p style="color: var(--text-gray)">
-              Acesso direto ao time da Bitto e materiais prontos para divulgar
-              nos stories.
-            </p>
-          </div>
+          <input
+            type="range"
+            id="calcRange"
+            min="0"
+            max="200"
+            value="0"
+            step="1"
+          />
         </div>
+      </div>
+    </div>
 
-        <div style="text-align: center; margin-bottom: 40px">
-          <h2 style="color: white; font-family: var(--font-heading)">
-            Regras do Jogo
-          </h2>
-          <p style="color: #94a3b8">
-            Transparência total para uma parceria duradoura.
+    <div class="divider"></div>
+
+    <!-- BENEFÍCIOS -->
+    <div class="section">
+      <p class="section-label">O que você recebe</p>
+      <h2 class="section-title">Benefícios do programa</h2>
+
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">💸</div>
+          <h3>35% de comissão</h3>
+          <p>
+            Você ganha na primeira venda e em cada renovação enquanto o aluno
+            continuar na plataforma. Passivo real.
           </p>
         </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🎫</div>
+          <h3>Cupom exclusivo com 5% OFF</h3>
+          <p>
+            Seus seguidores ganham desconto real usando seu cupom. Você entrega
+            valor e ainda converte mais.
+          </p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">⚡</div>
+          <h3>Acesso Pro gratuito</h3>
+          <p>
+            Você recebe acesso completo à plataforma para testar e criar
+            conteúdo autêntico sobre o produto.
+          </p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📦</div>
+          <h3>Kit de conteúdo pronto</h3>
+          <p>
+            Artes, roteiros e scripts prontos para stories, reels e TikTok. É só
+            personalizar e postar.
+          </p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📱</div>
+          <h3>Grupo exclusivo no WhatsApp</h3>
+          <p>
+            Acesso direto ao time Bitto para tirar dúvidas, pegar novidades e
+            receber suporte na hora.
+          </p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📊</div>
+          <h3>Dashboard em tempo real</h3>
+          <p>
+            Veja suas vendas, cliques e comissões em tempo real. Transparência
+            total em cada centavo.
+          </p>
+        </div>
+      </div>
+    </div>
 
-        <div class="rules-section">
-          <div class="rule-card" style="border-left: 4px solid #ef4444">
-            <span class="rule-icon">🚫</span>
-            <h4 class="rule-title">Zero Apostas/Tigrinho</h4>
-            <p class="rule-desc">
-              Não aceitamos parcerias com perfis que divulgam cassinos, jogos de
-              azar ou esquemas fraudulentos. Buscamos criadores sérios.
-            </p>
-          </div>
+    <div class="divider"></div>
 
-          <div class="rule-card" style="border-left: 4px solid #22c55e">
-            <span class="rule-icon">🔄</span>
-            <h4 class="rule-title">Recorrência Ativa</h4>
-            <p class="rule-desc">
-              Você não ganha apenas na primeira venda. Enquanto o aluno indicado
-              continuar pagando a mensalidade, você continua recebendo.
-            </p>
-          </div>
+    <!-- COMO FUNCIONA -->
+    <div class="section">
+      <p class="section-label">Como funciona</p>
+      <h2 class="section-title">4 passos para começar</h2>
 
-          <div class="rule-card" style="border-left: 4px solid #f59e0b">
-            <span class="rule-icon">⚠️</span>
-            <h4 class="rule-title">Política de Estorno</h4>
-            <p class="rule-desc">
-              Se o cliente solicitar reembolso dentro do prazo legal de 7 dias,
-              a comissão dessa venda será descontada do seu saldo futuro.
-            </p>
-          </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h4>Preencha a candidatura</h4>
+          <p>
+            Formulário rápido com seu @ e as informações básicas. Análise em até
+            48 horas.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h4>Receba seu kit</h4>
+          <p>
+            Cupom único, link rastreado e artes prontas para começar a divulgar
+            no mesmo dia.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h4>Poste e divulgue</h4>
+          <p>
+            Mostre a Bitto para sua audiência do jeito que preferir — stories,
+            reels, TikTok ou review.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <h4>Receba todo mês</h4>
+          <p>
+            Pagamento via Pix automático todo dia 10. Acompanhe tudo no seu
+            painel de afiliado.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- REGRAS -->
+    <div class="section">
+      <p class="section-label">Transparência total</p>
+      <h2 class="section-title">Regras do programa</h2>
+
+      <div class="rules-grid">
+        <div class="rule-card">
+          <div class="rule-pill pill-red">🚫 Proibido</div>
+          <h4>Zero apostas e jogos</h4>
+          <p>
+            Não aceitamos parceria com perfis que promovem cassinos, tigrinho ou
+            esquemas financeiros. Somos uma plataforma educacional seria.
+          </p>
+        </div>
+        <div class="rule-card">
+          <div class="rule-pill pill-green">✅ Garantido</div>
+          <h4>Comissão recorrente real</h4>
+          <p>
+            Enquanto o aluno que você indicou continuar pagando a assinatura,
+            você continua recebendo — mês após mês, sem limite de prazo.
+          </p>
+        </div>
+        <div class="rule-card">
+          <div class="rule-pill pill-yellow">⚠️ Importante</div>
+          <h4>Política de reembolso</h4>
+          <p>
+            Se o cliente solicitar reembolso dentro de 7 dias (prazo legal), a
+            comissão dessa venda será descontada do seu saldo seguinte.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FORMULÁRIO -->
+    <div class="section" id="candidatura">
+      <p class="section-label">Candidate-se agora</p>
+      <h2 class="section-title">Candidatura de embaixador</h2>
+
+      <div class="form-wrapper">
+        <div class="form-header">
+          <h2>Vamos começar?</h2>
+          <p>
+            Preencha abaixo. Após aprovação, você entra direto no grupo de
+            onboarding.
+          </p>
         </div>
 
-        <div class="form-box-clean" id="apply-form">
-          <h2
-            style="
-              text-align: center;
-              font-family: var(--font-heading);
-              margin-bottom: 30px;
-            "
+        <div class="form-info">
+          <span class="form-info-icon">ℹ️</span>
+          <span
+            >Ao enviar, seus dados são analisados e você recebe um convite para
+            o grupo de embaixadores no WhatsApp em até 48h.</span
           >
-            Candidatura VIP
-          </h2>
+        </div>
 
-          <div
-            style="
-              background: #f0f9ff;
-              border-left: 4px solid var(--primary);
-              padding: 15px;
-              margin-bottom: 25px;
-              border-radius: 8px;
-              font-size: 0.9rem;
-              color: #1e3a8a;
-            "
-          >
-            <strong>ℹ️ Próximo Passo:</strong> Ao clicar em enviar, seus dados
-            serão analisados e você será redirecionado para o Grupo de
-            Onboarding no WhatsApp.
-          </div>
-
-          <form id="partnerForm">
-            <div class="form-group" style="margin-bottom: 20px">
-              <label
-                style="display: block; font-weight: 700; margin-bottom: 8px"
-                >Nome Completo</label
-              >
-              <input
-                type="text"
-                name="nome"
-                class="form-input"
-                required
-                placeholder="Seu nome"
-              />
+        <form id="partnerForm">
+          <div class="field-row">
+            <div class="field">
+              <label>Nome completo</label>
+              <input type="text" name="nome" required placeholder="Seu nome" />
             </div>
-
-            <div class="form-group" style="margin-bottom: 20px">
-              <label
-                style="display: block; font-weight: 700; margin-bottom: 8px"
-                >Email</label
-              >
-              <input
-                type="email"
-                name="email"
-                class="form-input"
-                required
-                placeholder="email@exemplo.com"
-              />
-            </div>
-
-            <div class="form-group" style="margin-bottom: 20px">
-              <label
-                style="display: block; font-weight: 700; margin-bottom: 8px"
-                >WhatsApp</label
-              >
+            <div class="field">
+              <label>WhatsApp</label>
               <input
                 type="tel"
                 name="whatsapp"
-                class="form-input"
                 required
                 placeholder="(00) 00000-0000"
               />
             </div>
-
-            <div class="form-group" style="margin-bottom: 20px">
-              <label
-                style="display: block; font-weight: 700; margin-bottom: 8px"
-                >Instagram/TikTok</label
-              >
+          </div>
+          <div class="field">
+            <label>E-mail</label>
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="email@exemplo.com"
+            />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Instagram ou TikTok</label>
               <input
                 type="text"
                 name="social"
-                class="form-input"
                 required
                 placeholder="@usuario"
               />
             </div>
-
-            <div class="form-group" style="margin-bottom: 20px">
-              <label
-                style="display: block; font-weight: 700; margin-bottom: 8px"
-                >Cupom Sugerido</label
-              >
+            <div class="field">
+              <label>Cupom sugerido</label>
               <input
                 type="text"
                 name="cupom"
-                class="form-input"
                 required
-                placeholder="Ex: PEDRO5 (Letras Maiúsculas)"
+                placeholder="SEU_NOME5"
+                style="text-transform: uppercase"
               />
             </div>
+          </div>
+          <div class="field">
+            <label>Média de views nos stories</label>
+            <select name="views">
+              <option value="Iniciante">Menos de 500 visualizações</option>
+              <option value="Medio">500 a 2.000 visualizações</option>
+              <option value="Alto">Mais de 2.000 visualizações</option>
+            </select>
+          </div>
 
-            <div class="form-group" style="margin-bottom: 30px">
-              <label
-                style="display: block; font-weight: 700; margin-bottom: 8px"
-                >Média de Views nos Stories</label
-              >
-              <select name="views" class="form-input">
-                <option value="Iniciante">- 500 visualizações</option>
-                <option value="Medio">500 a 2.000 visualizações</option>
-                <option value="Alto">+ 2.000 visualizações</option>
-              </select>
-            </div>
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span id="submitText">Enviar candidatura 🚀</span>
+          </button>
+          <p class="form-note">
+            Ao se candidatar você concorda com as regras do programa acima.
+          </p>
+        </form>
+      </div>
+    </div>
 
-            <button
-              type="submit"
-              class="btn-main"
-              style="
-                width: 100%;
-                border: none;
-                cursor: pointer;
-                font-size: 1.1rem;
-              "
-            >
-              ENVIAR CANDIDATURA 🚀
-            </button>
-
-            <p
-              style="
-                text-align: center;
-                font-size: 0.8rem;
-                color: #94a3b8;
-                margin-top: 15px;
-              "
-            >
-              Ao se cadastrar, você concorda com os termos acima.
-            </p>
-          </form>
-        </div>
-      </section>
-    </main>
-
-    <footer
-      style="
-        background: var(--dark);
-        color: white;
-        padding: 40px 5%;
-        text-align: center;
-      "
-    >
-      <p>© 2026 Bitto Tecnologia. Todos os direitos reservados.</p>
+    <footer>
+      <p>
+        © 2026 Bitto Tecnologia —
+        <a href="../site/termos.html" style="color: inherit">Termos</a> ·
+        <a href="../site/privacidade.html" style="color: inherit"
+          >Privacidade</a
+        >
+      </p>
     </footer>
 
-    <script>
-      // JS DA CALCULADORA
-      const salesRange = document.getElementById("sales-range");
-      const displaySales = document.getElementById("display-sales");
-      const displayEarnings = document.getElementById("display-earnings");
-      const COMISSAO_TRIMESTRAL = 13.09;
+    <!-- FIREBASE -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      salesRange.addEventListener("input", function () {
-        const vendas = this.value;
-        const ganhos = vendas * COMISSAO_TRIMESTRAL;
-        displaySales.textContent = vendas + " alunos";
-        displayEarnings.textContent = ganhos.toLocaleString("pt-BR", {
+      const firebaseConfig = {
+        apiKey: "AIzaSyDuGpzkLI-1wFOK9wfrGblhoTqW_gQJA30",
+        authDomain: "bitto-99fac.firebaseapp.com",
+        projectId: "bitto-99fac",
+        storageBucket: "bitto-99fac.firebasestorage.app",
+        messagingSenderId: "483124758230",
+        appId: "1:483124758230:web:cdf73555872c8fe733eb77",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // CALCULADORA
+      const range = document.getElementById("calcRange");
+      const calcVal = document.getElementById("calcVal");
+      const rangeLabel = document.getElementById("rangeLabel");
+      const COMISSAO = 13.09;
+
+      range.addEventListener("input", () => {
+        const v = parseInt(range.value);
+        const total = (v * COMISSAO).toLocaleString("pt-BR", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
+        calcVal.textContent = total;
+        rangeLabel.textContent = v + " alunos";
       });
 
-      // JS DO FORMULÁRIO
+      // FORMULÁRIO → FIREBASE
       document
         .getElementById("partnerForm")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async (e) => {
           e.preventDefault();
-          const btn = this.querySelector("button");
-          const originalText = btn.innerText;
-          btn.innerText = "Enviando...";
+          const btn = document.getElementById("submitBtn");
+          const txt = document.getElementById("submitText");
           btn.disabled = true;
+          txt.textContent = "Enviando...";
 
-          const formData = new FormData(this);
-          const data = Object.fromEntries(formData);
+          const fd = new FormData(e.target);
+          const data = Object.fromEntries(fd.entries());
 
-          // INSIRA SEU LINK DO GOOGLE SCRIPT AQUI
-          const GOOGLE_SCRIPT_URL =
-            "https://script.google.com/macros/s/AKfycbxWDMWOBqy-JKwmYoWNXZFr26TCQFv-o2rlKEAI0kJHBh-9s3fkXkbKV0t0c77iYmur/exec";
-
-          fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          })
-            .then(() => {
-              window.location.href =
-                "https://chat.whatsapp.com/KJ6zFZpxCQMCoBwjHPKdDA";
-            })
-            .catch((error) => {
-              alert("Erro ao enviar. Tente novamente.");
-              btn.innerText = originalText;
-              btn.disabled = false;
+          try {
+            await addDoc(collection(db, "embaixadores"), {
+              ...data,
+              cupom: data.cupom.toUpperCase(),
+              status: "candidatura",
+              criadoEm: serverTimestamp(),
             });
+            // Redireciona para WhatsApp após salvar no Firebase
+            window.location.href =
+              "https://chat.whatsapp.com/KJ6zFZpxCQMCoBwjHPKdDA";
+          } catch (err) {
+            console.error(err);
+            alert("Erro ao enviar. Tente novamente.");
+            btn.disabled = false;
+            txt.textContent = "Enviar candidatura 🚀";
+          }
         });
     </script>
   </body>
