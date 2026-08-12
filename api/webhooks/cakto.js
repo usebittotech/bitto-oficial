@@ -26,6 +26,44 @@ function safeCompare(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
+// ========== EVENTO DE COMPRA NO GA4 (server-side, via Measurement Protocol) ==========
+// Mais confiável que rastrear no client: não depende do usuário voltar ao site
+// depois de pagar, e não é bloqueado por AdBlock. Requer GA4_MEASUREMENT_ID e
+// GA4_API_SECRET configurados no ambiente (Google Analytics 4 -> Admin ->
+// Fluxos de dados -> seu stream -> "Medição de eventos" -> "Criar" chave de API).
+async function sendGA4PurchaseEvent({ uid, value, currency, transactionId, planType }) {
+  const measurementId = process.env.GA4_MEASUREMENT_ID;
+  const apiSecret = process.env.GA4_API_SECRET;
+  if (!measurementId || !apiSecret) {
+    console.warn("ℹ️ GA4_MEASUREMENT_ID/GA4_API_SECRET não configurados — evento de compra não enviado ao GA4.");
+    return;
+  }
+  try {
+    await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          client_id: uid, // usa o UID do Firebase como client_id estável por usuário
+          events: [
+            {
+              name: "purchase",
+              params: {
+                transaction_id: transactionId,
+                value: value,
+                currency: currency || "BRL",
+                items: [{ item_id: planType, item_name: `Plano ${planType}` }],
+              },
+            },
+          ],
+        }),
+      }
+    );
+  } catch (e) {
+    console.error("Falha ao enviar evento 'purchase' para o GA4:", e.message);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -201,6 +239,19 @@ export default async function handler(req, res) {
       .collection("users")
       .doc(userRecord.uid)
       .set(userData, { merge: true });
+
+    // Envia o evento de compra confirmada para o GA4 (não bloqueia a resposta do webhook)
+    const amountRaw = data.amount ?? data.baseAmount ?? data.price ?? 0;
+    // A Cakto costuma enviar valores em centavos, como a maioria dos gateways BR —
+    // ajuste aqui se confirmar que o valor já vem em reais no seu payload real.
+    const amountInReais = amountRaw > 1000 ? amountRaw / 100 : amountRaw;
+    sendGA4PurchaseEvent({
+      uid: userRecord.uid,
+      value: amountInReais,
+      currency: "BRL",
+      transactionId: orderId,
+      planType,
+    });
 
     console.log(`
 ✅ ✅ ✅ SUCESSO ✅ ✅ ✅

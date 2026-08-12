@@ -27,6 +27,40 @@ function safeCompare(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
+// ========== EVENTO DE COMPRA NO GA4 (server-side, via Measurement Protocol) ==========
+async function sendGA4PurchaseEvent({ uid, value, currency, transactionId, planType }) {
+  const measurementId = process.env.GA4_MEASUREMENT_ID;
+  const apiSecret = process.env.GA4_API_SECRET;
+  if (!measurementId || !apiSecret) {
+    console.warn("ℹ️ GA4_MEASUREMENT_ID/GA4_API_SECRET não configurados — evento de compra não enviado ao GA4.");
+    return;
+  }
+  try {
+    await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          client_id: uid,
+          events: [
+            {
+              name: "purchase",
+              params: {
+                transaction_id: transactionId,
+                value,
+                currency: currency || "BRL",
+                items: [{ item_id: planType, item_name: `Plano ${planType}` }],
+              },
+            },
+          ],
+        }),
+      }
+    );
+  } catch (e) {
+    console.error("Falha ao enviar evento 'purchase' para o GA4:", e.message);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
@@ -158,6 +192,16 @@ export default async function handler(req, res) {
         },
         { merge: true },
       );
+
+    const amountRaw = data.amount ?? data.baseAmount ?? data.price ?? 0;
+    const amountInReais = amountRaw > 1000 ? amountRaw / 100 : amountRaw;
+    sendGA4PurchaseEvent({
+      uid: userRecord.uid,
+      value: amountInReais,
+      currency: "BRL",
+      transactionId: data.id || `webhook_${Date.now()}`,
+      planType,
+    });
 
     console.log(`✅ SUCESSO: ${userEmail} ativado.`);
     return res.json({ success: true });

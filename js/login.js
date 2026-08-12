@@ -4,7 +4,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   googleProvider,
+  trackEvent,
+  trackUserId,
 } from "./firebase-init.js";
+import { getAdditionalUserInfo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { syncUserDatabase } from "./userManager.js";
 
 const showRegisterBtn = document.getElementById("showRegister");
@@ -83,6 +86,9 @@ async function handleGoogleLogin() {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     await syncUserDatabase(result.user);
+    const isNewUser = getAdditionalUserInfo(result)?.isNewUser;
+    trackUserId(result.user.uid);
+    trackEvent(isNewUser ? "sign_up" : "login", { method: "google" });
     showToast("Conectado com Google!", "success");
     // [CORREÇÃO] Caminho absoluto a partir da raiz
     setTimeout(() => (window.location.href = "/pages/dashboard.html"), 1000);
@@ -121,6 +127,8 @@ loginForm.addEventListener("submit", async (e) => {
       passInput.value,
     );
     await syncUserDatabase(result.user);
+    trackUserId(result.user.uid);
+    trackEvent("login", { method: "password" });
 
     showToast("Login realizado!", "success");
     // [CORREÇÃO] Caminho absoluto a partir da raiz
@@ -178,6 +186,8 @@ registerForm.addEventListener("submit", async (e) => {
     });
 
     await syncUserDatabase(user);
+    trackUserId(user.uid);
+    trackEvent("sign_up", { method: "password" });
 
     showToast("Conta criada! Bem-vindo.", "success");
     // [CORREÇÃO] Caminho absoluto a partir da raiz

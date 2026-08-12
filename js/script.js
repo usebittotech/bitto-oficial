@@ -1,4 +1,10 @@
-import { auth } from "./firebase-init.js";
+import { auth, trackEvent } from "./firebase-init.js";
+
+// Exposta globalmente pois é chamada de um onclick inline no HTML gerado dinamicamente
+window.__trackUpgradeClick = () => trackEvent("select_item", {
+  item_list_name: "dashboard_upsell",
+  items: [{ item_id: "monthly", item_name: "Assinar Agora (dashboard)" }],
+});
 import {
   onAuthStateChanged,
   signOut,
@@ -573,7 +579,7 @@ async function loadSubscriptionStatus(userId) {
                 ">
                     <strong style="color: #e65100; font-size: 16px;">⏳ Plano GRATUITO</strong><br/>
                     <small style="color: #bf360c; font-size: 13px;">📊 Limite: <strong>10 Flashcards/mês</strong> • <strong>3 Quizzes/mês</strong> • <strong>5 Reviews/mês</strong></small><br/>
-                    <button onclick="window.location.href='https://pay.cakto.com.br/ar6yxop_697009'" style="
+                    <button onclick="window.__trackUpgradeClick && window.__trackUpgradeClick(); window.location.href='https://pay.cakto.com.br/ar6yxop_697009'" style="
                         margin-top: 10px; 
                         padding: 10px 20px; 
                         background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);

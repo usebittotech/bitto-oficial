@@ -1,4 +1,4 @@
-import { auth, onAuthStateChanged } from "./firebase-init.js";
+import { auth, onAuthStateChanged, trackEvent } from "./firebase-init.js";
 import { checkUsageLimit, incrementUsage } from "./userManager.js";
 
 const themeToggle = document.getElementById("themeToggle");
@@ -98,6 +98,7 @@ if (generateBtn) {
       }
 
       await incrementUsage(currentUser.uid, "review");
+      trackEvent("generate_review");
       if (window.recordActivity) window.recordActivity("review", 1);
       if (window.awardXP) window.awardXP(20, "Resumo IA");
 

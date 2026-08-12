@@ -1,4 +1,4 @@
-import { auth, onAuthStateChanged } from "./firebase-init.js";
+import { auth, onAuthStateChanged, trackEvent } from "./firebase-init.js";
 import { checkUsageLimit, incrementUsage } from "./userManager.js";
 
 const themeToggle = document.getElementById("themeToggle");
@@ -81,6 +81,7 @@ if (startBtn) {
     try {
       await fetchQuestions(topic, difficulty);
       await incrementUsage(currentUser.uid, "quiz");
+      trackEvent("generate_quiz");
       if (window.recordActivity) window.recordActivity("quiz", 1);
 
       loadingState.style.display = "none";

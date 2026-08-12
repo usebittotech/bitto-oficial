@@ -1,4 +1,4 @@
-import { auth, onAuthStateChanged } from "./firebase-init.js";
+import { auth, onAuthStateChanged, trackEvent } from "./firebase-init.js";
 import { checkUsageLimit, incrementUsage } from "./userManager.js";
 
 const themeToggle = document.getElementById("themeToggle");
@@ -199,6 +199,7 @@ if (generateBtn) {
 
     const canUse = await checkUsageLimit(currentUser.uid, "flashcards");
     if (!canUse) {
+      trackEvent("paywall_shown", { source: "flashcards" });
       showUpgradeModal();
       return;
     }
@@ -250,6 +251,7 @@ if (generateBtn) {
       currentIndex = 0;
 
       await incrementUsage(currentUser.uid, "flashcards");
+      trackEvent("generate_flashcards", { card_count: newDeck.length });
 
       if (window.recordActivity)
         window.recordActivity("flashcards", parseInt(quantity));
