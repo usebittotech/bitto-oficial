@@ -1,4 +1,5 @@
 import admin from "firebase-admin";
+import crypto from "crypto";
 
 // Inicializa o Firebase apenas se não estiver inicializado
 if (!admin.apps.length) {
@@ -16,6 +17,16 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const auth = admin.auth();
 
+function safeCompare(a, b) {
+  const bufA = Buffer.from(String(a || ""));
+  const bufB = Buffer.from(String(b || ""));
+  if (bufA.length !== bufB.length) {
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
@@ -26,6 +37,17 @@ export default async function handler(req, res) {
 
   const eventName = payload.event || data.event || "";
   const status = data.status || data.state || "";
+
+  // ========== VALIDAÇÃO DO WEBHOOK ==========
+  const expectedSecret = process.env.CAKTO_WEBHOOK_SECRET;
+  if (!expectedSecret) {
+    console.error("🔥 CAKTO_WEBHOOK_SECRET não configurado. Recusando por segurança.");
+    return res.status(500).json({ error: "Webhook secret não configurado no servidor." });
+  }
+  if (!payload.secret || !safeCompare(payload.secret, expectedSecret)) {
+    console.warn("⛔ Webhook recusado: secret ausente ou inválido.");
+    return res.status(401).json({ error: "Assinatura do webhook inválida." });
+  }
 
   // Busca o email em todos os locais possíveis
   const userEmail =

@@ -455,9 +455,14 @@ async function handleSend() {
 }
 
 async function callGeminiChat(history) {
+  if (!auth.currentUser) throw new Error("Usuário não autenticado.");
+  const idToken = await auth.currentUser.getIdToken();
   const res = await fetch("/api/chat", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
     body: JSON.stringify({ contents: history }),
   });
   const data = await res.json();
@@ -530,7 +535,11 @@ if (chatInput)
 // Carregar e exibir status de assinatura
 async function loadSubscriptionStatus(userId) {
   try {
-    const response = await fetch(`/api/webhooks/cakto-status?userId=${userId}`);
+    if (!auth.currentUser) return;
+    const idToken = await auth.currentUser.getIdToken();
+    const response = await fetch(`/api/webhooks/cakto-status?userId=${userId}`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
     const data = await response.json();
 
     const statusEl = document.getElementById("subscription-status");

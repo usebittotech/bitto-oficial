@@ -1,4 +1,5 @@
 import admin from "firebase-admin";
+import crypto from "crypto";
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -13,6 +14,18 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const auth = admin.auth();
 
+// Compara duas strings em tempo constante (evita timing attack na comparação do secret)
+function safeCompare(a, b) {
+  const bufA = Buffer.from(String(a || ""));
+  const bufB = Buffer.from(String(b || ""));
+  if (bufA.length !== bufB.length) {
+    // Ainda assim compara contra si mesma para manter tempo constante
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -22,6 +35,18 @@ export default async function handler(req, res) {
   const data = payload.data || payload;
   const eventName = payload.event || data.event || "";
   const status = data.status || data.state || "";
+
+  // ========== VALIDAÇÃO DO WEBHOOK (Cakto envia "secret" no corpo do payload) ==========
+  const expectedSecret = process.env.CAKTO_WEBHOOK_SECRET;
+  if (!expectedSecret) {
+    console.error("🔥 CAKTO_WEBHOOK_SECRET não configurado no ambiente. Recusando webhook por segurança.");
+    return res.status(500).json({ error: "Webhook secret não configurado no servidor." });
+  }
+  const receivedSecret = payload.secret;
+  if (!receivedSecret || !safeCompare(receivedSecret, expectedSecret)) {
+    console.warn("⛔ Webhook recusado: secret ausente ou inválido.");
+    return res.status(401).json({ error: "Assinatura do webhook inválida." });
+  }
 
   const userEmail =
     data.customer?.email || data.client?.email || data.payer?.email;

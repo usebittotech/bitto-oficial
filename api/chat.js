@@ -1,20 +1,47 @@
 // Arquivo: api/chat.js
+import admin from "firebase-admin";
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+  });
+}
+const authAdmin = admin.auth();
+
+const ALLOWED_ORIGIN = 'https://www.usebitto.com';
+
 export default async function handler(req, res) {
-    // 1. Configuração de CORS (Permite acesso do seu site)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-    );
+    // 1. Configuração de CORS (restrita ao próprio domínio, não mais "*")
+    res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+    res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    res.setHeader('Vary', 'Origin');
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
 
-    // 2. Busca a Chave de API
+    // 2. Autenticação obrigatória
+    const authHeader = req.headers.authorization || '';
+    const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!idToken) {
+        return res.status(401).json({ error: 'Token de autenticação ausente.' });
+    }
+    try {
+        await authAdmin.verifyIdToken(idToken);
+    } catch (e) {
+        return res.status(401).json({ error: 'Token de autenticação inválido.' });
+    }
+
+    // 3. Busca a Chave de API
     // Tenta a chave específica do Chat, se não achar, usa a geral
     const apiKey = process.env.GEMINI_API_CHAT || process.env.GEMINI_API_CHAT;
 
