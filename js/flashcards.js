@@ -223,9 +223,13 @@ if (generateBtn) {
             `;
 
       // 🛠️ ROTA CORRIGIDA
+      const idToken = await currentUser.getIdToken();
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
         }),

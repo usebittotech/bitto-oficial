@@ -12,11 +12,16 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
+const auth = admin.auth();
+
+const ADMIN_EMAIL = "usebitto.tech@gmail.com";
 
 /**
  * GET /api/webhooks/cakto-status?userId=abc123
+ * Header obrigatório: Authorization: Bearer <Firebase ID Token>
  *
- * Retorna o status de assinatura do usuário
+ * Retorna o status de assinatura do usuário autenticado.
+ * Só é permitido consultar o próprio userId (ou, se o token for do admin, qualquer userId).
  */
 export default async function handler(req, res) {
   // Permitir apenas GET
@@ -31,12 +36,35 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "userId is required" });
   }
 
+  // ========== AUTENTICAÇÃO ==========
+  const authHeader = req.headers.authorization || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (!idToken) {
+    return res.status(401).json({ error: "Token de autenticação ausente." });
+  }
+
+  let decodedToken;
+  try {
+    decodedToken = await auth.verifyIdToken(idToken);
+  } catch (e) {
+    return res.status(401).json({ error: "Token de autenticação inválido." });
+  }
+
+  const isAdmin = decodedToken.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  const isOwner = decodedToken.uid === userId;
+
+  if (!isOwner && !isAdmin) {
+    console.warn(`⛔ Tentativa de IDOR: ${decodedToken.uid} tentou ler status de ${userId}`);
+    return res.status(403).json({ error: "Você não tem permissão para consultar este usuário." });
+  }
+
   try {
     // Buscar documento do usuário
     const userDoc = await db.collection("users").doc(userId).get();
 
     // Usuário não encontrado
-    if (!userDoc.exists()) {
+    if (!userDoc.exists) {
       return res.json({
         status: "not_found",
         plan: "free",

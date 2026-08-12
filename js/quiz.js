@@ -116,9 +116,13 @@ async function fetchQuestions(topic, difficulty) {
         Regras: JSON PURO. Português.
     `;
   // 🛠️ ROTA CORRIGIDA
+  const idToken = await auth.currentUser.getIdToken();
   const response = await fetch("/api/generate", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
     }),

@@ -1,61 +1,119 @@
 // Arquivo: api/generate.js
+import admin from "firebase-admin";
 
-export const config = {
-  runtime: "edge",
-};
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+  });
+}
 
-export default async function handler(req) {
-  // Configuração de CORS para Edge (usando Headers nativos)
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-    "Access-Control-Allow-Headers":
-      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-  };
+const auth = admin.auth();
+const db = admin.firestore();
 
-  // Responde ao preflight do navegador imediatamente
+// Origem permitida para CORS (restrito ao próprio domínio, em vez de "*")
+const ALLOWED_ORIGIN = "https://www.usebitto.com";
+
+// Limite de segurança para o plano gratuito (contador simples de chamadas de IA/mês,
+// além dos limites específicos por ferramenta que o front já aplica).
+const FREE_PLAN_MONTHLY_AI_CALLS = 60;
+
+function setCors(res, origin) {
+  const allowOrigin = origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN;
+  res.setHeader("Access-Control-Allow-Origin", allowOrigin);
+  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Authorization, Content-Type"
+  );
+  res.setHeader("Vary", "Origin");
+}
+
+export default async function handler(req, res) {
+  setCors(res, req.headers.origin);
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return res.status(200).end();
+  }
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   const geminiKey = process.env.GEMINI_API_KEY;
   const openRouterKey = process.env.OPEN_API_KEY;
 
   if (!geminiKey || !openRouterKey) {
-    return new Response(
-      JSON.stringify({
-        error: "Chaves de API não configuradas no ambiente da Vercel.",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      },
-    );
+    return res
+      .status(500)
+      .json({ error: "Chaves de API não configuradas no ambiente da Vercel." });
+  }
+
+  // ========== AUTENTICAÇÃO OBRIGATÓRIA ==========
+  const authHeader = req.headers.authorization || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (!idToken) {
+    return res.status(401).json({ error: "Token de autenticação ausente." });
+  }
+
+  let decodedToken;
+  try {
+    decodedToken = await auth.verifyIdToken(idToken);
+  } catch (e) {
+    return res.status(401).json({ error: "Token de autenticação inválido." });
+  }
+
+  const uid = decodedToken.uid;
+
+  // ========== LIMITE DE USO NO SERVIDOR (defesa contra abuso do proxy de IA) ==========
+  // Isso é uma rede de segurança além do limite por ferramenta já aplicado no front-end
+  // (checkUsageLimit/incrementUsage), que sozinho não protege porque pode ser contornado
+  // chamando este endpoint diretamente.
+  try {
+    const userRef = db.collection("users").doc(uid);
+    const userSnap = await userRef.get();
+    const userData = userSnap.exists ? userSnap.data() : {};
+    const plan = userData.plan || "free";
+
+    if (plan === "free") {
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+      const aiUsage = userData.aiUsage || {};
+      const currentCount = aiUsage.month === monthKey ? aiUsage.count || 0 : 0;
+
+      if (currentCount >= FREE_PLAN_MONTHLY_AI_CALLS) {
+        return res.status(403).json({
+          error: "Limite mensal de uso do plano gratuito atingido. Faça upgrade para continuar.",
+        });
+      }
+
+      await userRef.set(
+        { aiUsage: { month: monthKey, count: currentCount + 1 } },
+        { merge: true }
+      );
+    }
+  } catch (e) {
+    // Se a checagem de uso falhar por algum motivo, não travamos a feature —
+    // mas registramos o erro para investigação.
+    console.error("Falha ao checar/atualizar uso de IA:", e.message);
   }
 
   try {
-    // No Edge, precisamos ler o body da requisição de forma assíncrona
-    const body = await req.json();
-    const prompt = body.contents?.[0]?.parts?.[0]?.text;
+    const body = req.body;
+    const prompt = body?.contents?.[0]?.parts?.[0]?.text;
 
     if (!prompt) {
-      return new Response(
-        JSON.stringify({ error: "O prompt enviado está vazio ou incorreto." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        },
-      );
+      return res.status(400).json({ error: "O prompt enviado está vazio ou incorreto." });
     }
 
     // 🚀 PIPELINE DE FALLBACK (Tier 1 a Tier 6)
     const pipeline = [
-      // Modelos do Gemini (Gratuitos / Atuais)
       { provider: "gemini", id: "gemini-3.1-flash-lite" },
       { provider: "gemini", id: "gemini-2.5-pro" },
       { provider: "gemini", id: "gemini-2.5-flash" },
-
-      // Modelos do OpenRouter (Com a tag :free para garantir gratuidade)
       { provider: "openrouter", id: "cohere/north-mini-code:free" },
       { provider: "openrouter", id: "nvidia/nemotron-3.5-content-safety:free" },
       { provider: "openrouter", id: "google/gemma-4-26b-a4b-it:free" },
@@ -63,7 +121,6 @@ export default async function handler(req) {
 
     let lastError = null;
 
-    // Percorre o pipeline tentando executar cada modelo sequencialmente se o anterior falhar
     for (const tier of pipeline) {
       try {
         if (tier.provider === "gemini") {
@@ -75,39 +132,21 @@ export default async function handler(req) {
               body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 safetySettings: [
-                  {
-                    category: "HARM_CATEGORY_HARASSMENT",
-                    threshold: "BLOCK_NONE",
-                  },
-                  {
-                    category: "HARM_CATEGORY_HATE_SPEECH",
-                    threshold: "BLOCK_NONE",
-                  },
-                  {
-                    category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                    threshold: "BLOCK_NONE",
-                  },
-                  {
-                    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                    threshold: "BLOCK_NONE",
-                  },
+                  { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                  { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                  { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                  { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
                 ],
               }),
-            },
+            }
           );
 
           if (!googleResponse.ok) {
-            throw new Error(
-              `Gemini ${tier.id} respondeu com status ${googleResponse.status}`,
-            );
+            throw new Error(`Gemini ${tier.id} respondeu com status ${googleResponse.status}`);
           }
 
           const data = await googleResponse.json();
-          // Retorna o sucesso imediatamente para o Frontend se funcionar
-          return new Response(JSON.stringify(data), {
-            status: 200,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          });
+          return res.status(200).json(data);
         } else if (tier.provider === "openrouter") {
           const openRouterResponse = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -121,67 +160,39 @@ export default async function handler(req) {
                 model: tier.id,
                 messages: [{ role: "user", content: prompt }],
               }),
-            },
+            }
           );
 
           if (!openRouterResponse.ok) {
-            throw new Error(
-              `OpenRouter ${tier.id} respondeu com status ${openRouterResponse.status}`,
-            );
+            throw new Error(`OpenRouter ${tier.id} respondeu com status ${openRouterResponse.status}`);
           }
 
           const data = await openRouterResponse.json();
-
-          // 🛠️ ADAPTADOR: Transforma o formato de resposta do OpenRouter no formato padrão do Gemini
           const adaptedData = {
             candidates: [
               {
                 content: {
-                  parts: [
-                    {
-                      text: data.choices?.[0]?.message?.content || "",
-                    },
-                  ],
+                  parts: [{ text: data.choices?.[0]?.message?.content || "" }],
                 },
               },
             ],
           };
 
-          return new Response(JSON.stringify(adaptedData), {
-            status: 200,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          });
+          return res.status(200).json(adaptedData);
         }
       } catch (error) {
-        console.warn(
-          `[Pipeline Fallback] Falha no modelo ${tier.id}:`,
-          error.message,
-        );
+        console.warn(`[Pipeline Fallback] Falha no modelo ${tier.id}:`, error.message);
         lastError = error;
-        // Continua para o próximo item do array (próximo fallback)
         continue;
       }
     }
 
-    // Se sair do loop, significa que todos os modelos falharam consecutivamente
-    return new Response(
-      JSON.stringify({
-        error: "Todos os modelos do pipeline falharam de forma consecutiva.",
-        details: lastError?.message,
-      }),
-      {
-        status: 502,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      },
-    );
+    return res.status(502).json({
+      error: "Todos os modelos do pipeline falharam de forma consecutiva.",
+      details: lastError?.message,
+    });
   } catch (error) {
-    console.error("Erro geral no Backend Edge:", error);
-    return new Response(
-      JSON.stringify({ error: "Erro interno ao processar solicitação." }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      },
-    );
+    console.error("Erro geral no Backend:", error);
+    return res.status(500).json({ error: "Erro interno ao processar solicitação." });
   }
 }

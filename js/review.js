@@ -66,9 +66,13 @@ if (generateBtn) {
             `;
 
       // 🛠️ ROTA CORRIGIDA
+      const idToken = await currentUser.getIdToken();
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
         }),
@@ -80,10 +84,18 @@ if (generateBtn) {
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!aiResponse) throw new Error("A IA não gerou resposta.");
 
-      reviewOutput.innerHTML =
+      // 🛡️ Sanitização: o conteúdo vem de uma IA que processa texto colado pelo
+      // usuário (risco de prompt injection → XSS). Nunca injetar HTML sem sanitizar.
+      const rawHtml =
         typeof marked !== "undefined"
           ? marked.parse(aiResponse)
           : `<pre style="white-space:pre-wrap;">${aiResponse}</pre>`;
+      reviewOutput.innerHTML =
+        typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(rawHtml) : "";
+      if (typeof DOMPurify === "undefined") {
+        console.error("DOMPurify não carregado — conteúdo não renderizado por segurança.");
+        showToast("Erro ao carregar biblioteca de segurança. Recarregue a página.", "error");
+      }
 
       await incrementUsage(currentUser.uid, "review");
       if (window.recordActivity) window.recordActivity("review", 1);
