@@ -47,23 +47,29 @@ function sanitizeText(value, maxLen) {
 }
 
 async function handleGet(req, res) {
+  // Só filtra por "status" (where de um campo só, não precisa de índice
+  // composto no Firestore). Ordena por data mais recente em memória.
   const snapshot = await db
     .collection(REVIEWS_COLLECTION)
     .where("status", "==", "approved")
-    .orderBy("createdAt", "desc")
-    .limit(MAX_LIST)
+    .limit(200)
     .get();
 
-  const reviews = snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      name: data.name,
-      rating: data.rating,
-      comment: data.comment,
-      createdAt: data.createdAt?.toDate?.().toISOString() || null,
-    };
-  });
+  const reviews = snapshot.docs
+    .map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        rating: data.rating,
+        comment: data.comment,
+        createdAt: data.createdAt?.toDate?.().toISOString() || null,
+        _sortKey: data.createdAt?.toMillis?.() || 0,
+      };
+    })
+    .sort((a, b) => b._sortKey - a._sortKey)
+    .slice(0, MAX_LIST)
+    .map(({ _sortKey, ...rest }) => rest);
 
   res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
   return res.status(200).json({ reviews });
@@ -133,7 +139,7 @@ export default async function handler(req, res) {
     }
     return res.status(405).json({ error: "Method Not Allowed" });
   } catch (err) {
-    console.error("reviews: erro inesperado", err);
+    console.error("reviews: erro inesperado", err?.message || err, err?.code || "");
     return res.status(500).json({ error: "Erro interno ao processar avaliação." });
   }
 }
