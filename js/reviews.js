@@ -279,9 +279,12 @@ function initReviewForm() {
 
       if (msg) {
         msg.textContent =
-          "Avaliação enviada! Ela aparece aqui assim que for aprovada.";
+          "Avaliação enviada! Ela já está publicada aqui em cima.";
         msg.className = "review-form-note review-form-success";
       }
+
+      // Publica na hora — recarrega a lista pra já mostrar a nova avaliação
+      loadReviews();
     } catch (err) {
       if (msg) {
         msg.textContent = "Não foi possível enviar agora. Tenta de novo em instantes.";

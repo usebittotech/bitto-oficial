@@ -1,9 +1,10 @@
 // Arquivo: api/reviews.js
 // Avaliações públicas da BITTO (nome + estrelas + comentário), no estilo
-// "avaliação de loja". Não exige login. Toda avaliação nova entra como
-// "pending" no Firestore e só aparece no site depois de aprovada manualmente
-// (coleção "reviews", campo status). Isso evita que spam/avaliação falsa
-// vá direto para o ar.
+// "avaliação de loja". Não exige login. Toda avaliação nova entra já como
+// "approved" e aparece no site imediatamente — sem fila de moderação manual.
+// A única barreira anti-spam/anti-abuso é técnica: honeypot + rate limit por
+// IP (ambos abaixo). Se quiser voltar a moderar manualmente, basta trocar o
+// status inicial de volta para "pending" no bloco de criação mais abaixo.
 
 import admin from "firebase-admin";
 
@@ -123,7 +124,7 @@ async function handlePost(req, res) {
     area,
     rating,
     comment,
-    status: "pending", // vira "approved" manualmente no console do Firebase
+    status: "approved", // publica direto, sem moderação manual
     featured: false, // marque manualmente como true pra entrar em "Resultados Reais"
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     ip,
