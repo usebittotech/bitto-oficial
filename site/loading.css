@@ -119,6 +119,62 @@ nav {
   background: var(--primary);
 }
 
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--dark);
+  flex-shrink: 0;
+}
+.nav-toggle-icon-open,
+.nav-toggle-icon-close {
+  width: 26px;
+  height: 26px;
+}
+.nav-toggle-icon-close {
+  display: none;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon-open {
+  display: none;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon-close {
+  display: block;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 0;
+  overflow: hidden;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  transition: max-height 0.3s ease;
+}
+.mobile-menu.open {
+  max-height: 420px;
+}
+.mobile-menu-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 5%;
+}
+.mobile-menu-links li a {
+  display: block;
+  padding: 14px 4px;
+  text-decoration: none;
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 1.02rem;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-menu-cta {
+  margin: 12px 5% 20px;
+}
+
 /* --- CORREÇÃO DE CONTEÚDO SOB O MENU --- */
 main {
   padding-top: 120px; /* Empurra o conteúdo para baixo do menu fixo */
@@ -1816,6 +1872,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .nav-links {
     display: none;
   }
+  .nav-toggle {
+    display: block;
+  }
+  .mobile-menu {
+    display: flex;
+  }
   .nav-container {
     padding: 0 5%;
   }
@@ -3010,6 +3072,26 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--text-gray);
   font-size: 0.95rem;
   grid-column: 1 / -1;
+}
+.reviews-load-more {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  margin: 24px auto 0;
+  padding: 0.7rem 1.8rem;
+  border-radius: 50px;
+  border: 2px solid var(--border);
+  background: var(--white);
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.reviews-load-more:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 .review-card {
   background: var(--white);

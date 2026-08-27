@@ -288,6 +288,29 @@
         </ul>
 
         <a href="pages/login.html" class="btn-login">Entrar</a>
+
+        <button
+          type="button"
+          class="nav-toggle"
+          id="nav-toggle"
+          aria-label="Abrir menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg nav-toggle-icon-open"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg nav-toggle-icon-close"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="mobile-menu" id="mobile-menu">
+        <ul class="mobile-menu-links">
+          <li><a href="#ferramentas">Ferramentas</a></li>
+          <li><a href="#demonstracao">Demonstração</a></li>
+          <li><a href="#planos">Planos</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#avaliacoes">Avaliações</a></li>
+        </ul>
+        <a href="pages/login.html" class="btn-main mobile-menu-cta">Entrar</a>
       </div>
     </nav>
 
@@ -1561,6 +1584,9 @@
             <div class="reviews-list" id="reviews-list">
               <p class="reviews-empty" id="reviews-empty">Carregando avaliações...</p>
             </div>
+            <button type="button" class="reviews-load-more" id="reviews-load-more" style="display:none">
+              Ver mais avaliações
+            </button>
           </div>
         </div>
       </section>

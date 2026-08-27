@@ -102,34 +102,62 @@ function renderSummary(reviews) {
 
 // ---------------------------------------------------------------
 // Lista completa (todas as aprovadas) — seção "Avaliações"
+// Paginada: mostra um lote por vez e revela mais sob clique, pra não
+// empilhar dezenas de cards de uma vez (ruim pra leitura e performance).
 // ---------------------------------------------------------------
-function renderReviewsList(reviews) {
-  const list = document.getElementById("reviews-list");
-  const empty = document.getElementById("reviews-empty");
-  if (!list) return;
+const REVIEWS_PAGE_SIZE = 6;
+let allReviewsCache = [];
+let reviewsVisibleCount = REVIEWS_PAGE_SIZE;
 
-  if (reviews.length === 0) {
-    if (empty) empty.textContent = "Seja o primeiro a avaliar a BITTO! ⭐";
-    return;
-  }
-
-  if (empty) empty.remove();
-
-  list.innerHTML = reviews
-    .map(
-      (r) => `
+function reviewCardHtml(r) {
+  return `
       <div class="review-card">
         <div class="review-card-header">
           <span class="review-card-name">${escapeHtml(r.name || "Anônimo")}${
-        r.area ? ` <span class="review-card-area">• ${escapeHtml(r.area)}</span>` : ""
-      }</span>
+    r.area ? ` <span class="review-card-area">• ${escapeHtml(r.area)}</span>` : ""
+  }</span>
           <span class="review-card-date">${formatDate(r.createdAt)}</span>
         </div>
         <div class="review-card-stars">${renderStars(r.rating)}</div>
         <p class="review-card-comment">${escapeHtml(r.comment || "")}</p>
-      </div>`
-    )
-    .join("");
+      </div>`;
+}
+
+function renderReviewsPage() {
+  const list = document.getElementById("reviews-list");
+  const loadMoreBtn = document.getElementById("reviews-load-more");
+  if (!list) return;
+
+  const visible = allReviewsCache.slice(0, reviewsVisibleCount);
+  list.innerHTML = visible.map(reviewCardHtml).join("");
+
+  if (loadMoreBtn) {
+    const remaining = allReviewsCache.length - reviewsVisibleCount;
+    loadMoreBtn.style.display = remaining > 0 ? "flex" : "none";
+    loadMoreBtn.textContent =
+      remaining > 0
+        ? `Ver mais avaliações (${remaining})`
+        : "Ver mais avaliações";
+  }
+}
+
+function renderReviewsList(reviews) {
+  const list = document.getElementById("reviews-list");
+  const empty = document.getElementById("reviews-empty");
+  const loadMoreBtn = document.getElementById("reviews-load-more");
+  if (!list) return;
+
+  allReviewsCache = reviews;
+  reviewsVisibleCount = REVIEWS_PAGE_SIZE;
+
+  if (reviews.length === 0) {
+    if (empty) empty.textContent = "Seja o primeiro a avaliar a BITTO! ⭐";
+    if (loadMoreBtn) loadMoreBtn.style.display = "none";
+    return;
+  }
+
+  if (empty) empty.remove();
+  renderReviewsPage();
 }
 
 // ---------------------------------------------------------------
@@ -307,8 +335,18 @@ function initReviewForm() {
   });
 }
 
+function initLoadMoreButton() {
+  const btn = document.getElementById("reviews-load-more");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    reviewsVisibleCount += REVIEWS_PAGE_SIZE;
+    renderReviewsPage();
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initStarRating();
   initReviewForm();
+  initLoadMoreButton();
   loadReviews();
 });

@@ -100,3 +100,41 @@ planToggleBtns.forEach((btn) => {
     }
   });
 });
+
+// Menu sanduíche (mobile)
+(function () {
+  const toggle = document.getElementById("nav-toggle");
+  const menu = document.getElementById("mobile-menu");
+  if (!toggle || !menu) return;
+
+  function closeMenu() {
+    menu.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Abrir menu");
+  }
+
+  function openMenu() {
+    menu.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Fechar menu");
+  }
+
+  toggle.addEventListener("click", () => {
+    const isOpen = menu.classList.contains("open");
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  // Fecha ao clicar em qualquer link do menu (navegação por âncora)
+  menu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+
+  // Fecha se a tela crescer pra desktop (evita menu preso aberto)
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) closeMenu();
+  });
+})();
