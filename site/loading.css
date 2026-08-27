@@ -370,9 +370,11 @@ h1 {
 }
 .persona-card:nth-child(odd) .persona-avatar {
   background: rgba(0, 53, 255, 0.25);
+  color: rgba(99, 179, 255, 0.9);
 }
 .persona-card:nth-child(even) .persona-avatar {
   background: rgba(204, 255, 0, 0.15);
+  color: var(--accent);
 }
 .persona-info {
   flex: 1;
@@ -796,6 +798,7 @@ h1 {
 .demo-icon {
   font-size: 1.8rem;
   line-height: 1;
+  color: white;
 }
 .demo-card-top h4 {
   font-family: var(--font-heading);
@@ -2252,6 +2255,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .problem-bad h3 {
   color: #e0314c;
 }
+.problem-bad .problem-icon {
+  color: #e0314c;
+}
 .problem-bad .problem-list li {
   color: #7a4a4f;
 }
@@ -2277,6 +2283,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 2px solid rgba(204, 255, 0, 0.25);
 }
 .problem-good h3 {
+  color: var(--accent);
+}
+.problem-good .problem-icon {
   color: var(--accent);
 }
 .problem-good .problem-list li {
@@ -2337,6 +2346,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 1.8rem;
   display: block;
   margin-bottom: 12px;
+  color: var(--primary);
 }
 
 .audience-card h4 {
@@ -2484,6 +2494,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .pricing-guarantee-icon {
   font-size: 2rem;
   flex-shrink: 0;
+  color: var(--primary);
 }
 .pricing-guarantee strong {
   display: block;
