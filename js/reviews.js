@@ -8,7 +8,16 @@
 
 const API_URL = "/api/reviews";
 
-const AVATAR_BY_INDEX = ["🎓", "⚖️", "🩺", "📖", "💼", "🎯", "🌐", "📊"];
+const AVATAR_ICONS = [
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><path d="M12 3v18"/><path d="M5 7h4l-2 6a2.5 2.5 0 0 1-2 1 2.5 2.5 0 0 1-2-1Z"/><path d="M15 7h4l-2 6a2.5 2.5 0 0 1-2 1 2.5 2.5 0 0 1-2-1Z"/><path d="M7 21h10"/><path d="M9 7h6"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2Z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7Z"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>',
+];
 
 function initStarRating() {
   const wrap = document.getElementById("review-stars");
@@ -156,7 +165,7 @@ function renderFeaturedShowcase(featuredReviews) {
           (r, cardIndex) => `
         <div class="persona-card${pairIndex === 0 ? " active" : ""}" data-pair="${pairIndex}">
           <div class="persona-card-header">
-            <div class="persona-avatar">${AVATAR_BY_INDEX[(pairIndex * 2 + cardIndex) % AVATAR_BY_INDEX.length]}</div>
+            <div class="persona-avatar">${AVATAR_ICONS[(pairIndex * 2 + cardIndex) % AVATAR_ICONS.length]}</div>
             <div class="persona-info">
               <h4>${escapeHtml(r.name || "Aluno BITTO")}</h4>
               <span class="tag">${escapeHtml(r.area || "Estudante")}</span>

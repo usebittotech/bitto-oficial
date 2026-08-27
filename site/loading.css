@@ -62,6 +62,16 @@ nav {
   color: var(--dark);
   text-decoration: none;
   white-space: nowrap; /* Impede a logo de quebrar linha */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  object-fit: cover;
 }
 .logo span {
   color: var(--primary);
@@ -341,6 +351,13 @@ h1 {
   gap: 14px;
   margin-bottom: 20px;
 }
+.icon-svg {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .persona-avatar {
   width: 48px;
   height: 48px;
