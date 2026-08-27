@@ -1,0 +1,24 @@
+
+# **ROW 1 — Base Forms (0–45 dias)**
+
+1. **Bitto Seed — 0 dias**
+2. **Bitto Sprout — 7 dias**
+3. **Bitto Rookie — 15 dias**
+4. **Bitto Adept — 30 dias**
+5. **Bitto Pro — 45 dias**
+
+
+
+# **ROW 2 — Advance Forms (60–100 dias)**
+
+6. **Bitto Elite — 60 dias**
+7. **Bitto Ultra — 80 dias**
+8. **Bitto Prime — 100 dias**
+
+
+
+# **ROW 3 — Final Form (150 dias)**
+
+10. **Bitto Master — 150 dias**
+
+

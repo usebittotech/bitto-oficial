@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script defer src="/_vercel/insights/script.js"></script>
+    <title>BITTO - Ciclo de Estudos</title>
+    <link rel="icon" type="image/png" href="/imagens/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Unbounded:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/planner.css" />
+  </head>
+  <body>
+    <div class="crt-overlay"></div>
+    <div id="toast-container"></div>
+
+    <nav class="navbar">
+      <div class="container nav-grid">
+        <div class="nav-left">
+          <a href="dashboard.html" class="back-pill">
+            <span class="icon">←</span> Voltar
+          </a>
+        </div>
+        <div class="nav-center">
+          <span class="page-title">CICLO DE ESTUDOS</span>
+        </div>
+        <div class="nav-right">
+          <button class="icon-button" id="themeToggle" title="Alternar Tema">
+            <svg
+              class="icon-sun"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg
+              class="icon-moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="display: none"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <div
+            class="user-profile"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              margin-left: 15px;
+            "
+          >
+            <span
+              class="user-name"
+              id="navUserName"
+              style="font-size: 0.9rem; font-weight: 600"
+              >...</span
+            >
+            <div class="avatar-circle"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container main-wrapper">
+      <div class="tool-layout">
+        <div class="main-column">
+          <div
+            class="deck-header"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div class="deck-info" style="margin-bottom: 0">
+              <h2 id="toolTitle">Planejamento Semanal</h2>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <div class="view-toggle" id="viewToggle" style="display: none">
+                <button
+                  class="view-toggle-btn active"
+                  id="btnViewWeek"
+                  title="Ver semana completa"
+                >
+                  📅 Semana
+                </button>
+                <button
+                  class="view-toggle-btn"
+                  id="btnViewToday"
+                  title="Focar no dia de hoje"
+                >
+                  ⚡ Hoje
+                </button>
+              </div>
+              <button
+                id="btnExportCopy"
+                class="back-pill"
+                style="display: none; cursor: pointer"
+                title="Copiar cronograma"
+              >
+                📋 Exportar
+              </button>
+              <button
+                id="btnNewPlan"
+                class="back-pill"
+                style="display: none; cursor: pointer"
+              >
+                🔄 Replanejar Ciclo
+              </button>
+            </div>
+          </div>
+
+          <div class="paper-sheet tilt-element" style="padding: 1.5rem">
+            <div id="emptyState" class="empty-state">
+              <div
+                class="empty-icon"
+                style="font-size: 4rem; margin-bottom: 1rem"
+              >
+                🗓️
+              </div>
+              <h3>Nenhum Ciclo Ativo</h3>
+              <p>
+                Utilize o painel ao lado para definir suas matérias e gerar seu
+                ciclo de estudos Kanban.
+              </p>
+            </div>
+
+            <div id="plannerActive" style="display: none">
+              <!-- Cards de resumo em grid horizontal -->
+              <div class="result-summary-cards">
+                <div class="result-card">
+                  <span class="result-card-label">PROGRESSO GERAL</span>
+                  <div class="result-card-value" id="plannerProgressText">
+                    0%
+                  </div>
+                  <div
+                    class="xp-bar-bg"
+                    style="
+                      height: 6px;
+                      border-radius: 20px;
+                      background: var(--input-bg);
+                      margin-top: 8px;
+                    "
+                  >
+                    <div
+                      class="xp-bar-fill"
+                      id="plannerProgressBar"
+                      style="
+                        width: 0%;
+                        background: var(--accent-green);
+                        box-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
+                      "
+                    ></div>
+                  </div>
+                </div>
+                <div class="result-card">
+                  <span class="result-card-label">TEMPO ESTUDADO</span>
+                  <div class="result-card-value" id="cycleTimeText">
+                    0h00min / 0h00min
+                  </div>
+                  <span
+                    class="result-card-hint"
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-muted);
+                      margin-top: 8px;
+                    "
+                    >de horas planejadas</span
+                  >
+                </div>
+                <div class="result-card">
+                  <span class="result-card-label">CICLOS COMPLETOS</span>
+                  <div class="result-card-value" id="cyclesCompleted">0</div>
+                  <span
+                    class="result-card-hint"
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-muted);
+                      margin-top: 8px;
+                    "
+                    >semanas finalizadas</span
+                  >
+                </div>
+              </div>
+
+              <p id="plannerMotivation" class="planner-motivation"></p>
+
+              <!-- Linha com calendário + progresso por disciplina -->
+              <div class="result-main-grid">
+                <!-- Coluna esquerda: Calendário -->
+                <div class="result-left-column">
+                  <p
+                    style="
+                      font-size: 0.8rem;
+                      color: var(--text-muted);
+                      margin-bottom: 12px;
+                      font-weight: 600;
+                    "
+                  >
+                    Selecione o bloco na agenda para registrar o estudo e ganhar
+                    XP.
+                  </p>
+                  <div class="calendar-board-container">
+                    <div id="weeklyCalendar" class="calendar-board"></div>
+                  </div>
+                </div>
+
+                <!-- Coluna direita: Progresso por disciplina + Gráfico -->
+                <div class="result-right-column">
+                  <div class="subject-progress-section-wrapper">
+                    <h4
+                      style="
+                        font-size: 0.9rem;
+                        font-weight: 700;
+                        margin-bottom: 12px;
+                        color: var(--text-main);
+                      "
+                    >
+                      Sequência dos Estudos
+                    </h4>
+                    <div
+                      id="subjectProgressSection"
+                      class="subject-progress-section-compact"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-column">
+          <div class="tool-panel creator-card" id="plannerFormArea">
+            <div class="panel-header">
+              <h3>Configurar Ciclo</h3>
+              <span class="ai-badge">AUTO</span>
+            </div>
+
+            <!-- Indicador de etapas -->
+            <div class="stepper-header">
+              <div class="stepper-step active" id="step-indicator-1">
+                <div class="stepper-circle">1</div>
+                <span class="stepper-label">Horas</span>
+              </div>
+              <div class="stepper-line" id="stepper-line-1"></div>
+              <div class="stepper-step" id="step-indicator-2">
+                <div class="stepper-circle">2</div>
+                <span class="stepper-label">Matérias</span>
+              </div>
+              <div class="stepper-line" id="stepper-line-2"></div>
+              <div class="stepper-step" id="step-indicator-3">
+                <div class="stepper-circle">3</div>
+                <span class="stepper-label">Revisão</span>
+              </div>
+            </div>
+
+            <!-- ETAPA 1: Horas -->
+            <div class="stepper-panel active" id="stepper-panel-1">
+              <p class="stepper-panel-title">
+                Quanto tempo você tem disponível?
+              </p>
+              <div class="form-group">
+                <label for="totalWeeklyHours"
+                  >⏱️ Horas na semana (7 dias)</label
+                >
+                <input
+                  type="number"
+                  id="totalWeeklyHours"
+                  placeholder="Ex: 20"
+                  min="1"
+                  class="input-field"
+                />
+              </div>
+              <div
+                id="step1-summary"
+                class="stepper-summary"
+                style="display: none"
+              ></div>
+              <div class="stepper-nav">
+                <span></span>
+                <button class="btn-step-next" id="step1NextBtn" disabled>
+                  Próximo → Matérias
+                </button>
+              </div>
+            </div>
+
+            <!-- ETAPA 2: Matérias -->
+            <div class="stepper-panel" id="stepper-panel-2">
+              <p class="stepper-panel-title">
+                Quais disciplinas você vai estudar?
+              </p>
+
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="subjectName"
+                  placeholder="Ex: Banco de Dados"
+                  class="input-field"
+                />
+              </div>
+              <div class="weight-picker" id="weightPicker">
+                <button
+                  class="weight-btn"
+                  data-weight="1"
+                  title="Peso 1 (Fácil)"
+                >
+                  1
+                </button>
+                <button
+                  class="weight-btn active"
+                  data-weight="2"
+                  title="Peso 2 (Média)"
+                >
+                  2
+                </button>
+                <button
+                  class="weight-btn"
+                  data-weight="3"
+                  title="Peso 3 (Difícil)"
+                >
+                  3
+                </button>
+                <button
+                  id="addSubjectBtn"
+                  class="weight-btn weight-btn-add"
+                  title="Adicionar matéria"
+                >
+                  +
+                </button>
+              </div>
+              <p class="planner-weight-hint" id="weightHint">
+                Peso: <strong>2 (Média)</strong> — distribuição equilibrada
+              </p>
+
+              <ul id="subjectList" class="subject-list">
+                <!-- Estado vazio -->
+                <li class="subject-empty-state" id="subjectEmptyState">
+                  <span class="subject-empty-icon">📚</span>
+                  <span class="subject-empty-title"
+                    >Nenhuma disciplina ainda</span
+                  >
+                  <span class="subject-empty-hint"
+                    >Digite acima e pressione Enter ou +</span
+                  >
+                </li>
+              </ul>
+
+              <div class="stepper-nav">
+                <button class="btn-step-back" id="step2BackBtn">
+                  ← Voltar
+                </button>
+                <button class="btn-step-next" id="step2NextBtn" disabled>
+                  Revisar →
+                </button>
+              </div>
+            </div>
+
+            <!-- ETAPA 3: Revisão -->
+            <div class="stepper-panel" id="stepper-panel-3">
+              <p class="stepper-panel-title">Confirme seu ciclo de estudos</p>
+              <div id="reviewSummary" class="review-summary"></div>
+              <div class="stepper-nav">
+                <button class="btn-step-back" id="step3BackBtn">
+                  ← Editar
+                </button>
+                <button
+                  class="btn-generate"
+                  id="generatePlanBtn"
+                  style="margin-top: 0"
+                >
+                  GERAR KANBAN 🚀
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="registerModal">
+      <div class="modal-card" style="max-width: 500px; padding: 0">
+        <div
+          class="modal-header"
+          style="background: var(--input-bg); border-bottom: none"
+        >
+          <h2 style="font-size: 1.2rem">Registro de Estudo</h2>
+          <button class="close-modal" id="closeRegisterBtn">✕</button>
+        </div>
+        <div class="modal-body" style="gap: 1.2rem; padding: 2rem">
+          <div
+            style="
+              background: rgba(0, 53, 255, 0.05);
+              padding: 15px;
+              border-radius: 12px;
+              border: 1px dashed var(--primary-blue);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <span
+                style="
+                  display: block;
+                  font-size: 0.75rem;
+                  font-weight: 700;
+                  color: var(--text-muted);
+                  margin-bottom: 5px;
+                "
+                >DISCIPLINA SELECIONADA</span
+              >
+              <strong
+                id="regSubjectDisplay"
+                style="
+                  font-family: var(--font-display);
+                  font-size: 1.1rem;
+                  color: var(--primary-blue);
+                "
+                >Matéria</strong
+              >
+            </div>
+            <div style="text-align: right">
+              <span
+                style="
+                  display: block;
+                  font-size: 0.75rem;
+                  font-weight: 700;
+                  color: var(--text-muted);
+                  margin-bottom: 5px;
+                "
+                >META</span
+              >
+              <span
+                id="regTargetTimeDisplay"
+                style="
+                  font-weight: 800;
+                  color: var(--text-main);
+                  background: var(--card-bg);
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid var(--border-color);
+                "
+                >0h00min</span
+              >
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 10px">
+            <div class="form-group" style="flex: 1">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >CATEGORIA</label
+              >
+              <select id="regCategory" class="input-field" style="width: 100%">
+                <option value="Teoria">Teoria</option>
+                <option value="Questões">Questões</option>
+                <option value="Revisão">Revisão</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1">
+              <label
+                style="
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >ESTUDADO (H decimais)</label
+              >
+              <input
+                type="number"
+                id="regTime"
+                class="input-field"
+                step="0.1"
+                style="width: 100%; font-weight: bold; color: var(--text-main)"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0">
+            <label
+              style="
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                font-weight: 600;
+              "
+              >TÓPICO ESTUDADO</label
+            >
+            <input
+              type="text"
+              id="regTopic"
+              class="input-field"
+              placeholder="O que você estudou nesta sessão?"
+              style="width: 100%"
+            />
+          </div>
+
+          <input type="hidden" id="regDayIndex" />
+          <input type="hidden" id="regTaskIndex" />
+        </div>
+        <div
+          class="modal-footer"
+          style="background: transparent; border-top: none; padding-top: 0"
+        >
+          <button
+            class="btn-generate"
+            id="saveRegisterBtn"
+            style="
+              width: 100%;
+              font-size: 1rem;
+              padding: 1rem;
+              margin-top: 0;
+              background: var(--primary-blue);
+              color: white;
+            "
+          >
+            ✅ Confirmar Sessão e Ganhar XP
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../js/tools-core.js"></script>
+    <script type="module" src="../js/planner.js"></script>
+  </body>
+</html>
