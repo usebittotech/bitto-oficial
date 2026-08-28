@@ -12,19 +12,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
 
     <style>
       :root {
+        --bg: #f8f9ff;
         --primary: #0035ff;
         --accent: #ccff00;
-        --bg: #000000;
-        --glass: rgba(255, 255, 255, 0.03);
-        --border: rgba(255, 255, 255, 0.08);
-        --text: #ffffff;
-        --text-sec: #94a3b8;
+        --dark: #0a0a0b;
+        --white: #ffffff;
+        --text-gray: #475569;
+        --border: rgba(0, 0, 0, 0.08);
+        --shadow-glass: 0 12px 40px 0 rgba(0, 53, 255, 0.12);
+        --font-heading: "Outfit", sans-serif;
+        --font-body: "Plus Jakarta Sans", sans-serif;
       }
 
       * {
@@ -36,8 +39,8 @@
 
       body {
         background-color: var(--bg);
-        color: var(--text);
-        font-family: "Inter", sans-serif;
+        color: var(--dark);
+        font-family: var(--font-body);
         min-height: 100dvh;
         display: flex;
         justify-content: center;
@@ -45,188 +48,182 @@
         position: relative;
       }
 
-      /* === IA NEBULA AMBIENCE === */
-      .nebula {
+      /* Glow suave no topo, mesma linguagem do hero da landing */
+      .glow {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 480px;
         z-index: -1;
-        background:
-          radial-gradient(
-            circle at 50% -20%,
-            rgba(0, 53, 255, 0.25) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 0% 100%,
-            rgba(0, 53, 255, 0.05) 0%,
-            transparent 40%
-          );
-        animation: nebulaPulse 12s infinite alternate ease-in-out;
-      }
-
-      @keyframes nebulaPulse {
-        from {
-          transform: scale(1);
-          opacity: 0.7;
-        }
-        to {
-          transform: scale(1.1);
-          opacity: 1;
-        }
-      }
-
-      .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: radial-gradient(
-          rgba(255, 255, 255, 0.05) 1px,
-          transparent 1px
+        background: radial-gradient(
+          circle at 50% -10%,
+          rgba(0, 53, 255, 0.14) 0%,
+          transparent 60%
         );
-        background-size: 32px 32px;
-        z-index: -1;
-        mask-image: radial-gradient(circle at center, black, transparent 80%);
       }
 
       .container {
         width: 100%;
         max-width: 415px;
-        padding: 70px 24px;
+        padding: 56px 24px 40px;
         display: flex;
         flex-direction: column;
-        gap: 40px;
+        gap: 32px;
       }
 
       /* === HEADER === */
       .profile {
         text-align: center;
-        animation: entrance 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        animation: entrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .avatar-box {
-        position: relative;
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 24px;
+        width: 88px;
+        height: 88px;
+        margin: 0 auto 20px;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-glass);
       }
-
-      .avatar-img {
-        position: relative;
+      .avatar-box img {
         width: 100%;
         height: 100%;
-        border-radius: 40px;
-        background: #080808;
-        padding: 10px;
-        border: 1px solid var(--border);
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
-        z-index: 2;
+        object-fit: cover;
+        display: block;
       }
 
       .logo-text {
-        font-family: "Outfit", sans-serif;
-        font-size: 2.8rem;
+        font-family: var(--font-heading);
+        font-size: 1.9rem;
         font-weight: 900;
-        letter-spacing: -2.5px;
-        background: linear-gradient(to bottom, #fff 60%, var(--primary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--dark);
+        letter-spacing: -0.5px;
+      }
+      .logo-text span {
+        color: var(--primary);
       }
 
-      /* === LINKS GRID (CONTEÚDO ORIGINAL) === */
+      .profile p {
+        color: var(--text-gray);
+        font-weight: 500;
+        margin-top: 8px;
+        font-size: 0.92rem;
+      }
+
+      /* === LINKS === */
       .links-grid {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
         width: 100%;
       }
 
       .link-card {
-        background: var(--glass);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        padding: 20px;
-        border-radius: 28px;
+        background: var(--white);
+        padding: 18px 20px;
+        border-radius: 20px;
         text-decoration: none;
         display: flex;
         align-items: center;
         justify-content: space-between;
         border: 1px solid var(--border);
-        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        transition: 0.2s ease;
       }
-
       .link-card:active {
-        transform: scale(0.96);
-        background: rgba(255, 255, 255, 0.08);
+        transform: scale(0.97);
+      }
+      .link-card:hover {
         border-color: var(--primary);
+        box-shadow: var(--shadow-glass);
       }
 
       .card-body {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 16px;
       }
 
       .icon-circle {
-        width: 52px;
-        height: 52px;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 16px;
+        width: 46px;
+        height: 46px;
+        background: rgba(0, 53, 255, 0.08);
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
-        border: 1px solid var(--border);
+        color: var(--primary);
+        flex-shrink: 0;
+      }
+      .icon-circle svg {
+        width: 20px;
+        height: 20px;
       }
 
       .title-main {
         display: block;
         font-weight: 700;
-        font-size: 1.05rem;
-        color: #fff;
+        font-size: 1rem;
+        color: var(--dark);
+        font-family: var(--font-heading);
       }
       .desc-sub {
         display: block;
         font-size: 0.8rem;
-        color: var(--text-sec);
+        color: var(--text-gray);
         margin-top: 2px;
       }
 
-      /* Card Destaque */
+      .chevron {
+        color: var(--text-gray);
+        flex-shrink: 0;
+      }
+
+      /* Card destaque — CTA principal, cor sólida como os botões da landing */
       .featured {
         background: var(--primary);
         border: none;
-        box-shadow: 0 20px 40px -10px rgba(0, 53, 255, 0.4);
+        box-shadow: 0 16px 32px -8px rgba(0, 53, 255, 0.35);
+      }
+      .featured .title-main,
+      .featured .desc-sub {
+        color: white;
       }
       .featured .desc-sub {
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.75);
       }
       .featured .icon-circle {
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+      }
+      .featured .chevron {
+        color: rgba(255, 255, 255, 0.7);
       }
 
-      /* === SEÇÃO DE SUPORTE DIFERENCIADA === */
+      /* Card com destaque secundário — accent lime, como badges da landing */
+      .accent-card .icon-circle {
+        background: rgba(204, 255, 0, 0.25);
+        color: #7a8f00;
+      }
+
+      /* === SUPORTE === */
       .support-box {
-        margin-top: 10px;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 30px;
-        padding: 24px;
+        margin-top: 4px;
+        background: var(--white);
+        border-radius: 20px;
+        padding: 22px;
         border: 1px dashed var(--border);
         text-align: center;
       }
 
       .support-title {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--accent);
-        margin-bottom: 16px;
+        letter-spacing: 1.5px;
+        color: var(--primary);
+        margin-bottom: 14px;
         display: block;
       }
 
@@ -235,18 +232,24 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 12px;
-        background: white;
-        color: black;
-        padding: 16px;
-        border-radius: 20px;
+        gap: 10px;
+        background: var(--dark);
+        color: white;
+        padding: 14px;
+        border-radius: 14px;
         font-weight: 700;
-        font-size: 0.95rem;
-        transition: 0.3s;
+        font-size: 0.92rem;
+        font-family: var(--font-heading);
+        transition: 0.2s;
+      }
+      .support-link:active {
+        transform: scale(0.96);
       }
 
-      .support-link:active {
-        transform: scale(0.95);
+      .support-box p {
+        font-size: 0.75rem;
+        color: var(--text-gray);
+        margin-top: 12px;
       }
 
       /* === FOOTER === */
@@ -254,148 +257,157 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 30px;
+        gap: 22px;
       }
 
       .socials {
         display: flex;
-        gap: 25px;
+        gap: 22px;
       }
       .socials a {
-        color: var(--text-sec);
-        transition: 0.3s;
+        color: var(--text-gray);
+        transition: 0.2s;
       }
+      .socials a:hover,
       .socials a:active {
         color: var(--primary);
-        transform: scale(1.3);
+      }
+      .socials svg {
+        width: 22px;
+        height: 22px;
       }
 
       .copyright {
         font-size: 0.65rem;
         font-weight: 800;
-        color: rgba(255, 255, 255, 0.1);
-        letter-spacing: 3px;
+        color: rgba(10, 10, 11, 0.25);
+        letter-spacing: 2px;
         text-transform: uppercase;
       }
 
-      /* Animações Sequenciais */
+      /* Animações sequenciais, mesmas timings do original */
       .reveal {
         opacity: 0;
-        animation: revealUp 0.8s forwards;
+        animation: revealUp 0.7s forwards;
       }
       .r-1 {
-        animation-delay: 0.1s;
+        animation-delay: 0.05s;
       }
       .r-2 {
-        animation-delay: 0.2s;
+        animation-delay: 0.15s;
       }
       .r-3 {
-        animation-delay: 0.3s;
+        animation-delay: 0.25s;
       }
       .r-4 {
-        animation-delay: 0.4s;
+        animation-delay: 0.35s;
+      }
+      .r-5 {
+        animation-delay: 0.45s;
       }
 
       @keyframes entrance {
         from {
           opacity: 0;
-          transform: translateY(-20px) scale(0.95);
+          transform: translateY(-16px);
         }
         to {
           opacity: 1;
-          transform: translateY(0) scale(1);
+          transform: translateY(0);
         }
       }
 
       @keyframes revealUp {
         from {
           opacity: 0;
-          transform: translateY(30px);
-          filter: blur(10px);
+          transform: translateY(20px);
         }
         to {
           opacity: 1;
           transform: translateY(0);
-          filter: blur(0);
         }
       }
     </style>
   </head>
   <body>
-    <div class="nebula"></div>
-    <div class="particles"></div>
+    <div class="glow"></div>
 
     <div class="container">
       <header class="profile reveal r-1">
         <div class="avatar-box">
-          <img src="imagens/bittoofc.png" alt="BITTO" class="avatar-img" />
+          <img src="imagens/favicon.png" alt="BITTO" />
         </div>
         <h1 class="logo-text">BITTO<span>.</span></h1>
-        <p style="color: var(--text-sec); font-weight: 500; margin-top: 8px">
-          A plataforma de estudo inteligente para universitários.
-        </p>
+        <p>A plataforma de estudo inteligente para universitários.</p>
       </header>
 
       <nav class="links-grid">
-        <a href="pages/login.html" class="link-card reveal r-2">
+        <a href="https://www.usebitto.com/pages/login?mode=register" class="link-card featured reveal r-2">
           <div class="card-body">
             <div class="icon-circle">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </div>
+            <div>
+              <span class="title-main">Comece Grátis Agora</span>
+              <span class="desc-sub">Crie sua conta em segundos</span>
+            </div>
+          </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+
+        <a href="https://www.usebitto.com/pages/login" class="link-card reveal r-2">
+          <div class="card-body">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                 <polyline points="10 17 15 12 10 7"></polyline>
                 <line x1="15" y1="12" x2="3" y2="12"></line>
               </svg>
             </div>
             <div>
-              <span class="title-main">Acesse sua conta!</span>
-              <span class="desc-sub">Faça login na plataforma</span>
+              <span class="title-main">Já tenho conta</span>
+              <span class="desc-sub">Fazer login na plataforma</span>
             </div>
           </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </a>
 
-        <a href="index.html" class="link-card featured reveal r-3">
+        <a href="https://www.usebitto.com/" class="link-card reveal r-3">
           <div class="card-body">
             <div class="icon-circle">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                ></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>
               </svg>
             </div>
             <div>
-              <span class="title-main">Conheça nossas ferramentas</span>
-              <span class="desc-sub">Acesse o Site Oficial</span>
+              <span class="title-main">Conheça as ferramentas</span>
+              <span class="desc-sub">Site oficial e demonstração</span>
             </div>
           </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </a>
 
-        <a href="site/parceiro.html" class="link-card reveal r-4">
+        <a href="https://www.usebitto.com/#avaliacoes" class="link-card accent-card reveal r-3">
           <div class="card-body">
             <div class="icon-circle">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </div>
+            <div>
+              <span class="title-main">Veja quem já usa</span>
+              <span class="desc-sub">Avaliações reais de estudantes</span>
+            </div>
+          </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+
+        <a href="https://www.usebitto.com/site/parceiro" class="link-card reveal r-4">
+          <div class="card-body">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -403,79 +415,45 @@
               </svg>
             </div>
             <div>
-              <span class="title-main">Embaixadores BITTO</span>
-              <span class="desc-sub">Seja um afiliado e ganhe dinheiro</span>
+              <span class="title-main">Influenciadores</span>
+              <span class="desc-sub">Seja um parceiro e ganhe dinheiro</span>
             </div>
           </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </a>
 
-        <div class="support-box reveal r-4">
+        <div class="support-box reveal r-5">
           <span class="support-title">Problemas técnicos?</span>
           <a href="mailto:usebitto.tech@gmail.com" class="support-link">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <path
-                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-              ></path>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
               <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
             Falar com Suporte
           </a>
-          <p
-            style="font-size: 0.75rem; color: var(--text-sec); margin-top: 12px"
-          >
-            usebitto.tech@gmail.com
-          </p>
+          <p>usebitto.tech@gmail.com</p>
         </div>
       </nav>
 
-      <div class="footer reveal r-4">
+      <div class="footer reveal r-5">
         <div class="socials">
-          <a href="https://instagram.com/usebitto"
-            ><svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+          <a href="https://instagram.com/usebitto" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg
-          ></a>
-          <a href="https://tiktok.com/@usebitto"
-            ><svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg
-          ></a>
-          <a href="https://x.com/usebitto"
-            ><svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-              /></svg
-          ></a>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+          <a href="https://tiktok.com/@usebitto" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+            </svg>
+          </a>
+          <a href="https://x.com/usebitto" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
         </div>
 
         <div class="copyright">BITTO TECNOLOGIA © 2026</div>
