@@ -1,1649 +1,1298 @@
 <!doctype html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Backstage · Bitto</title>
-    <link rel="icon" type="image/png" href="imagens/favicon.png" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --bg: #07080b;
-        --s1: #0d0f14;
-        --s2: #13161d;
-        --s3: #1a1e28;
-        --b: rgba(255, 255, 255, 0.07);
-        --bh: rgba(255, 255, 255, 0.13);
-        --t: #edf0f8;
-        --m: #5a6276;
-        --m2: #8d94a8;
-        --blue: #3b6fff;
-        --blue-g: rgba(59, 111, 255, 0.2);
-        --green: #00e37a;
-        --green-g: rgba(0, 227, 122, 0.18);
-        --yellow: #ffc840;
-        --red: #ff4d6a;
-        --purple: #a855f7;
-        --accent: #ccff00;
-        --accent-g: rgba(204, 255, 0, 0.1);
-        --fh: "Outfit", sans-serif;
-        --fb: "Inter", sans-serif;
-      }
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      body {
-        background: var(--bg);
-        color: var(--t);
-        font-family: var(--fb);
-        min-height: 100vh;
-        display: flex;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Backstage · Bitto</title>
+  <link rel="icon" type="image/png" href="imagens/favicon.png" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #f8f9ff;
+      --primary: #0035ff;
+      --accent: #ccff00;
+      --dark: #0a0a0b;
+      --white: #ffffff;
+      --text-gray: #475569;
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow-glass: 0 12px 40px 0 rgba(0, 53, 255, 0.12);
+      --font-heading: "Outfit", sans-serif;
+      --font-body: "Plus Jakarta Sans", sans-serif;
+      --success: #0a8a3f;
+      --error: #d1293d;
+      --warning: #ffc840;
+    }
 
-      /* AUTH WALL */
-      #authWall {
-        position: fixed;
-        inset: 0;
-        background: var(--bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999;
-      }
-      .auth-box {
-        background: var(--s1);
-        border: 1px solid var(--b);
-        border-radius: 20px;
-        padding: 40px;
-        width: 360px;
-        text-align: center;
-      }
-      .auth-logo {
-        font-family: var(--fh);
-        font-size: 1.4rem;
-        font-weight: 800;
-        margin-bottom: 8px;
-      }
-      .auth-logo span {
-        color: var(--blue);
-      }
-      .auth-sub {
-        font-size: 0.8rem;
-        color: var(--m2);
-        margin-bottom: 28px;
-      }
-      .auth-field {
-        margin-bottom: 14px;
-        text-align: left;
-      }
-      .auth-field label {
-        display: block;
-        font-size: 0.72rem;
-        font-weight: 600;
-        color: var(--m2);
-        margin-bottom: 5px;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-      .auth-field input {
-        width: 100%;
-        background: var(--s2);
-        border: 1px solid var(--b);
-        border-radius: 10px;
-        padding: 11px 14px;
-        font-size: 0.86rem;
-        color: var(--t);
-        font-family: var(--fb);
-        outline: none;
-        transition: border-color 0.2s;
-      }
-      .auth-field input:focus {
-        border-color: var(--blue);
-      }
-      .btn-auth {
-        width: 100%;
-        background: var(--blue);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 13px;
-        font-family: var(--fh);
-        font-size: 0.9rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-        margin-top: 4px;
-      }
-      .btn-auth:hover {
-        background: #2d5fe8;
-      }
-      #authErr {
-        font-size: 0.78rem;
-        color: var(--red);
-        margin-top: 10px;
-        min-height: 20px;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      /* SIDEBAR */
-      .sidebar {
-        width: 240px;
-        min-height: 100vh;
-        background: var(--s1);
-        border-right: 1px solid var(--b);
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 50;
-      }
-      .sb-logo {
-        padding: 24px 20px;
-        border-bottom: 1px solid var(--b);
-      }
-      .sb-tag {
-        font-size: 0.6rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--m);
-        margin-bottom: 3px;
-        font-family: var(--fb);
-      }
-      .sb-name {
-        font-family: var(--fh);
-        font-size: 1.25rem;
-        font-weight: 800;
-      }
-      .sb-name span {
-        color: var(--blue);
-      }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
 
-      .sb-nav {
-        padding: 12px 10px;
-        flex: 1;
-      }
-      .sb-section {
-        font-size: 0.58rem;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--m);
-        padding: 0 10px;
-        margin: 14px 0 6px;
-      }
-      .sb-item {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        padding: 9px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.83rem;
-        font-weight: 500;
-        color: var(--m2);
-        transition: all 0.15s;
-        text-decoration: none;
-        border: 1px solid transparent;
-        margin-bottom: 2px;
-      }
-      .sb-item:hover {
-        background: var(--s2);
-        color: var(--t);
-      }
-      .sb-item.active {
-        background: var(--blue-g);
-        color: var(--t);
-        border-color: rgba(59, 111, 255, 0.25);
-      }
-      .sb-item .ico {
-        width: 16px;
-        text-align: center;
-        font-size: 0.9rem;
-      }
-      .sb-badge {
-        margin-left: auto;
-        background: var(--blue);
-        color: white;
-        font-size: 0.6rem;
-        font-weight: 700;
-        padding: 2px 7px;
-        border-radius: 20px;
-      }
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-      .sb-footer {
-        padding: 14px 20px;
-        border-top: 1px solid var(--b);
-      }
-      .sb-user {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-      }
-      .sb-avatar {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, var(--blue), var(--purple));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        font-weight: 700;
-        flex-shrink: 0;
-      }
-      .sb-uname {
-        font-size: 0.8rem;
-        font-weight: 600;
-      }
-      .sb-urole {
-        font-size: 0.65rem;
-        color: var(--m);
-      }
-      .btn-logout {
-        margin-left: auto;
-        background: var(--s2);
-        border: 1px solid var(--b);
-        color: var(--m2);
-        width: 28px;
-        height: 28px;
-        border-radius: 7px;
-        cursor: pointer;
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.15s;
-      }
-      .btn-logout:hover {
-        background: var(--s3);
-        color: var(--red);
-      }
+    /* --- NAV FIXA --- */
+    nav {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      background: rgba(248, 249, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      height: 80px;
+      padding: 0 8%;
+    }
 
-      /* MAIN */
-      .main {
-        margin-left: 240px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 100%;
+      width: 100%;
+      gap: 20px;
+    }
 
-      /* TOPBAR */
-      .topbar {
-        padding: 18px 28px;
-        border-bottom: 1px solid var(--b);
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        background: rgba(7, 8, 11, 0.85);
-        backdrop-filter: blur(10px);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
-      .topbar-title {
-        font-family: var(--fh);
-        font-size: 0.95rem;
-        font-weight: 700;
-      }
-      .topbar-sub {
-        font-size: 0.75rem;
-        color: var(--m);
-        margin-top: 1px;
-      }
-      .topbar-actions {
-        margin-left: auto;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
+    .logo {
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--dark);
+      text-decoration: none;
+      white-space: nowrap;
+    }
 
-      /* BUTTONS */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 14px;
-        border-radius: 8px;
-        border: 1px solid var(--b);
-        font-size: 0.78rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s;
-        font-family: var(--fb);
-        background: var(--s2);
-        color: var(--t);
-      }
-      .btn:hover {
-        background: var(--s3);
-        border-color: var(--bh);
-      }
-      .btn-blue {
-        background: var(--blue);
-        border-color: var(--blue);
-        color: white;
-      }
-      .btn-blue:hover {
-        background: #2d5fe8;
-        border-color: #2d5fe8;
-      }
-      .btn-green {
-        background: rgba(0, 227, 122, 0.15);
-        border-color: rgba(0, 227, 122, 0.3);
-        color: var(--green);
-      }
-      .btn-green:hover {
-        background: rgba(0, 227, 122, 0.22);
-      }
-      .btn-sm {
-        padding: 6px 11px;
-        font-size: 0.72rem;
-      }
+    .logo span {
+      color: var(--primary);
+    }
 
-      /* CONTENT */
-      .content {
-        padding: 24px 28px;
-        flex: 1;
-      }
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
 
-      /* TABS */
-      .tabs {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 24px;
-      }
-      .tab {
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        color: var(--m2);
-        transition: all 0.15s;
-        border: 1px solid transparent;
-      }
-      .tab:hover {
-        color: var(--t);
-        background: var(--s2);
-      }
-      .tab.active {
-        background: var(--blue-g);
-        color: var(--t);
-        border-color: rgba(59, 111, 255, 0.25);
-      }
+    .btn-nav {
+      background: var(--dark);
+      color: white;
+      padding: 0.7rem 1.8rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.3s;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      border: none;
+      cursor: pointer;
+    }
 
-      /* KPI GRID */
-      .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 24px;
-      }
-      .kpi-card {
-        background: var(--s1);
-        border: 1px solid var(--b);
-        border-radius: 14px;
-        padding: 18px;
-        position: relative;
-        overflow: hidden;
-        transition: border-color 0.2s;
-      }
-      .kpi-card:hover {
-        border-color: var(--bh);
-      }
-      .kpi-card::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        transform: translate(30%, -30%);
-        opacity: 0.1;
-      }
-      .kpi-card.c-blue::after {
-        background: var(--blue);
-      }
-      .kpi-card.c-green::after {
-        background: var(--green);
-      }
-      .kpi-card.c-yellow::after {
-        background: var(--yellow);
-      }
-      .kpi-card.c-purple::after {
-        background: var(--purple);
-      }
-      .kpi-tag {
-        font-size: 0.6rem;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--m);
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .kpi-dot {
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-      }
-      .c-blue .kpi-dot {
-        background: var(--blue);
-        box-shadow: 0 0 5px var(--blue);
-      }
-      .c-green .kpi-dot {
-        background: var(--green);
-        box-shadow: 0 0 5px var(--green);
-      }
-      .c-yellow .kpi-dot {
-        background: var(--yellow);
-      }
-      .c-purple .kpi-dot {
-        background: var(--purple);
-      }
-      .kpi-val {
-        font-family: var(--fh);
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-      }
-      .kpi-info {
-        font-size: 0.7rem;
-        color: var(--m);
-        margin-top: 3px;
-      }
-      .kpi-info.up {
-        color: var(--green);
-      }
+    .btn-nav:hover {
+      background: var(--primary);
+    }
 
-      /* PANEL */
-      .panel {
-        background: var(--s1);
-        border: 1px solid var(--b);
-        border-radius: 16px;
-        overflow: hidden;
-      }
-      .panel-hd {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--b);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .panel-ttl {
-        font-size: 0.82rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-      }
-      .panel-count {
-        background: var(--s3);
-        border: 1px solid var(--b);
-        color: var(--m2);
-        font-size: 0.6rem;
-        padding: 2px 8px;
-        border-radius: 20px;
-      }
-      .panel-acts {
-        margin-left: auto;
-        display: flex;
-        gap: 6px;
-      }
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--dark);
+    }
 
-      /* SEARCH */
-      .search-row {
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--b);
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-      .search-wrap {
-        position: relative;
-        flex: 1;
-        min-width: 200px;
-      }
-      .search-ico {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--m);
-        font-size: 0.8rem;
-        pointer-events: none;
-      }
-      .search-input {
-        width: 100%;
-        background: var(--s2);
-        border: 1px solid var(--b);
-        border-radius: 8px;
-        padding: 8px 12px 8px 30px;
-        font-size: 0.82rem;
-        color: var(--t);
-        font-family: var(--fb);
-        outline: none;
-        transition: border-color 0.2s;
-      }
-      .search-input:focus {
-        border-color: var(--blue);
-      }
-      .chip {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        background: var(--s2);
-        border: 1px solid var(--b);
-        border-radius: 6px;
-        padding: 6px 11px;
-        font-size: 0.72rem;
-        font-weight: 500;
-        cursor: pointer;
-        color: var(--m2);
-        white-space: nowrap;
-        transition: all 0.15s;
-      }
-      .chip:hover,
-      .chip.on {
-        border-color: var(--blue);
-        color: var(--t);
-        background: var(--blue-g);
-      }
+    /* --- MAIN CONTENT --- */
+    main {
+      padding-top: 120px;
+      padding-bottom: 40px;
+      padding-left: 8%;
+      padding-right: 8%;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
 
-      /* TABLE */
-      .tbl-wrap {
-        overflow-x: auto;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      thead tr {
-        background: var(--s2);
-      }
-      th {
-        padding: 9px 16px;
-        font-size: 0.6rem;
-        font-weight: 600;
-        color: var(--m);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        text-align: left;
-        white-space: nowrap;
-      }
-      td {
-        padding: 0 16px;
-        font-size: 0.81rem;
-        color: var(--t);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        vertical-align: middle;
-      }
-      tbody tr {
-        height: 54px;
-        border-bottom: 1px solid var(--b);
-        transition: background 0.1s;
-        cursor: pointer;
-      }
-      tbody tr:hover {
-        background: var(--s2);
-      }
-      tbody tr:last-child {
-        border-bottom: none;
-      }
+    .page-header {
+      margin-bottom: 3rem;
+    }
 
-      .inf-cell {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-      }
-      .inf-av {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background: var(--s3);
-        border: 1px solid var(--b);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.68rem;
-        font-weight: 700;
-        flex-shrink: 0;
-        color: var(--m2);
-      }
-      .inf-name {
-        font-weight: 600;
-        font-size: 0.82rem;
-      }
-      .inf-handle {
-        font-size: 0.7rem;
-        color: var(--m);
-      }
+    .page-header h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
 
-      /* BADGES */
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 3px 9px;
-        border-radius: 5px;
-        font-size: 0.67rem;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-      .bd {
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-      }
-      .b-green {
-        background: rgba(0, 227, 122, 0.1);
-        color: var(--green);
-        border: 1px solid rgba(0, 227, 122, 0.2);
-      }
-      .b-green .bd {
-        background: var(--green);
-        box-shadow: 0 0 4px var(--green);
-      }
-      .b-yellow {
-        background: rgba(255, 200, 64, 0.1);
-        color: var(--yellow);
-        border: 1px solid rgba(255, 200, 64, 0.2);
-      }
-      .b-yellow .bd {
-        background: var(--yellow);
-      }
-      .b-blue {
-        background: rgba(59, 111, 255, 0.1);
-        color: #7ba3ff;
-        border: 1px solid rgba(59, 111, 255, 0.2);
-      }
-      .b-blue .bd {
-        background: var(--blue);
-      }
-      .b-red {
-        background: rgba(255, 77, 106, 0.1);
-        color: var(--red);
-        border: 1px solid rgba(255, 77, 106, 0.2);
-      }
-      .b-purple {
-        background: rgba(168, 85, 247, 0.1);
-        color: var(--purple);
-        border: 1px solid rgba(168, 85, 247, 0.2);
-      }
-      .b-gray {
-        background: var(--s3);
-        color: var(--m2);
-        border: 1px solid var(--b);
-      }
+    .page-header p {
+      color: var(--text-gray);
+      font-size: 1rem;
+    }
 
-      /* CUPOM */
-      .cupom-tag {
-        font-size: 0.7rem;
-        background: var(--s3);
-        border: 1px solid var(--b);
-        padding: 3px 8px;
-        border-radius: 5px;
-        color: var(--yellow);
-        font-family: monospace;
-      }
+    /* --- TABS --- */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+    }
 
-      /* ICON BTNS */
-      .ibtn {
-        background: none;
-        border: 1px solid transparent;
-        color: var(--m);
-        cursor: pointer;
-        padding: 5px 7px;
-        border-radius: 6px;
-        font-size: 0.78rem;
-        transition: all 0.15s;
-        line-height: 1;
-      }
-      .ibtn:hover {
-        background: var(--s3);
-        border-color: var(--b);
-        color: var(--t);
-      }
-      .ibtn.del:hover {
-        background: rgba(255, 77, 106, 0.1);
-        border-color: rgba(255, 77, 106, 0.3);
-        color: var(--red);
-      }
+    .tab {
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-gray);
+      position: relative;
+      transition: color 0.3s;
+    }
 
-      /* RIGHT COL */
-      .workspace {
-        display: grid;
-        grid-template-columns: 1fr 300px;
-        gap: 16px;
-        align-items: start;
-      }
-      .right-col {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
+    .tab.active {
+      color: var(--primary);
+    }
 
-      .form-sec {
-        padding: 18px;
-      }
-      .flbl {
-        font-size: 0.62rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--m);
-        margin-bottom: 4px;
-        display: block;
-      }
-      .fg {
-        margin-bottom: 10px;
-      }
-      .finput {
-        width: 100%;
-        background: var(--s2);
-        border: 1px solid var(--b);
-        border-radius: 8px;
-        padding: 9px 12px;
-        font-size: 0.82rem;
-        color: var(--t);
-        font-family: var(--fb);
-        outline: none;
-        transition: border-color 0.2s;
-      }
-      .finput:focus {
-        border-color: var(--blue);
-        box-shadow: 0 0 0 3px var(--blue-g);
-      }
-      .finput::placeholder {
-        color: var(--m);
-      }
-      select.finput {
-        cursor: pointer;
-        -webkit-appearance: none;
-        appearance: none;
-      }
+    .tab.active::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+    }
 
-      /* ATIVIDADE */
-      .act-list {
-        padding: 6px 0;
-      }
-      .act-item {
-        display: flex;
-        gap: 10px;
-        padding: 10px 18px;
-        transition: background 0.1s;
-      }
-      .act-item:hover {
-        background: var(--s2);
-      }
-      .act-ico {
-        width: 28px;
-        height: 28px;
-        border-radius: 7px;
-        background: var(--s3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        flex-shrink: 0;
-        border: 1px solid var(--b);
-      }
-      .act-txt {
-        font-size: 0.77rem;
-        line-height: 1.4;
-      }
-      .act-time {
-        font-size: 0.63rem;
-        color: var(--m);
-        margin-top: 2px;
-        font-family: monospace;
-      }
+    /* --- SECTION GRID --- */
+    .section {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
 
-      /* EMPTY */
-      .empty {
-        padding: 48px 20px;
-        text-align: center;
-        color: var(--m);
-        font-size: 0.82rem;
-      }
-      .empty-ico {
-        font-size: 1.8rem;
-        margin-bottom: 10px;
-        opacity: 0.4;
-      }
-      .empty-ttl {
-        font-weight: 600;
-        color: var(--m2);
-        margin-bottom: 4px;
-      }
+    .section.active {
+      display: block;
+    }
 
-      /* MODAL */
-      .overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(4px);
-        z-index: 200;
-        display: none;
-        align-items: center;
-        justify-content: center;
-      }
-      .overlay.open {
-        display: flex;
-      }
-      .modal {
-        background: var(--s1);
-        border: 1px solid var(--b);
-        border-radius: 18px;
-        padding: 28px;
-        width: 440px;
-        max-width: 95vw;
-        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-        animation: mIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-      @keyframes mIn {
-        from {
-          transform: scale(0.92);
-          opacity: 0;
-        }
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-      .modal-hd {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-      }
-      .modal-ttl {
-        font-family: var(--fh);
-        font-size: 1rem;
-        font-weight: 700;
-      }
-      .modal-x {
-        background: none;
-        border: none;
-        color: var(--m);
-        cursor: pointer;
-        font-size: 1.1rem;
-        transition: color 0.15s;
-      }
-      .modal-x:hover {
-        color: var(--t);
-      }
-      .modal-frow {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .modal-actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 16px;
-      }
-
-      /* TOAST */
-      #toast {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        background: var(--s1);
-        color: var(--t);
-        padding: 12px 18px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.82rem;
-        border: 1px solid var(--b);
-        border-left: 3px solid var(--green);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        transform: translateY(80px) scale(0.95);
+    @keyframes fadeIn {
+      from {
         opacity: 0;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        max-width: 300px;
+        transform: translateY(10px);
       }
-      #toast.show {
-        transform: translateY(0) scale(1);
+      to {
         opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --- CARDS & LAYOUT --- */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .card h2 {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+
+    /* --- FORM ELEMENTS --- */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--dark);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 53, 255, 0.1);
+    }
+
+    /* --- BUTTONS --- */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-family: var(--font-heading);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 20px 40px rgba(0, 53, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 24px 48px rgba(0, 53, 255, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--dark);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg);
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      opacity: 0.9;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 2rem;
+    }
+
+    /* --- TABLE --- */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: var(--bg);
+      padding: 14px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--dark);
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-gray);
+    }
+
+    tr:hover {
+      background: rgba(0, 53, 255, 0.03);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-selecionado {
+      background: rgba(204, 255, 0, 0.2);
+      color: #8b9a00;
+    }
+
+    .status-contato1 {
+      background: rgba(255, 200, 64, 0.2);
+      color: #b88900;
+    }
+
+    .status-contato2 {
+      background: rgba(59, 111, 255, 0.2);
+      color: #003aaa;
+    }
+
+    .status-ativo {
+      background: rgba(10, 138, 63, 0.2);
+      color: #0a8a3f;
+    }
+
+    .status-sem-resposta {
+      background: rgba(209, 41, 61, 0.2);
+      color: #d1293d;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg);
+      border-color: var(--primary);
+    }
+
+    /* --- MODAL --- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 11, 0.6);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-gray);
+    }
+
+    /* --- TOAST --- */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--white);
+      border-left: 4px solid var(--success);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-glass);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3000;
+      transform: translateX(400px);
+      transition: transform 0.3s;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      font-size: 1.2rem;
+      min-width: 24px;
+    }
+
+    .toast-message {
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+
+    /* --- KPI STATS --- */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .kpi-label {
+      font-size: 0.85rem;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .kpi-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .kpi-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+
+    /* --- RESPONSIVO --- */
+    @media (max-width: 1024px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
       }
 
-      /* LOADING SPINNER */
-      .spin {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.6s linear infinite;
+      main {
+        padding-left: 6%;
+        padding-right: 6%;
+        padding-top: 100px;
       }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
       }
 
-      /* SCROLLBAR */
-      ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
+      .nav-actions {
+        display: none;
+        position: absolute;
+        top: 80px;
+        right: 0;
+        left: 0;
+        flex-direction: column;
+        background: rgba(248, 249, 255, 0.98);
+        border-bottom: 1px solid var(--border);
+        padding: 12px;
+        gap: 8px;
       }
-      ::-webkit-scrollbar-track {
-        background: transparent;
+
+      .nav-actions.open {
+        display: flex;
       }
-      ::-webkit-scrollbar-thumb {
-        background: var(--s3);
-        border-radius: 4px;
+
+      .btn-nav {
+        width: 100%;
+        text-align: center;
       }
-    </style>
-  </head>
-  <body>
-    <!-- AUTH WALL -->
-    <div id="authWall">
-      <div class="auth-box">
-        <div class="auth-logo">BACK<span>STAGE</span></div>
-        <div class="auth-sub">Acesso restrito · Bitto Admin</div>
-        <div class="auth-field">
-          <label>E-mail</label>
-          <input type="email" id="authEmail" placeholder="admin@email.com" />
-        </div>
-        <div class="auth-field">
-          <label>Senha</label>
-          <input type="password" id="authPass" placeholder="••••••••" />
-        </div>
-        <button class="btn-auth" id="btnLogin">Entrar</button>
-        <div id="authErr"></div>
+
+      nav {
+        height: auto;
+        padding: 0 4%;
+      }
+
+      .nav-container {
+        padding: 12px 0;
+      }
+
+      main {
+        padding: 100px 4% 40px;
+      }
+
+      .page-header h1 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+      }
+
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .table-wrapper {
+        border-radius: 12px;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 10px 8px;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 24px;
+      }
+
+      .modal-header h2 {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toast {
+        right: 12px;
+        left: 12px;
+        bottom: 12px;
+        width: auto;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .row-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="logo">bitto<span>.</span></a>
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <div class="nav-actions" id="navActions">
+        <button class="btn-nav" id="btnSync">🔄 Sincronizar</button>
+        <button class="btn-nav" id="btnLogout">Sair</button>
       </div>
     </div>
+  </nav>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sb-logo">
-        <div class="sb-tag">CRM · Bitto</div>
-        <div class="sb-name">BACK<span>STAGE</span></div>
-      </div>
-      <nav class="sb-nav">
-        <div class="sb-section">Principal</div>
-        <a class="sb-item active" onclick="setTab('pipeline')">
-          <span class="ico">⬛</span> Pipeline
-          <span class="sb-badge" id="navBadge">0</span>
-        </a>
-        <a class="sb-item" onclick="setTab('candidaturas')">
-          <span class="ico">📥</span> Candidaturas
-          <span
-            class="sb-badge"
-            id="navCandBadge"
-            style="background: var(--yellow); color: #000"
-            >0</span
-          >
-        </a>
-        <div class="sb-section">Ações</div>
-        <a
-          class="sb-item"
-          onclick="
-            document.getElementById('modalOverlay').classList.add('open')
-          "
-        >
-          <span class="ico">➕</span> Novo embaixador
-        </a>
-        <a class="sb-item" onclick="exportCSV()">
-          <span class="ico">⬇</span> Exportar CSV
-        </a>
-      </nav>
-      <div class="sb-footer">
-        <div class="sb-user">
-          <div class="sb-avatar">B</div>
-          <div>
-            <div class="sb-uname">Bitto Admin</div>
-            <div class="sb-urole">backstage</div>
-          </div>
-          <button class="btn-logout" id="btnLogout" title="Sair">↩</button>
-        </div>
-      </div>
-    </aside>
+  <!-- MAIN -->
+  <main>
+    <div class="page-header">
+      <h1>Backstage Bitto</h1>
+      <p>Gerencie seus embaixadores e parceiros de forma fácil</p>
+    </div>
 
-    <!-- MAIN -->
-    <main class="main">
-      <div class="topbar">
-        <div>
-          <div class="topbar-title" id="topTitle">Pipeline de Embaixadores</div>
-          <div class="topbar-sub" id="topSub">
-            Carregando dados do Firebase…
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="pipeline">📊 Pipeline</button>
+      <button class="tab" data-tab="scripts">📝 Scripts</button>
+      <button class="tab" data-tab="settings">⚙️ Configurações</button>
+    </div>
+
+    <!-- SECTION: PIPELINE -->
+    <section class="section active" id="pipeline">
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total</div>
+          <div class="kpi-value" id="kpiTotal">0</div>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill" id="barTotal" style="width: 0%"></div>
           </div>
         </div>
-        <div class="topbar-actions">
-          <button class="btn btn-sm" onclick="loadAll()">↻ Atualizar</button>
-          <button
-            class="btn btn-blue btn-sm"
-            onclick="
-              document.getElementById('modalOverlay').classList.add('open')
-            "
-          >
-            + Novo
-          </button>
+        <div class="kpi-card">
+          <div class="kpi-label">Selecionados</div>
+          <div class="kpi-value" id="kpiSelecionados">0</div>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill" id="barSelecionados" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Em Abordagem</div>
+          <div class="kpi-value" id="kpiAbordagem">0</div>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill" id="barAbordagem" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ativos</div>
+          <div class="kpi-value" id="kpiAtivos">0</div>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill" id="barAtivos" style="width: 0%"></div>
+          </div>
         </div>
       </div>
 
-      <div class="content">
-        <!-- TABS -->
-        <div class="tabs">
-          <div class="tab active" onclick="setTab('pipeline')">Pipeline</div>
-          <div class="tab" onclick="setTab('candidaturas')">Candidaturas</div>
-        </div>
-
-        <!-- KPIs -->
-        <div class="kpi-grid">
-          <div class="kpi-card c-blue">
-            <div class="kpi-tag">
-              <span class="kpi-dot"></span>Total pipeline
-            </div>
-            <div class="kpi-val" id="kpiTotal">—</div>
-            <div class="kpi-info up" id="kpiAtivosInfo">Carregando…</div>
-          </div>
-          <div class="kpi-card c-green">
-            <div class="kpi-tag"><span class="kpi-dot"></span>Ativos</div>
-            <div class="kpi-val" id="kpiAtivos">—</div>
-            <div class="kpi-info">Gerando comissão</div>
-          </div>
-          <div class="kpi-card c-yellow">
-            <div class="kpi-tag"><span class="kpi-dot"></span>Em abordagem</div>
-            <div class="kpi-val" id="kpiAb">—</div>
-            <div class="kpi-info">Aguardando resposta</div>
-          </div>
-          <div class="kpi-card c-purple">
-            <div class="kpi-tag"><span class="kpi-dot"></span>Candidaturas</div>
-            <div class="kpi-val" id="kpiCand">—</div>
-            <div class="kpi-info">Aguardando análise</div>
-          </div>
-        </div>
-
-        <!-- WORKSPACE -->
-        <div class="workspace">
-          <!-- TABELA -->
-          <div class="panel">
-            <div class="panel-hd">
-              <div class="panel-ttl">
-                📋 Base de embaixadores
-                <span class="panel-count" id="tableCount">0 registros</span>
-              </div>
-              <div class="panel-acts">
-                <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV</button>
-              </div>
-            </div>
-            <div class="search-row">
-              <div class="search-wrap">
-                <span class="search-ico">🔍</span>
-                <input
-                  type="text"
-                  class="search-input"
-                  id="searchInput"
-                  placeholder="Buscar por nome, @, cupom…"
-                  oninput="renderTable()"
-                />
-              </div>
-              <div class="chip on" data-f="all" onclick="setFilter(this)">
-                Todos
-              </div>
-              <div class="chip" data-f="Ativo" onclick="setFilter(this)">
-                Ativos
-              </div>
-              <div class="chip" data-f="Abordagem" onclick="setFilter(this)">
-                Abordagem
-              </div>
-              <div class="chip" data-f="Prospecção" onclick="setFilter(this)">
-                Prospecção
-              </div>
-            </div>
-            <div class="tbl-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th style="width: 30%">Embaixador</th>
-                    <th style="width: 16%">Status</th>
-                    <th style="width: 18%">Cupom</th>
-                    <th style="width: 14%">Plano</th>
-                    <th style="width: 14%">Cadastro</th>
-                    <th style="width: 8%; text-align: right">Ações</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- DIREITA -->
-          <div class="right-col">
-            <!-- ATIVAR NO FIREBASE -->
-            <div class="panel">
-              <div class="panel-hd">
-                <div class="panel-ttl">⚡ Ativar acesso Pro</div>
-              </div>
-              <div class="form-sec">
-                <div class="fg">
-                  <label class="flbl">E-mail do embaixador</label>
-                  <input
-                    type="email"
-                    id="userEmail"
-                    class="finput"
-                    placeholder="email@exemplo.com"
-                  />
-                </div>
-                <div class="fg">
-                  <label class="flbl">Plano a liberar</label>
-                  <select id="userPlan" class="finput">
-                    <option value="pro">Pro</option>
-                    <option value="elite">Elite</option>
-                  </select>
-                </div>
-                <button
-                  class="btn btn-green"
-                  style="width: 100%; justify-content: center"
-                  onclick="grantAccess()"
-                >
-                  ⚡ Liberar acesso
-                </button>
-              </div>
-            </div>
-
-            <!-- ATIVIDADE -->
-            <div class="panel">
-              <div class="panel-hd">
-                <div class="panel-ttl">🕐 Atividade recente</div>
-              </div>
-              <div class="act-list" id="actFeed">
-                <div class="act-item">
-                  <div class="act-ico">🔄</div>
-                  <div>
-                    <div class="act-txt">Backstage iniciado</div>
-                    <div class="act-time">agora</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- TOOLBAR -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Buscar por nome, @instagram ou email..."
+            class="form-group"
+            style="flex: 1; min-width: 200px; margin: 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px;"
+          />
+          <button class="btn btn-primary" id="btnAddNew">+ Adicionar Embaixador</button>
+          <button class="btn btn-secondary" id="btnExport">⬇️ Exportar CSV</button>
         </div>
       </div>
-    </main>
 
-    <!-- MODAL NOVO EMBAIXADOR -->
-    <div class="overlay" id="modalOverlay">
-      <div class="modal">
-        <div class="modal-hd">
-          <div class="modal-ttl">👤 Novo Embaixador</div>
-          <button
-            class="modal-x"
-            onclick="
-              document.getElementById('modalOverlay').classList.remove('open')
-            "
-          >
-            ✕
-          </button>
+      <!-- TABELA -->
+      <div class="card">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome / Instagram</th>
+                <th>Status</th>
+                <th>Email</th>
+                <th>Cupom</th>
+                <th>Data</th>
+                <th style="text-align: center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                  Carregando dados...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="modal-frow">
-          <div class="fg">
-            <label class="flbl">Nome completo</label>
-            <input type="text" id="mNome" class="finput" placeholder="Nome" />
-          </div>
-          <div class="fg">
-            <label class="flbl">@ Instagram / handle</label>
-            <input
-              type="text"
-              id="mInsta"
-              class="finput"
-              placeholder="@usuario"
-            />
-          </div>
-        </div>
-        <div class="modal-frow">
-          <div class="fg">
-            <label class="flbl">E-mail</label>
-            <input
-              type="email"
-              id="mEmail"
-              class="finput"
-              placeholder="email@email.com"
-            />
-          </div>
-          <div class="fg">
-            <label class="flbl">WhatsApp</label>
-            <input
-              type="text"
-              id="mWpp"
-              class="finput"
-              placeholder="(00) 00000-0000"
-            />
-          </div>
-        </div>
-        <div class="modal-frow">
-          <div class="fg">
-            <label class="flbl">Cupom</label>
-            <input
-              type="text"
-              id="mCupom"
-              class="finput"
-              placeholder="NOME5"
-              style="text-transform: uppercase"
-            />
-          </div>
-          <div class="fg">
-            <label class="flbl">Plano</label>
-            <select id="mPlano" class="finput">
-              <option>Basic</option>
-              <option>Pro</option>
-              <option>Elite</option>
+      </div>
+    </section>
+
+    <!-- SECTION: SCRIPTS -->
+    <section class="section" id="scripts">
+      <div class="grid-2">
+        <!-- GERADORES DE SCRIPT -->
+        <div class="card">
+          <h2>🎬 Gerar Script</h2>
+          <div class="form-group">
+            <label>Escolha de Quem</label>
+            <select id="scriptFrom">
+              <option value="pedro">👤 Pedro (Founder)</option>
+              <option value="bitto">🚀 Bitto (Marca)</option>
             </select>
           </div>
+
+          <div class="form-group">
+            <label>Qual Script?</label>
+            <select id="scriptTemplate">
+              <option value="contato1">📬 1º Contato (Apresentação)</option>
+              <option value="contato2">🔔 Follow-up (Lembrete)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Selecione o Embaixador</label>
+            <select id="scriptProfile">
+              <option value="">-- Carregando perfis --</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="btnGenerateScript" style="width: 100%;">
+            ✨ Gerar Script
+          </button>
         </div>
-        <div class="fg">
-          <label class="flbl">Status inicial</label>
-          <select id="mStatus" class="finput">
-            <option>Prospecção</option>
-            <option>Abordagem</option>
-            <option>Ativo</option>
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button
-            class="btn"
-            style="flex: 1; justify-content: center"
-            onclick="
-              document.getElementById('modalOverlay').classList.remove('open')
+
+        <!-- PREVIEW DO SCRIPT -->
+        <div class="card">
+          <h2>📋 Preview</h2>
+          <div
+            id="scriptPreview"
+            style="
+              background: var(--bg);
+              border-radius: 12px;
+              padding: 16px;
+              font-family: 'Courier New', monospace;
+              font-size: 0.9rem;
+              line-height: 1.6;
+              color: var(--dark);
+              min-height: 200px;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              border: 1px solid var(--border);
+              margin-bottom: 1rem;
             "
           >
-            Cancelar
-          </button>
-          <button
-            class="btn btn-blue"
-            style="flex: 2; justify-content: center"
-            onclick="saveNew()"
-          >
-            💾 Salvar
+            Selecione um template para ver o preview aqui...
+          </div>
+          <button class="btn btn-primary" id="btnCopyScript" style="width: 100%;">
+            📋 Copiar Script
           </button>
         </div>
       </div>
+    </section>
+
+    <!-- SECTION: SETTINGS -->
+    <section class="section" id="settings">
+      <div class="card" style="max-width: 600px;">
+        <h2>⚡ Liberar Acesso</h2>
+        <p style="color: var(--text-gray); margin-bottom: 1.5rem;">
+          Ative um plano para um usuário digitando o e-mail dele.
+        </p>
+
+        <div class="form-group">
+          <label>Email do Usuário</label>
+          <input type="email" id="userEmail" placeholder="user@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label>Plano</label>
+          <select id="userPlan">
+            <option value="free">Free</option>
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+            <option value="embaixador">Embaixador</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" id="btnGrantAccess" style="width: 100%;">
+          ✅ Liberar Acesso
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: ADD NEW -->
+  <div class="modal-overlay" id="modalAdd">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Adicionar Embaixador</h2>
+        <button class="modal-close" onclick="document.getElementById('modalAdd').classList.remove('open');">
+          ✕
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" id="inputNome" placeholder="Nome do embaixador" />
+      </div>
+
+      <div class="form-group">
+        <label>Instagram @ *</label>
+        <input type="text" id="inputInsta" placeholder="@usuario" />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="inputEmail" placeholder="email@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Cupom</label>
+        <input type="text" id="inputCupom" placeholder="BITTO20" />
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select id="inputStatus">
+          <option value="Selecionado">📌 Selecionado</option>
+          <option value="Contato 1">📬 Contato 1</option>
+          <option value="Contato 2">🔔 Contato 2</option>
+          <option value="Ativo">✅ Ativo</option>
+          <option value="Sem Resposta">❌ Sem Resposta</option>
+        </select>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btnSaveNew" style="flex: 1;">
+          ✅ Salvar
+        </button>
+        <button
+          class="btn btn-secondary"
+          onclick="document.getElementById('modalAdd').classList.remove('open');"
+          style="flex: 1;"
+        >
+          Cancelar
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- TOAST -->
-    <div id="toast">
-      <span id="toastIco">✅</span>
-      <span id="toastMsg">Pronto!</span>
-    </div>
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon">✅</div>
+    <div class="toast-message" id="toastMessage">Mensagem</div>
+  </div>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import {
-        getAuth,
-        signInWithEmailAndPassword,
-        signOut,
-        onAuthStateChanged,
-      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-      import {
-        getFirestore,
-        collection,
-        query,
-        where,
-        getDocs,
-        addDoc,
-        doc,
-        updateDoc,
-        deleteDoc,
-        serverTimestamp,
-        orderBy,
-      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  <!-- SCRIPTS -->
+  <script type="module">
+    import {
+      auth,
+      db,
+      onAuthStateChanged,
+      doc,
+      updateDoc,
+      addDoc,
+      deleteDoc,
+      getDocs,
+      collection,
+      query,
+      where,
+      serverTimestamp,
+    } from "./firebase-init.js";
 
-      const FB = {
-        apiKey: "AIzaSyDuGpzkLI-1wFOK9wfrGblhoTqW_gQJA30",
-        authDomain: "bitto-99fac.firebaseapp.com",
-        projectId: "bitto-99fac",
-        storageBucket: "bitto-99fac.firebasestorage.app",
-        messagingSenderId: "483124758230",
-        appId: "1:483124758230:web:cdf73555872c8fe733eb77",
-      };
-      const app = initializeApp(FB);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+    const SEU_EMAIL_ADMIN = "usebitto.tech@gmail.com";
 
-      const ADMIN = "usebitto.tech@gmail.com";
-      let allData = [];
-      let candData = [];
-      let currentFilter = "all";
-      let currentTab = "pipeline";
+    // ── GLOBAL STATE ──
+    let allData = [];
+    let currentTab = "pipeline";
 
-      // ── AUTH ──
-      onAuthStateChanged(auth, (user) => {
-        if (user && user.email.toLowerCase() === ADMIN) {
-          document.getElementById("authWall").style.display = "none";
-          document.body.style.display = "flex";
-          loadAll();
-        } else if (user) {
-          signOut(auth);
-        }
-      });
+    // ── AUTH ──
+    onAuthStateChanged(auth, (user) => {
+      if (!user || user.email.toLowerCase() !== SEU_EMAIL_ADMIN.toLowerCase()) {
+        window.location.href = "index.html";
+      } else {
+        loadData();
+      }
+    });
 
-      document
-        .getElementById("btnLogin")
-        .addEventListener("click", async () => {
-          const email = document.getElementById("authEmail").value.trim();
-          const pass = document.getElementById("authPass").value;
-          const err = document.getElementById("authErr");
-          err.textContent = "";
-          try {
-            await signInWithEmailAndPassword(auth, email, pass);
-          } catch (e) {
-            err.textContent = "E-mail ou senha incorretos.";
-          }
-        });
+    // ── TOAST ──
+    function showToast(msg, type = "success") {
+      const t = document.getElementById("toast");
+      const ico = document.getElementById("toastIcon");
+      const msg_el = document.getElementById("toastMessage");
 
-      document.getElementById("authPass").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") document.getElementById("btnLogin").click();
-      });
+      msg_el.textContent = msg;
+      ico.textContent = type === "error" ? "❌" : type === "warning" ? "⚠️" : "✅";
+      t.style.borderLeftColor =
+        type === "error" ? "var(--error)" : type === "warning" ? "var(--warning)" : "var(--success)";
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 3000);
+    }
 
-      document
-        .getElementById("btnLogout")
-        .addEventListener("click", () => signOut(auth));
+    // ── LOAD DATA FROM FIREBASE ──
+    async function loadData() {
+      try {
+        const snap = await getDocs(collection(db, "embaixadores"));
+        allData = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        updateKPIs();
+        renderTable();
+        updateProfileSelect();
+      } catch (e) {
+        console.error("Erro ao carregar:", e);
+        showToast("Erro ao carregar dados", "error");
+      }
+    }
 
-      // ── LOAD ALL ──
-      window.loadAll = async function () {
-        document.getElementById("topSub").textContent =
-          "Sincronizando com Firebase…";
-        try {
-          // Embaixadores (pipeline)
-          const snap = await getDocs(collection(db, "embaixadores"));
-          allData = [];
-          snap.forEach((d) => allData.push({ id: d.id, ...d.data() }));
+    // ── UPDATE KPIs ──
+    function updateKPIs() {
+      const total = allData.length;
+      const selecionados = allData.filter((d) => d.status === "Selecionado").length;
+      const abordagem = allData.filter((d) => d.status?.includes("Contato")).length;
+      const ativos = allData.filter((d) => d.status === "Ativo").length;
 
-          // Candidaturas pendentes
-          const q2 = query(
-            collection(db, "embaixadores"),
-            where("status", "==", "candidatura"),
-          );
-          const snap2 = await getDocs(q2);
-          candData = [];
-          snap2.forEach((d) => candData.push({ id: d.id, ...d.data() }));
+      document.getElementById("kpiTotal").textContent = total;
+      document.getElementById("kpiSelecionados").textContent = selecionados;
+      document.getElementById("kpiAbordagem").textContent = abordagem;
+      document.getElementById("kpiAtivos").textContent = ativos;
 
-          updateKPIs();
-          renderTable();
-          document.getElementById("topSub").textContent =
-            `${allData.length} registros · atualizado agora`;
-          addAct("🔄", "Dados sincronizados com Firebase");
-        } catch (e) {
-          toast("Erro ao carregar dados", "error");
-          console.error(e);
-        }
-      };
+      if (total > 0) {
+        document.getElementById("barTotal").style.width = Math.min(100, (total / 50) * 100) + "%";
+        document.getElementById("barSelecionados").style.width = (selecionados / total) * 100 + "%";
+        document.getElementById("barAbordagem").style.width = (abordagem / total) * 100 + "%";
+        document.getElementById("barAtivos").style.width = (ativos / total) * 100 + "%";
+      }
+    }
 
-      // ── KPIs ──
-      function updateKPIs() {
-        const pipeline = allData.filter((d) => d.status !== "candidatura");
-        const ativos = pipeline.filter((d) => d.status === "Ativo").length;
-        const ab = pipeline.filter((d) => d.status === "Abordagem").length;
-        const cand = candData.length;
+    // ── RENDER TABLE ──
+    function renderTable() {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      let filtered = allData;
 
-        document.getElementById("kpiTotal").textContent = pipeline.length;
-        document.getElementById("kpiAtivos").textContent = ativos;
-        document.getElementById("kpiAb").textContent = ab;
-        document.getElementById("kpiCand").textContent = cand;
-        document.getElementById("navBadge").textContent = pipeline.length;
-        document.getElementById("navCandBadge").textContent = cand;
-        document.getElementById("kpiAtivosInfo").textContent =
-          ativos > 0
-            ? `↑ ${Math.round((ativos / pipeline.length) * 100)}% convertidos`
-            : "Nenhum ativo ainda";
+      if (search) {
+        filtered = allData.filter(
+          (d) =>
+            (d.nome || "").toLowerCase().includes(search) ||
+            (d.social || "").toLowerCase().includes(search) ||
+            (d.email || "").toLowerCase().includes(search)
+        );
       }
 
-      // ── FILTER ──
-      window.setFilter = function (el) {
-        document
-          .querySelectorAll(".chip")
-          .forEach((c) => c.classList.remove("on"));
-        el.classList.add("on");
-        currentFilter = el.dataset.f;
-        renderTable();
-      };
+      const tbody = document.getElementById("tableBody");
 
-      // ── RENDER TABLE ──
-      window.renderTable = function () {
-        const q = document.getElementById("searchInput").value.toLowerCase();
-        const source =
-          currentTab === "candidaturas"
-            ? candData
-            : allData.filter((d) => d.status !== "candidatura");
+      if (!filtered.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="6" style="text-align: center; padding: 40px;">Nenhum embaixador encontrado</td></tr>';
+        return;
+      }
 
-        let rows = source.filter((d) => {
-          const match = [d.nome, d.social, d.cupom, d.email].some((v) =>
-            (v || "").toLowerCase().includes(q),
-          );
-          const filt = currentFilter === "all" || d.status === currentFilter;
-          return match && filt;
+      tbody.innerHTML = filtered
+        .map((d) => {
+          const ini = (d.nome || "?")
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+          const statusClass = {
+            Selecionado: "status-selecionado",
+            "Contato 1": "status-contato1",
+            "Contato 2": "status-contato2",
+            Ativo: "status-ativo",
+            "Sem Resposta": "status-sem-resposta",
+          }[d.status] || "status-selecionado";
+
+          const data = d.criadoEm
+            ? new Date(d.criadoEm.seconds * 1000).toLocaleDateString("pt-BR")
+            : "—";
+
+          return `<tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, var(--primary), var(--accent));
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: 700;
+                  font-size: 0.85rem;
+                ">${ini}</div>
+                <div>
+                  <div style="font-weight: 600; color: var(--dark);">${d.nome || "—"}</div>
+                  <div style="font-size: 0.85rem; color: var(--primary);">${d.social || "—"}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge ${statusClass}">${d.status || "Selecionado"}</span>
+            </td>
+            <td style="font-size: 0.9rem;">${d.email || "—"}</td>
+            <td><span style="background: var(--accent); color: var(--dark); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">${(d.cupom || "—").toUpperCase()}</span></td>
+            <td style="font-size: 0.85rem; color: var(--text-gray);">${data}</td>
+            <td style="text-align: center;">
+              <div class="row-actions">
+                <button class="icon-btn" onclick="editRow('${d.id}')" title="Editar">✏️</button>
+                <button class="icon-btn" onclick="deleteRow('${d.id}', '${d.nome}')" title="Remover">🗑️</button>
+              </div>
+            </td>
+          </tr>`;
+        })
+        .join("");
+    }
+
+    // ── MODAL ──
+    document.getElementById("btnAddNew").onclick = () => {
+      document.getElementById("inputNome").value = "";
+      document.getElementById("inputInsta").value = "";
+      document.getElementById("inputEmail").value = "";
+      document.getElementById("inputCupom").value = "";
+      document.getElementById("inputStatus").value = "Selecionado";
+      document.getElementById("modalAdd").classList.add("open");
+    };
+
+    // ── SAVE NEW ──
+    document.getElementById("btnSaveNew").onclick = async () => {
+      const nome = document.getElementById("inputNome").value.trim();
+      const social = document.getElementById("inputInsta").value.trim();
+      const email = document.getElementById("inputEmail").value.trim();
+      const cupom = document.getElementById("inputCupom").value.trim();
+      const status = document.getElementById("inputStatus").value;
+
+      if (!nome || !social) {
+        showToast("Nome e Instagram são obrigatórios", "error");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "embaixadores"), {
+          nome,
+          social,
+          email,
+          cupom,
+          status,
+          criadoEm: serverTimestamp(),
         });
 
-        document.getElementById("tableCount").textContent =
-          rows.length + " registros";
-        const tbody = document.getElementById("tbody");
+        document.getElementById("modalAdd").classList.remove("open");
+        showToast(`Embaixador "${nome}" adicionado!`);
+        await loadData();
+      } catch (e) {
+        console.error(e);
+        showToast("Erro ao salvar", "error");
+      }
+    };
 
-        if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-ico">📭</div><div class="empty-ttl">Nenhum registro</div><div>Ajuste o filtro ou adicione um embaixador</div></div></td></tr>`;
+    // ── DELETE ──
+    window.deleteRow = async (id, nome) => {
+      if (!confirm(`Remover "${nome}"?`)) return;
+      try {
+        await deleteDoc(doc(db, "embaixadores", id));
+        showToast(`"${nome}" removido`);
+        await loadData();
+      } catch (e) {
+        showToast("Erro ao remover", "error");
+      }
+    };
+
+    // ── EDIT (stub) ──
+    window.editRow = (id) => {
+      // TODO: implementar edição
+    };
+
+    // ── UPDATE PROFILE SELECT ──
+    function updateProfileSelect() {
+      const select = document.getElementById("scriptProfile");
+      select.innerHTML = '<option value="">-- Selecione um perfil --</option>';
+      allData.forEach((d) => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify({ nome: d.nome, id: d.id });
+        opt.textContent = `${d.nome} (${d.social})`;
+        select.appendChild(opt);
+      });
+    }
+
+    // ── SCRIPT GENERATOR ──
+    const SCRIPTS = {
+      pedro: {
+        contato1: [
+          `Fala, {nome}! Tudo bem? Tenho acompanhado seus posts sobre rotina de estudos, muito boa a forma como você organiza tudo.
+Sou o criador da Bitto, uma plataforma que usa IA para transformar materiais de estudo em flashcards e quizzes em segundos, poupando aquelas horas que a galera perde fazendo resumo na mão.
+Pensei direto no seu público e queria liberar um acesso Pro vitalício para você testar. Se você curtir e fizer sentido para sua rotina, podemos desenhar uma parceria de afiliados bem legal. Posso te mandar o link para você dar uma olhada?`,
+
+          `Oi, {nome}! Tudo bem? Acompanho seu conteúdo e acho incrível como você engaja com a galera que está estudando pesado.
+Eu sou o founder da Bitto, uma nova plataforma de estudos com IA, e estamos selecionando a dedo os nossos primeiros criadores parceiros para crescerem junto com a gente.
+Queria muito que você fosse um desses primeiros parceiros. Topa receber um acesso premium gratuito para testar a ferramenta nos seus próprios estudos? Se gostar, a gente estrutura um formato de comissão recorrente para você.`,
+
+          `Fala, {nome}! Excelente o seu último Reels sobre como estudar melhor.
+Sou founder da Bitto (@usebitto), uma plataforma de flashcards com IA. Estamos montando nosso time de afiliados e seu perfil é exatamente o que procuramos.
+Quero te dar um acesso Pro para você testar na prática. Se a ferramenta te ajudar de verdade, a gente conversa sobre uma parceria remunerada para sua audiência. Faz sentido para você?`,
+        ],
+        contato2: [
+          `Fala, {nome}, tudo bem? Passando só para dar um 'up' aqui, sei que a correria de criação de conteúdo e estudos é grande! 😅
+Conseguiu dar uma olhada na mensagem acima? Se não for o momento ideal para parcerias agora, sem problemas, só me dar um toque!`,
+        ],
+      },
+      bitto: {
+        contato1: [
+          `Olá, {nome}! Tudo bem? Aqui é o time da Bitto. 💙
+Nossa equipe tem acompanhado o seu perfil e adoramos a forma como você compartilha sua rotina de estudos. A Bitto é uma plataforma de IA focada em criação automática de flashcards e quizzes, e estamos abrindo vagas selecionadas para o nosso novo time de embaixadores e afiliados.
+Gostaríamos de te presentear com um acesso Pro vitalício para você conhecer a nossa tecnologia. Fazendo sentido para a sua rotina, temos um modelo de parceria remunerada (comissão recorrente) para você divulgar para sua audiência. Podemos te enviar os detalhes?`,
+
+          `Oi, {nome}! Tudo bem? Acompanhamos o seu trabalho e sabemos o quanto sua audiência busca formas de estudar melhor e mais rápido.
+Aqui na Bitto, nós desenvolvemos uma inteligência artificial que poupa horas de resumo criando flashcards automáticos. Acreditamos muito no seu perfil e queremos te convidar para ser um dos nossos parceiros oficiais.
+Para começarmos, queremos liberar sua conta Pro gratuita. Assim você testa a plataforma e, se gostar, ativamos seu link de afiliado. Topa testar?`,
+        ],
+        contato2: [
+          `Olá, {nome}! Tudo bem? Passando para saber se conseguiu ver nossa mensagem anterior. Nossa equipe de parcerias adoraria ter você testando a plataforma! Qualquer dúvida sobre como funciona o nosso programa de afiliados, estamos à disposição por aqui. 🚀`,
+        ],
+      },
+    };
+
+    document.getElementById("btnGenerateScript").onclick = () => {
+      const from = document.getElementById("scriptFrom").value;
+      const template = document.getElementById("scriptTemplate").value;
+      const profileStr = document.getElementById("scriptProfile").value;
+
+      if (!profileStr) {
+        showToast("Selecione um perfil", "error");
+        return;
+      }
+
+      const profile = JSON.parse(profileStr);
+      const scriptOptions = SCRIPTS[from][template];
+      const script = scriptOptions[0].replace("{nome}", profile.nome);
+
+      document.getElementById("scriptPreview").textContent = script;
+    };
+
+    document.getElementById("btnCopyScript").onclick = () => {
+      const text = document.getElementById("scriptPreview").textContent;
+      if (!text.includes("{nome")) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast("Script copiado!");
+        });
+      } else {
+        showToast("Gere um script primeiro", "error");
+      }
+    };
+
+    // ── TABS ──
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const tabName = tab.dataset.tab;
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
+        document.getElementById(tabName).classList.add("active");
+
+        currentTab = tabName;
+      });
+    });
+
+    // ── SEARCH ──
+    document.getElementById("searchInput").addEventListener("input", renderTable);
+
+    // ── SYNC ──
+    document.getElementById("btnSync").onclick = () => {
+      showToast("Sincronizando...");
+      loadData();
+    };
+
+    // ── LOGOUT ──
+    document.getElementById("btnLogout").onclick = () => {
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    };
+
+    // ── EXPORT CSV ──
+    document.getElementById("btnExport").onclick = () => {
+      const csv = [
+        ["Nome", "Instagram", "Email", "Cupom", "Status", "Data"].join(","),
+        ...allData.map((d) => {
+          const data = d.criadoEm
+            ? new Date(d.criadoEm.seconds * 1000).toLocaleDateString("pt-BR")
+            : "—";
+          return [d.nome, d.social, d.email, d.cupom, d.status, data]
+            .map((v) => `"${(v || "").replace(/"/g, '""')}"`)
+            .join(",");
+        }),
+      ].join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `embaixadores_${new Date().toISOString().split("T")[0]}.csv`;
+      link.click();
+      showToast("CSV exportado!");
+    };
+
+    // ── GRANT ACCESS (Firebase) ──
+    document.getElementById("btnGrantAccess").onclick = async () => {
+      const email = document.getElementById("userEmail").value.trim();
+      const plan = document.getElementById("userPlan").value;
+
+      if (!email) {
+        showToast("Digite um email", "error");
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "users"), where("email", "==", email));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          showToast("Usuário não encontrado", "error");
           return;
         }
 
-        tbody.innerHTML = rows
-          .map((d) => {
-            const ini = (d.nome || "?")
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .substring(0, 2)
-              .toUpperCase();
-            const badge = statusBadge(d.status);
-            const date = d.criadoEm
-              ? new Date(d.criadoEm.seconds * 1000).toLocaleDateString("pt-BR")
-              : "—";
-            const plano = d.plano || d.views || "—";
-            return `<tr onclick="editRow('${d.id}')">
-            <td><div class="inf-cell"><div class="inf-av">${ini}</div><div><div class="inf-name">${d.nome || "—"}</div><div class="inf-handle">${d.social || "—"}</div></div></div></td>
-            <td>${badge}</td>
-            <td><span class="cupom-tag">${(d.cupom || "—").toUpperCase()}</span></td>
-            <td><span class="badge b-gray">${plano}</span></td>
-            <td style="font-size:.75rem;color:var(--m)">${date}</td>
-            <td style="text-align:right"><div style="display:flex;gap:4px;justify-content:flex-end">
-              <button class="ibtn" onclick="event.stopPropagation();approveRow('${d.id}')" title="Ativar">✓</button>
-              <button class="ibtn del" onclick="event.stopPropagation();deleteRow('${d.id}','${d.nome || ""}')" title="Remover">✕</button>
-            </div></td>
-          </tr>`;
-          })
-          .join("");
-      };
-
-      function statusBadge(s) {
-        const map = {
-          Ativo: `<span class="badge b-green"><span class="bd"></span>Ativo</span>`,
-          Abordagem: `<span class="badge b-yellow"><span class="bd"></span>Abordagem</span>`,
-          Prospecção: `<span class="badge b-purple">Prospecção</span>`,
-          candidatura: `<span class="badge b-blue">Candidatura</span>`,
-        };
-        return map[s] || `<span class="badge b-gray">${s || "—"}</span>`;
-      }
-
-      // ── TABS ──
-      window.setTab = function (tab) {
-        currentTab = tab;
-        document
-          .querySelectorAll(".tab")
-          .forEach((t) => t.classList.remove("active"));
-        document.querySelectorAll(".tab").forEach((t) => {
-          if (
-            t.textContent
-              .toLowerCase()
-              .includes(tab === "pipeline" ? "pipeline" : "candid")
-          )
-            t.classList.add("active");
+        await updateDoc(doc(db, "users", snap.docs[0].id), {
+          plano: plan,
+          planoAtivo: true,
         });
-        document
-          .querySelectorAll(".sb-item")
-          .forEach((i) => i.classList.remove("active"));
-        const titles = {
-          pipeline: "Pipeline de Embaixadores",
-          candidaturas: "Candidaturas Pendentes",
-        };
-        document.getElementById("topTitle").textContent = titles[tab] || "";
-        renderTable();
-      };
 
-      // ── GRANT ACCESS ──
-      window.grantAccess = async function () {
-        const email = document.getElementById("userEmail").value.trim();
-        const plan = document.getElementById("userPlan").value;
-        if (!email) return toast("Digite um e-mail", "error");
-        try {
-          const q = query(collection(db, "users"), where("email", "==", email));
-          const snap = await getDocs(q);
-          if (snap.empty)
-            return toast("Usuário não encontrado no Firebase", "error");
-          const ref = snap.docs[0].ref;
-          await updateDoc(ref, {
-            plano: plan,
-            planoAtivo: true,
-            updatedAt: serverTimestamp(),
-          });
-          toast(`✅ Acesso ${plan.toUpperCase()} liberado para ${email}`);
-          addAct(
-            "⚡",
-            `Acesso ${plan} liberado para <strong>${email}</strong>`,
-          );
-        } catch (e) {
-          toast("Erro ao liberar acesso", "error");
-          console.error(e);
-        }
-      };
-
-      // ── SAVE NEW ──
-      window.saveNew = async function () {
-        const d = {
-          nome: document.getElementById("mNome").value.trim(),
-          social: document.getElementById("mInsta").value.trim(),
-          email: document.getElementById("mEmail").value.trim(),
-          whatsapp: document.getElementById("mWpp").value.trim(),
-          cupom: document.getElementById("mCupom").value.trim().toUpperCase(),
-          plano: document.getElementById("mPlano").value,
-          status: document.getElementById("mStatus").value,
-          criadoEm: serverTimestamp(),
-          origem: "backstage",
-        };
-        if (!d.nome || !d.social)
-          return toast("Nome e @ são obrigatórios", "error");
-        try {
-          await addDoc(collection(db, "embaixadores"), d);
-          document.getElementById("modalOverlay").classList.remove("open");
-          toast("Embaixador cadastrado!");
-          addAct(
-            "👤",
-            `Novo embaixador: <strong>${d.nome}</strong> (${d.social})`,
-          );
-          await loadAll();
-        } catch (e) {
-          toast("Erro ao salvar", "error");
-        }
-      };
-
-      // ── APPROVE ──
-      window.approveRow = async function (id) {
-        try {
-          await updateDoc(doc(db, "embaixadores", id), { status: "Ativo" });
-          toast("Status → Ativo");
-          addAct("✅", "Embaixador ativado");
-          await loadAll();
-        } catch (e) {
-          toast("Erro", "error");
-        }
-      };
-
-      // ── DELETE ──
-      window.deleteRow = async function (id, nome) {
-        if (!confirm(`Remover "${nome}" do pipeline?`)) return;
-        try {
-          await deleteDoc(doc(db, "embaixadores", id));
-          toast("Removido");
-          addAct("🗑️", `Removido: <strong>${nome}</strong>`);
-          await loadAll();
-        } catch (e) {
-          toast("Erro ao remover", "error");
-        }
-      };
-
-      // ── EDIT (stub) ──
-      window.editRow = function (id) {
-        // Pode expandir para abrir modal de edição
-      };
-
-      // ── EXPORT CSV ──
-      window.exportCSV = function () {
-        const cols = [
-          "nome",
-          "social",
-          "email",
-          "whatsapp",
-          "cupom",
-          "plano",
-          "status",
-          "views",
-        ];
-        const rows = allData.map((d) =>
-          cols
-            .map((c) => `"${(d[c] || "").toString().replace(/"/g, '""')}"`)
-            .join(","),
-        );
-        const csv = [cols.join(","), ...rows].join("\n");
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-        a.download = "embaixadores_bitto.csv";
-        a.click();
-        toast("CSV exportado!");
-      };
-
-      // ── ACTIVITY ──
-      function addAct(ico, html) {
-        const feed = document.getElementById("actFeed");
-        const now = new Date().toLocaleTimeString("pt-BR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const el = document.createElement("div");
-        el.className = "act-item";
-        el.innerHTML = `<div class="act-ico">${ico}</div><div><div class="act-txt">${html}</div><div class="act-time">${now}</div></div>`;
-        feed.prepend(el);
-        while (feed.children.length > 12) feed.lastChild.remove();
+        showToast(`✅ Acesso ${plan} liberado para ${email}`);
+        document.getElementById("userEmail").value = "";
+      } catch (e) {
+        console.error(e);
+        showToast("Erro ao liberar acesso", "error");
       }
-      window.addAct = addAct;
+    };
 
-      // ── TOAST ──
-      function toast(msg, type = "success") {
-        const t = document.getElementById("toast");
-        document.getElementById("toastMsg").textContent = msg;
-        document.getElementById("toastIco").textContent =
-          type === "error" ? "❌" : "✅";
-        t.style.borderLeftColor =
-          type === "error" ? "var(--red)" : "var(--green)";
-        t.classList.add("show");
-        setTimeout(() => t.classList.remove("show"), 3000);
-      }
-      window.toast = toast;
-    </script>
-  </body>
+    // ── MENU MOBILE ──
+    document.getElementById("menuToggle").onclick = () => {
+      const nav = document.getElementById("navActions");
+      nav.classList.toggle("open");
+    };
+
+    // Fechar menu ao clicar em um botão
+    document.querySelectorAll(".nav-actions .btn-nav").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.getElementById("navActions").classList.remove("open");
+      });
+    });
+  </script>
+</body>
 </html>
