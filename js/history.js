@@ -2,8 +2,9 @@ import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   doc,
-  getDoc,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { checkMonthlyReset } from "./xpSystem.js";
 
 // Elementos
 const themeToggle = document.getElementById("themeToggle");
@@ -19,7 +20,6 @@ const currentMonthDisplay = document.getElementById("currentMonthDisplay");
 const monthProgressBar = document.getElementById("monthProgressBar");
 const daysLeftText = document.getElementById("daysLeftText");
 
-// --- 1. CÁLCULO DE DATAS (MÊS) ---
 function setupMonthInfo() {
   const date = new Date();
   const monthNames = [
@@ -37,37 +37,37 @@ function setupMonthInfo() {
     "Dezembro",
   ];
 
-  // Nome do Mês
   if (currentMonthDisplay) {
     currentMonthDisplay.innerText = `${monthNames[date.getMonth()]} de ${date.getFullYear()}`;
   }
 
-  // Dias Restantes
   const lastDay = new Date(
     date.getFullYear(),
     date.getMonth() + 1,
     0,
-  ).getDate(); // Último dia do mês (28, 30, 31)
+  ).getDate();
   const today = date.getDate();
   const daysLeft = lastDay - today;
   const progress = (today / lastDay) * 100;
 
   if (monthProgressBar) monthProgressBar.style.width = `${progress}%`;
-  if (daysLeftText)
+  if (daysLeftText) {
     daysLeftText.innerText = `${daysLeft} dias restantes para o Reset Mensal`;
+  }
 }
 
-// --- 2. AUTENTICAÇÃO E DADOS ---
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
+    await checkMonthlyReset(user);
 
-    if (snap.exists()) {
+    const userRef = doc(db, "users", user.uid);
+    onSnapshot(userRef, (snap) => {
+      if (!snap.exists()) return;
+
       const data = snap.data();
       updateHeader(user, data);
-      updateStats(data.stats || {});
-    }
+      updateStats(data);
+    });
   } else {
     window.location.href = "login.html";
   }
@@ -76,55 +76,70 @@ onAuthStateChanged(auth, async (user) => {
 function updateHeader(user, dbData) {
   const displayName = dbData.displayName || user.displayName || "Estudante";
   if (navName) navName.innerText = displayName.split(" ")[0];
+
   const photoURL = dbData.photoURL || user.photoURL;
   if (photoURL && navAvatar) {
     navAvatar.innerHTML = `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
   }
 }
 
-function updateStats(stats) {
-  // Busca valores (se não existir, usa 0)
-  const flashcards = stats.flashcardsGen || 0;
-  const quiz = stats.quizGen || 0;
-  const review = stats.reviewGen || 0;
-  const total = stats.cardsGeneratedMonth || flashcards + quiz + review; // Fallback soma manual
+function toNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
 
-  // Anima os números
+function getMonthlyStats(userData) {
+  const stats = userData.stats || {};
+  const usage = userData.usage || {};
+
+  const flashcards = toNumber(stats.flashcardsGen ?? usage.flashcards);
+  const quiz = toNumber(stats.quizGen ?? usage.quiz);
+  const review = toNumber(stats.reviewGen ?? usage.review);
+  const total =
+    toNumber(stats.cardsGeneratedMonth) || flashcards + quiz + review;
+
+  return { flashcards, quiz, review, total };
+}
+
+function updateStats(userData) {
+  const { flashcards, quiz, review, total } = getMonthlyStats(userData);
+
   animateValue(valFlashcards, 0, flashcards, 1000);
   animateValue(valQuiz, 0, quiz, 1000);
   animateValue(valReview, 0, review, 1000);
   animateValue(valTotal, 0, total, 1500);
 }
 
-// Efeito de contagem "slot machine"
 function animateValue(obj, start, end, duration) {
   if (!obj) return;
+
   let startTimestamp = null;
   const step = (timestamp) => {
     if (!startTimestamp) startTimestamp = timestamp;
+
     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
     obj.innerHTML = Math.floor(progress * (end - start) + start);
+
     if (progress < 1) {
       window.requestAnimationFrame(step);
     } else {
-      obj.innerHTML = end; // Garante valor final exato
+      obj.innerHTML = end;
     }
   };
+
   window.requestAnimationFrame(step);
 }
 
-// --- TEMA E UI ---
 setupMonthInfo();
 
-// Tilt 3D
 const tiltElements = document.querySelectorAll(".tilt-element");
 document.addEventListener("mousemove", (e) => {
   if (window.innerWidth > 768) {
-    // Só no PC
     tiltElements.forEach((el) => {
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
       if (
         x >= -20 &&
         x <= rect.width + 20 &&
@@ -161,9 +176,7 @@ if (themeToggle) {
     }
   });
 }
-// ==========================================================================
-//   GERAÇÃO, PRÉVIA E EXPORTAÇÃO DO STORY (CORRIGIDO)
-// ==========================================================================
+
 const btnShareStory = document.getElementById("btnShareStory");
 const storyTemplate = document.getElementById("story-template");
 const previewModal = document.getElementById("storyPreviewModal");
@@ -177,25 +190,25 @@ let currentFileName = "";
 
 if (btnShareStory) {
   btnShareStory.addEventListener("click", async () => {
+    const originalText = btnShareStory.innerHTML;
+
     try {
-      const originalText = btnShareStory.innerHTML;
       btnShareStory.innerHTML = "⏳ Criando Design Premium...";
       btnShareStory.disabled = true;
 
-      // 1. Puxar Dados do Usuário e Data
       const navNameText = document.getElementById("navUserName").innerText;
       document.getElementById("st-name").innerText =
         navNameText !== "..." ? navNameText : "Estudante";
 
       const avatarImg = document.querySelector(".avatar-circle img");
       const stAvatar = document.getElementById("st-avatar");
+
       if (avatarImg && avatarImg.src) {
         stAvatar.src = avatarImg.src;
       } else {
         stAvatar.src = `https://ui-avatars.com/api/?name=${navNameText}&background=0035FF&color=fff&size=256`;
       }
 
-      // Garante que o mês não seja "Carregando..."
       let monthText = document.getElementById("currentMonthDisplay").innerText;
       if (monthText === "Carregando..." || !monthText) {
         const date = new Date();
@@ -215,9 +228,9 @@ if (btnShareStory) {
         ];
         monthText = `${monthNames[date.getMonth()]} de ${date.getFullYear()}`;
       }
+
       document.getElementById("st-month").innerText = monthText;
 
-      // 2. Atualizar Números
       const valTotal = document.getElementById("valTotal").innerText;
       document.getElementById("st-total").innerText = valTotal;
       document.getElementById("st-flashcards").innerText =
@@ -227,33 +240,27 @@ if (btnShareStory) {
       document.getElementById("st-review").innerText =
         document.getElementById("valReview").innerText;
 
-      // Atualiza legenda
       const emojis = ["🔥", "🚀", "🧠", "⚡"];
       const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
       document.getElementById("suggestedCaption").innerText =
         `"Meu mês na @usebitto: ${valTotal} materiais gerados com Inteligência Artificial! ${randomEmoji} Acelerando os estudos pro próximo nível."`;
 
-      // Delay para garantir carregamento de fontes e imagens no template oculto
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // 3. Renderizar (SEM BUG DE BACKGROUND)
-      // O segredo é que o elemento já está com position:fixed e left:-10000px no CSS.
-      // Não precisamos movê-lo. O html2canvas vai buscar ele lá.
       const canvas = await window.html2canvas(storyTemplate, {
-        scale: 1, // Mantém 1080x1920
+        scale: 1,
         useCORS: true,
         allowTaint: false,
-        backgroundColor: "#020205", // Cor de fundo de segurança
+        backgroundColor: "#020205",
         width: 1080,
         height: 1920,
-        x: 0, // Coordenadas relativas ao próprio elemento fixo
+        x: 0,
         y: 0,
-        scrollX: 0, // Impede que o scroll da página afete o print
+        scrollX: 0,
         scrollY: 0,
         logging: false,
       });
 
-      // 4. Mostrar Prévia
       currentStoryDataUrl = canvas.toDataURL("image/png");
       previewImage.src = currentStoryDataUrl;
 
@@ -261,16 +268,17 @@ if (btnShareStory) {
         navNameText !== "..."
           ? navNameText.toLowerCase().replace(/\s+/g, "-")
           : "estudante";
+
       currentFileName = `bitto-story-${safeName}.png`;
 
       previewModal.classList.add("active");
 
-      // 5. Resetar botão
       btnShareStory.innerHTML = originalText;
       btnShareStory.disabled = false;
     } catch (error) {
       console.error("Erro ao gerar o Story: ", error);
       btnShareStory.innerHTML = "❌ Erro. Tente novamente.";
+
       setTimeout(() => {
         btnShareStory.innerHTML = originalText;
         btnShareStory.disabled = false;
@@ -279,14 +287,12 @@ if (btnShareStory) {
   });
 }
 
-// Fechar Modal
 if (btnClosePreview) {
   btnClosePreview.addEventListener("click", () => {
     previewModal.classList.remove("active");
   });
 }
 
-// Download da Imagem
 if (btnDownloadStory) {
   btnDownloadStory.addEventListener("click", () => {
     const link = document.createElement("a");
@@ -300,6 +306,7 @@ if (btnDownloadStory) {
     btnDownloadStory.innerHTML = "✅ Imagem Salva!";
     btnDownloadStory.style.background = "var(--accent-green)";
     btnDownloadStory.style.color = "var(--primary-blue)";
+
     setTimeout(() => {
       btnDownloadStory.innerHTML = originalText;
       btnDownloadStory.style.background = "";
@@ -308,7 +315,6 @@ if (btnDownloadStory) {
   });
 }
 
-// Copiar Legenda
 if (btnCopyCaption) {
   btnCopyCaption.addEventListener("click", () => {
     const captionText = document.getElementById("suggestedCaption").innerText;

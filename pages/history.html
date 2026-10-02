@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="../css/styles.css" />
 
     <style>
-      /* --- ESTILO DO BOTÃO VOLTAR --- */
       .nav-grid {
         display: flex;
         justify-content: space-between;
@@ -52,7 +51,6 @@
         padding-bottom: 2px;
       }
 
-      /* --- ESTILOS DO HISTÓRICO --- */
       .month-header {
         text-align: center;
         margin-bottom: 2.5rem;
@@ -230,6 +228,237 @@
         flex: 1;
       }
 
+      .btn-share-story {
+        border: 0;
+        border-radius: 18px;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #0035ff 0%, #001b82 100%);
+        color: #fff;
+        font-weight: 800;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(0, 53, 255, 0.25);
+      }
+      .btn-share-story:disabled {
+        cursor: wait;
+        opacity: 0.75;
+      }
+
+      .story-preview-card {
+        max-width: 460px;
+        width: min(92vw, 460px);
+      }
+      .preview-body {
+        display: grid;
+        gap: 1rem;
+      }
+      .preview-img-container {
+        display: flex;
+        justify-content: center;
+        max-height: 58vh;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #020205;
+        border: 1px solid var(--border-color);
+      }
+      .preview-img-container img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        max-height: 58vh;
+        object-fit: contain;
+      }
+      .caption-box {
+        padding: 1rem;
+        border-radius: 16px;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+      }
+      .caption-box p {
+        margin: 0 0 0.8rem;
+        color: var(--text-main);
+        line-height: 1.45;
+      }
+      .btn-copy {
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--card-bg);
+        color: var(--text-main);
+        padding: 0.7rem 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .story-export-box {
+        position: fixed;
+        left: -12000px;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            circle at 18% 12%,
+            rgba(0, 53, 255, 0.55),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at 86% 78%,
+            rgba(204, 255, 0, 0.22),
+            transparent 30%
+          ),
+          linear-gradient(160deg, #020205 0%, #07123f 52%, #020205 100%);
+        color: #fff;
+        font-family: "DM Sans", sans-serif;
+        z-index: -1;
+      }
+
+      .story-content {
+        position: relative;
+        z-index: 2;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        padding: 150px 92px 110px;
+        display: flex;
+        flex-direction: column;
+      }
+      .story-header-box {
+        margin-bottom: 110px;
+      }
+      .story-title {
+        margin: 0;
+        font-family: "Unbounded", sans-serif;
+        font-size: 72px;
+        line-height: 1.05;
+      }
+      .story-subtitle {
+        margin: 22px 0 0;
+        color: #ccff00;
+        font-size: 34px;
+        font-weight: 800;
+      }
+      .story-user-info {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        margin-bottom: 90px;
+      }
+      .story-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #0035ff;
+        border: 6px solid rgba(255, 255, 255, 0.24);
+      }
+      .story-user-name {
+        margin: 0;
+        font-size: 46px;
+        line-height: 1.05;
+      }
+      .story-badge,
+      .brand-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+        padding: 14px 20px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .story-grid-premium {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .story-card-hero,
+      .story-card-mini {
+        box-sizing: border-box;
+        border: 2px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.11);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+      }
+      .story-card-hero {
+        grid-column: 1 / -1;
+        min-height: 360px;
+        border-radius: 44px;
+        padding: 58px;
+        display: flex;
+        align-items: center;
+        gap: 48px;
+      }
+      .hero-icon {
+        width: 190px;
+        height: 190px;
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(204, 255, 0, 0.15);
+        font-size: 92px;
+      }
+      .story-num-hero {
+        font-family: "Unbounded", sans-serif;
+        font-size: 150px;
+        line-height: 0.9;
+        font-weight: 800;
+      }
+      .story-label-hero {
+        margin-top: 22px;
+        max-width: 520px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1.18;
+      }
+      .story-card-mini {
+        min-height: 300px;
+        border-radius: 34px;
+        padding: 34px 26px;
+        text-align: center;
+      }
+      .mini-icon {
+        font-size: 54px;
+        margin-bottom: 24px;
+      }
+      .story-num-mini {
+        font-family: "Unbounded", sans-serif;
+        font-size: 72px;
+        line-height: 1;
+        font-weight: 800;
+      }
+      .story-label-mini {
+        margin-top: 16px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 25px;
+        font-weight: 800;
+      }
+      .safe-text-gold {
+        color: #ccff00;
+      }
+      .safe-text-blue {
+        color: #77a0ff;
+      }
+      .safe-text-green {
+        color: #55f0be;
+      }
+      .safe-text-purple {
+        color: #d4a3ff;
+      }
+      .story-footer-branding {
+        margin-top: auto;
+        text-align: center;
+      }
+      .story-footer-branding .brand-pill {
+        margin-top: 0;
+        font-size: 26px;
+      }
+
       @media (max-width: 768px) {
         .month-title {
           font-size: 1.5rem;
@@ -259,39 +488,7 @@
         </div>
 
         <div class="nav-right">
-          <button class="icon-button" id="themeToggle">
-            <svg
-              class="icon-sun"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <svg
-              class="icon-moon"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              style="display: none"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
+          <button class="icon-button" id="themeToggle">☀️</button>
           <div
             class="user-profile"
             style="display: flex; align-items: center; gap: 10px"
@@ -404,8 +601,9 @@
                   display: block;
                   margin-bottom: 5px;
                 "
-                >SUGESTÃO DE LEGENDA</span
               >
+                SUGESTÃO DE LEGENDA
+              </span>
               <p id="suggestedCaption">...</p>
               <button id="btnCopyCaption" class="btn-copy">Copiar Texto</button>
             </div>
@@ -423,9 +621,6 @@
       </div>
 
       <div id="story-template" class="story-export-box">
-        <div class="safe-glow glow-top"></div>
-        <div class="safe-glow glow-bottom"></div>
-
         <div class="story-content">
           <div class="story-header-box">
             <h2 class="story-title">RESUMO DO MÊS</h2>
@@ -462,11 +657,13 @@
               </div>
               <div class="story-label-mini">Flashcards</div>
             </div>
+
             <div class="story-card-mini safe-card-green">
               <div class="mini-icon">🎮</div>
               <div class="story-num-mini safe-text-green" id="st-quiz">0</div>
               <div class="story-label-mini">Quizzes</div>
             </div>
+
             <div class="story-card-mini safe-card-purple">
               <div class="mini-icon">📝</div>
               <div class="story-num-mini safe-text-purple" id="st-review">
