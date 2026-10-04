@@ -581,7 +581,8 @@
   font-weight: 600;
   color: var(--text-muted);
 }
-.input-field {
+.input-field,
+.input-textarea {
   width: 100%;
   padding: 1rem;
   border-radius: 12px;
@@ -595,7 +596,22 @@
   /* touch target */
   min-height: 48px;
 }
-.input-field:focus {
+
+.input-textarea {
+  height: 120px;
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.input-field::placeholder,
+.input-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+.input-field:focus,
+.input-textarea:focus {
   border-color: var(--primary-blue);
   background: var(--card-bg);
 }
