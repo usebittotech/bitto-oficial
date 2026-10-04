@@ -112,6 +112,40 @@
         font-size: 0.92rem;
       }
 
+      .mini-flow {
+        display: grid;
+        gap: 8px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 18px;
+        box-shadow: var(--shadow-glass);
+      }
+
+      .mini-flow-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-gray);
+        font-size: 0.84rem;
+        font-weight: 700;
+      }
+
+      .mini-flow-step {
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: rgba(0, 53, 255, 0.09);
+        color: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-heading);
+        font-size: 0.76rem;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+
       /* === LINKS === */
       .links-grid {
         display: flex;
@@ -205,6 +239,11 @@
       .accent-card .icon-circle {
         background: rgba(204, 255, 0, 0.25);
         color: #7a8f00;
+      }
+
+      .enem-card .icon-circle {
+        background: rgba(0, 53, 255, 0.08);
+        color: var(--primary);
       }
 
       /* === SUPORTE === */
@@ -338,8 +377,23 @@
           <img src="imagens/favicon.png" alt="BITTO" />
         </div>
         <h1 class="logo-text">BITTO<span>.</span></h1>
-        <p>A plataforma de estudo inteligente para universitários.</p>
+        <p>Transforme PDFs e anotações em flashcards, quiz e revisão.</p>
       </header>
+
+      <section class="mini-flow reveal r-2" aria-label="Como a BITTO funciona">
+        <div class="mini-flow-item">
+          <span class="mini-flow-step">1</span>
+          Envie seu PDF, texto ou anotação
+        </div>
+        <div class="mini-flow-item">
+          <span class="mini-flow-step">2</span>
+          Gere flashcards, quiz ou revisão
+        </div>
+        <div class="mini-flow-item">
+          <span class="mini-flow-step">3</span>
+          Estude com mais clareza
+        </div>
+      </section>
 
       <nav class="links-grid">
         <a href="https://www.usebitto.com/pages/login?mode=register" class="link-card featured reveal r-2">
@@ -350,25 +404,24 @@
               </svg>
             </div>
             <div>
-              <span class="title-main">Comece Grátis Agora</span>
-              <span class="desc-sub">Crie sua conta em segundos</span>
+              <span class="title-main">Criar meus materiais grátis</span>
+              <span class="desc-sub">PDF, texto ou anotação viram estudo ativo</span>
             </div>
           </div>
           <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </a>
 
-        <a href="https://www.usebitto.com/pages/login" class="link-card reveal r-2">
+        <a href="https://www.usebitto.com/#ferramentas" class="link-card enem-card reveal r-3">
           <div class="card-body">
             <div class="icon-circle">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                <polyline points="10 17 15 12 10 7"></polyline>
-                <line x1="15" y1="12" x2="3" y2="12"></line>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path>
               </svg>
             </div>
             <div>
-              <span class="title-main">Já tenho conta</span>
-              <span class="desc-sub">Fazer login na plataforma</span>
+              <span class="title-main">Reta final do ENEM</span>
+              <span class="desc-sub">Transforme material em revisão e questões</span>
             </div>
           </div>
           <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
@@ -382,14 +435,14 @@
               </svg>
             </div>
             <div>
-              <span class="title-main">Conheça as ferramentas</span>
-              <span class="desc-sub">Site oficial e demonstração</span>
+              <span class="title-main">Ver a BITTO funcionando</span>
+              <span class="desc-sub">Flashcards, quiz, revisão e planner</span>
             </div>
           </div>
           <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </a>
 
-        <a href="https://www.usebitto.com/#avaliacoes" class="link-card accent-card reveal r-3">
+        <a href="https://www.usebitto.com/#planos" class="link-card accent-card reveal r-3">
           <div class="card-body">
             <div class="icon-circle">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -397,8 +450,25 @@
               </svg>
             </div>
             <div>
-              <span class="title-main">Veja quem já usa</span>
-              <span class="desc-sub">Avaliações reais de estudantes</span>
+              <span class="title-main">Planos e acesso ilimitado</span>
+              <span class="desc-sub">Estude todos os dias sem travar no limite</span>
+            </div>
+          </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </a>
+
+        <a href="https://www.usebitto.com/pages/login" class="link-card reveal r-4">
+          <div class="card-body">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                <polyline points="10 17 15 12 10 7"></polyline>
+                <line x1="15" y1="12" x2="3" y2="12"></line>
+              </svg>
+            </div>
+            <div>
+              <span class="title-main">Já tenho conta</span>
+              <span class="desc-sub">Fazer login na plataforma</span>
             </div>
           </div>
           <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
@@ -416,7 +486,7 @@
             </div>
             <div>
               <span class="title-main">Influenciadores</span>
-              <span class="desc-sub">Seja um parceiro e ganhe dinheiro</span>
+              <span class="desc-sub">Seja parceiro e ganhe comissão</span>
             </div>
           </div>
           <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
