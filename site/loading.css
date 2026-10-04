@@ -3217,6 +3217,137 @@ input[type="range"]::-webkit-slider-thumb:hover {
   line-height: 1.5;
 }
 
+/* =========================================
+   POLIMENTO DE TEXTO E PERFORMANCE
+   ========================================= */
+.features-header h2,
+.pricing-header h2,
+.final-cta h2,
+.feature-text h3 {
+  text-wrap: balance;
+}
+
+.features-highlight {
+  line-height: 1.12;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@media (max-width: 560px) {
+  .features-eyebrow {
+    margin-bottom: 14px;
+  }
+
+  .features-header {
+    margin-bottom: 34px;
+  }
+
+  .features-header h2 {
+    font-size: clamp(1.45rem, 7vw, 1.72rem);
+    line-height: 1.22;
+    max-width: 19rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .problem-section .features-header h2 {
+    max-width: 18rem;
+  }
+
+  .features-highlight {
+    display: inline;
+    padding: 0 6px 2px;
+    border-radius: 7px;
+  }
+
+  .features-header p {
+    max-width: 21rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .problem-section {
+    padding-top: 44px;
+  }
+
+  .pdf-flow-section {
+    padding-top: 46px;
+  }
+}
+
+@media (max-width: 900px) {
+  nav {
+    backdrop-filter: none;
+  }
+
+  .floating-card {
+    animation: none;
+  }
+
+  .main-img-box,
+  .mock-card,
+  .mock-quiz,
+  .mock-revisao,
+  .screenshots-gallery,
+  .plan-card,
+  .pdf-flow-card,
+  .audience-card,
+  .review-form-card {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+  }
+
+  .social-proof-section::before,
+  .demo-section::before {
+    background-size: 48px 48px;
+  }
+
+  .pricing-section-modern::before,
+  .pricing-section-modern::after,
+  .final-cta::before,
+  .final-cta::after {
+    opacity: 0.45;
+  }
+
+  .plan-card.featured,
+  .btn-main,
+  .btn-cta-large,
+  .btn-primary-neon {
+    box-shadow: 0 10px 26px rgba(0, 53, 255, 0.16);
+  }
+
+  .btn-primary-neon,
+  .plan-card.featured,
+  .neon-brand-title {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .stat-item h3 {
+    white-space: normal;
+  }
+
+  .pdf-flow-card::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media (max-width: 900px) {
   .reviews-layout {
     grid-template-columns: 1fr;

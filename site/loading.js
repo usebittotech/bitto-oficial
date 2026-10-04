@@ -4,6 +4,7 @@
 // avaliações reais (featured) depois que a página já carregou.
 let currentPair = 0;
 let personaInterval = null;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function setupPersonaCarousel() {
   const cards = document.querySelectorAll(".persona-card");
@@ -43,12 +44,23 @@ function setupPersonaCarousel() {
   });
 
   if (personaInterval) clearInterval(personaInterval);
-  if (cards.length) personaInterval = setInterval(switchPersonas, 5000);
+  if (cards.length && !reduceMotion) {
+    personaInterval = setInterval(switchPersonas, 7000);
+  }
 }
 
 setupPersonaCarousel();
 // reviews.js dispara este evento quando troca o fallback por reviews reais
 document.addEventListener("bitto:featured-reviews-rendered", setupPersonaCarousel);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && personaInterval) {
+    clearInterval(personaInterval);
+    personaInterval = null;
+  } else if (!document.hidden) {
+    setupPersonaCarousel();
+  }
+});
 
 // JS do FAQ (Abre e fecha perguntas)
 document.querySelectorAll(".faq-question").forEach((button) => {
