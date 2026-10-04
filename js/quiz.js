@@ -44,6 +44,14 @@ onAuthStateChanged(auth, (user) => {
 if (startBtn) {
   startBtn.addEventListener("click", async () => {
     const topic = document.getElementById("quizTopic").value.trim();
+    const contentRaw = document.getElementById("quizContent")?.value || "";
+    const content = contentRaw.substring(0, 5000);
+    if (contentRaw.length > 5000) {
+      showToast(
+        "Texto longo! Limitado aos primeiros 5000 caracteres.",
+        "warning",
+      );
+    }
     const difficultyEl = document.querySelector(
       'input[name="difficulty"]:checked',
     );
@@ -79,7 +87,7 @@ if (startBtn) {
     gameActive.style.display = "none";
 
     try {
-      await fetchQuestions(topic, difficulty);
+      await fetchQuestions(topic, difficulty, content);
       await incrementUsage(currentUser.uid, "quiz");
       trackEvent("generate_quiz");
       if (window.recordActivity) window.recordActivity("quiz", 1);
@@ -109,9 +117,14 @@ if (startBtn) {
 }
 
 // --- API ---
-async function fetchQuestions(topic, difficulty) {
+async function fetchQuestions(topic, difficulty, content = "") {
+  const contextInstruction = content.trim()
+    ? `Use este conteúdo como base principal das perguntas: "${content}".`
+    : "Se não houver conteúdo base, use conhecimento geral confiável sobre o tema.";
+
   const prompt = `
         Gere um Quiz JSON válido sobre: "${topic}".
+        ${contextInstruction}
         Nível: ${difficulty}. Quantidade: ${TOTAL_QUESTIONS}.
         FORMATO JSON: [{"q": "...", "options": ["A", "B", "C", "D"], "correct": 0, "why": "..."}]
         Regras: JSON PURO. Português.

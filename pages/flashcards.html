@@ -181,10 +181,29 @@
 
             <div class="form-group">
               <label>Conteúdo (Opcional)</label>
+              <div class="pdf-upload-box">
+                <input
+                  type="file"
+                  id="flashcardsPdfInput"
+                  class="pdf-file-input"
+                  accept="application/pdf"
+                />
+                <button
+                  type="button"
+                  class="pdf-upload-btn"
+                  data-pdf-trigger="flashcardsPdfInput"
+                >
+                  📄 Importar PDF
+                </button>
+                <span class="pdf-upload-hint">
+                  Funciona melhor com PDFs em que o texto pode ser selecionado.
+                </span>
+                <p id="flashcardsPdfStatus" class="pdf-upload-status"></p>
+              </div>
               <textarea
                 class="input-textarea"
                 id="aiContent"
-                placeholder="Cole aqui um texto para a IA estudar..."
+                placeholder="Cole aqui um texto ou importe um PDF para a IA estudar..."
               ></textarea>
             </div>
 
@@ -265,7 +284,16 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="../js/pdf-upload.js"></script>
     <script type="module" src="../js/tools-core.js"></script>
+    <script>
+      window.BittoPdfUpload?.setup({
+        inputId: "flashcardsPdfInput",
+        textareaId: "aiContent",
+        statusId: "flashcardsPdfStatus",
+      });
+    </script>
     <script type="module" src="../js/flashcards.js"></script>
   </body>
 </html>

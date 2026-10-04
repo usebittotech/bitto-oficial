@@ -202,6 +202,34 @@
             </div>
 
             <div class="form-group">
+              <label>Conteúdo Base (Opcional)</label>
+              <div class="pdf-upload-box">
+                <input
+                  type="file"
+                  id="quizPdfInput"
+                  class="pdf-file-input"
+                  accept="application/pdf"
+                />
+                <button
+                  type="button"
+                  class="pdf-upload-btn"
+                  data-pdf-trigger="quizPdfInput"
+                >
+                  📄 Importar PDF
+                </button>
+                <span class="pdf-upload-hint">
+                  Funciona melhor com PDFs em que o texto pode ser selecionado.
+                </span>
+                <p id="quizPdfStatus" class="pdf-upload-status"></p>
+              </div>
+              <textarea
+                class="input-textarea"
+                id="quizContent"
+                placeholder="Cole um texto ou importe um PDF para gerar questões mais fiéis ao seu material..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
               <label>Nível de Dificuldade</label>
               <div class="qty-selector-group">
                 <label class="qty-option">
@@ -250,7 +278,16 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="../js/pdf-upload.js"></script>
     <script type="module" src="../js/tools-core.js"></script>
+    <script>
+      window.BittoPdfUpload?.setup({
+        inputId: "quizPdfInput",
+        textareaId: "quizContent",
+        statusId: "quizPdfStatus",
+      });
+    </script>
     <script type="module" src="../js/quiz.js"></script>
   </body>
 </html>
