@@ -2372,6 +2372,77 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 /* ==============================================
+   SEÇÃO PDF FLOW
+   ============================================== */
+.pdf-flow-section {
+  padding: 80px 8%;
+  background: linear-gradient(135deg, #f8f9ff 0%, #eef3ff 100%);
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.pdf-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.pdf-flow-card {
+  background: var(--white);
+  border: 2px solid #eef0f8;
+  border-radius: 22px;
+  padding: 28px;
+  min-height: 210px;
+  box-shadow: 0 16px 45px rgba(0, 53, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.pdf-flow-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -30px -60px auto;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(204, 255, 0, 0.28);
+}
+
+.pdf-flow-step {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  margin-bottom: 18px;
+}
+
+.pdf-flow-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: var(--dark);
+  position: relative;
+  z-index: 1;
+}
+
+.pdf-flow-card p {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+/* ==============================================
    SEÇÃO AUDIÊNCIA (Para Quem é)
    ============================================== */
 .audience-section {
@@ -2429,7 +2500,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* Responsivo - Problema & Audiência */
 @media (max-width: 900px) {
   .problem-section,
-  .audience-section {
+  .audience-section,
+  .pdf-flow-section {
     padding: 48px 5%;
   }
   .problem-section .features-header,
@@ -2462,6 +2534,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .audience-grid {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+  }
+  .pdf-flow-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .pdf-flow-card {
+    min-height: auto;
+    padding: 24px 20px;
   }
   .audience-card {
     padding: 22px 18px;
