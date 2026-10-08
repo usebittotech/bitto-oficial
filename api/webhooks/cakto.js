@@ -35,7 +35,7 @@ export default async function handler(req,res) {
     const results=[];
     for(const order of orders) results.push(await processOrder(payload.event,order));
     const gaId=process.env.GA4_MEASUREMENT_ID,gaSecret=process.env.GA4_API_SECRET;
-    if(gaId&&gaSecret) for(let i=0;i<results.length;i++) if(results[i].action==='activated') {
+    if(process.env.VERCEL_ENV==='production'&&gaId&&gaSecret) for(let i=0;i<results.length;i++) if(results[i].action==='activated') {
       try {await fetch('https://www.google-analytics.com/mp/collect?measurement_id='+gaId+'&api_secret='+gaSecret,{method:'POST',signal:AbortSignal.timeout(1000),body:JSON.stringify({client_id:String(orders[i].customer?.id || orders[i].id),events:[{name:'purchase',params:{transaction_id:orders[i].id,value:Number(orders[i].amount||0),currency:'BRL',items:[{item_id:results[i].plan,item_name:'Plano '+results[i].plan}]}}]})});}catch{console.warn('Evento GA4 não entregue.');}
     }
     return res.json({success:true,results});
