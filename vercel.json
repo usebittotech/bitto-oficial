@@ -12,6 +12,22 @@
   ],
   "headers": [
     {
+      "source": "/pages/:path*",
+      "headers": [{"key":"X-Robots-Tag","value":"noindex, nofollow"}]
+    },
+    {
+      "source": "/backstage",
+      "headers": [{"key":"X-Robots-Tag","value":"noindex, nofollow"}]
+    },
+    {
+      "source": "/backstage.html",
+      "headers": [{"key":"X-Robots-Tag","value":"noindex, nofollow"}]
+    },
+    {
+      "source": "/api/:path*",
+      "headers": [{"key":"X-Robots-Tag","value":"noindex, nofollow"}]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {

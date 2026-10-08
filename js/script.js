@@ -2,12 +2,17 @@ import {effectiveAccess} from "./entitlements.js";
 import {syncUserDatabase} from "./userManager.js";
 import {sendEmailVerification} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { auth, trackEvent } from "./firebase-init.js";
+import {campaignLink} from './campaign.js';
 
 // Exposta globalmente pois é chamada de um onclick inline no HTML gerado dinamicamente
-window.__trackUpgradeClick = () => trackEvent("select_item", {
+window.__trackUpgradeClick = () => {
+trackEvent("select_item", {
   item_list_name: "dashboard_upsell",
   items: [{ item_id: "monthly", item_name: "Assinar Agora (dashboard)" }],
 });
+trackEvent('begin_checkout',{currency:'BRL',value:24.90,items:[{item_id:'monthly',item_name:'Plano mensal',price:24.90,quantity:1}]});
+};
+window.__bittoMonthlyCheckout = () => campaignLink('https://pay.cakto.com.br/ar6yxop_697009');
 import {
   onAuthStateChanged,
   signOut,
@@ -599,7 +604,7 @@ async function loadSubscriptionStatus(userId) {
                 ">
                     <strong style="color: #e65100; font-size: 16px;">⏳ Plano GRATUITO</strong><br/>
                     <small style="color: #bf360c; font-size: 13px;">📊 Limite: <strong>10 Flashcards/mês</strong> • <strong>3 Quizzes/mês</strong> • <strong>3 Reviews/mês</strong></small><br/>
-                    <button onclick="window.__trackUpgradeClick && window.__trackUpgradeClick(); window.location.href='https://pay.cakto.com.br/ar6yxop_697009'" style="
+                    <button onclick="window.__trackUpgradeClick && window.__trackUpgradeClick(); window.location.href=window.__bittoMonthlyCheckout()" style="
                         margin-top: 10px; 
                         padding: 10px 20px; 
                         background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);
