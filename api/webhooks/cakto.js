@@ -11,7 +11,18 @@ export default async function handler(req,res) {
   if(req.method!=='POST') return res.status(405).json({error:'Method Not Allowed'});
   try {
     let raw,payload;
-    if(req.body && typeof req.body==='object' && !Buffer.isBuffer(req.body)) payload=req.body;
+    if(typeof req.on==='function') {
+      // Os helpers da Vercel restauram o stream original mesmo após preparar req.body.
+      // Leia os bytes antes de usar o corpo convertido: HMAC depende do JSON exato.
+      raw=await new Promise((resolve,reject)=>{
+        const chunks=[];let size=0;
+        req.on('data',chunk=>{size+=chunk.length;if(size>1048576){reject(Object.assign(new Error('Payload muito grande.'),{status:413}));return;}chunks.push(Buffer.from(chunk));});
+        req.on('end',()=>resolve(Buffer.concat(chunks)));
+        req.on('error',reject);
+      });
+      try{payload=JSON.parse(raw.toString('utf8'));}catch{throw Object.assign(new Error('JSON inválido.'),{status:400});}
+    }
+    else if(req.body && typeof req.body==='object' && !Buffer.isBuffer(req.body)) payload=req.body;
     else {
       const chunks=[];let size=0;
       if(typeof req.body==='string' || Buffer.isBuffer(req.body)) chunks.push(Buffer.from(req.body));
