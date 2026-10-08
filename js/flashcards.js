@@ -197,7 +197,7 @@ if (generateBtn) {
       return;
     }
 
-    const canUse = await checkUsageLimit(currentUser.uid, "flashcards");
+    const canUse = await checkUsageLimit(currentUser.uid, "flashcards", quantity);
     if (!canUse) {
       trackEvent("paywall_shown", { source: "flashcards" });
       showUpgradeModal();
@@ -232,12 +232,13 @@ if (generateBtn) {
           Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify({
+          tool: "flashcards", quantity,
           contents: [{ parts: [{ text: prompt }] }],
         }),
       });
 
-      if (!response.ok) throw new Error("Erro na API Backend");
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível gerar flashcards.");
       let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!rawText) throw new Error("A IA respondeu vazio.");
 

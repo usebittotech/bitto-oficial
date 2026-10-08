@@ -1240,9 +1240,11 @@
                     <option value="monthly">Mensal</option>
                     <option value="quarterly">Trimestral</option>
                     <option value="annual">Anual</option>
+                    <option value="free">Remover concessão gratuita</option>
                   </select>
                 </div>
-                <button class="btn btn-green" style="width: 100%; justify-content: center" onclick="grantAccess()">⚡ Liberar acesso</button>
+                <div class="fg"><label class="flbl">Validade (opcional)</label><input type="date" id="grantEndDate" class="finput"/><small>Em branco: 1, 3 ou 12 meses, conforme o plano. Remover concessão preserva compras pagas.</small></div>
+                <button id="grantAccessButton" class="btn btn-green" style="width: 100%; justify-content: center" onclick="grantAccess()">⚡ Liberar acesso</button>
               </div>
             </div>
 
@@ -1700,26 +1702,21 @@
 
       // ── GRANT ACCESS ──
       window.grantAccess = async function () {
-        const email = document.getElementById("userEmail").value.trim();
-        const plan = document.getElementById("userPlan").value;
-        if (!email) return toast("Digite um e-mail", "error");
+        const email=document.getElementById('userEmail').value.trim().toLowerCase();
+        const plan=document.getElementById('userPlan').value;
+        const date=document.getElementById('grantEndDate').value;
+        if(!email) return toast('Digite um e-mail','error');
+        const button=document.getElementById('grantAccessButton');
+        if(button.disabled)return;button.disabled=true;
         try {
-          const q = query(collection(db, "users"), where("email", "==", email));
-          const snap = await getDocs(q);
-          if (snap.empty) return toast("Usuário não encontrado no Firebase", "error");
-          const ref = snap.docs[0].ref;
-          await updateDoc(ref, {
-            plan: plan,
-            subscriptionStatus: "active",
-            updatedAt: serverTimestamp(),
-          });
-          toast(`✅ Acesso ${plan.toUpperCase()} liberado para ${email}`);
-          addAct("⚡", `Acesso ${plan} liberado para <strong>${email}</strong>`);
+          const idToken=await auth.currentUser.getIdToken();
+          const response=await fetch('/api/admin/grant-plan',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+idToken},body:JSON.stringify({email,plan,requestId:crypto.randomUUID(),...(date&&plan!=='free'?{endDate:date+'T23:59:59-03:00'}:{})})});
+          const result=await response.json();
+          if(!response.ok)throw new Error(result.error||'Não foi possível liberar o acesso');
+          toast(plan==='free'?'Concessão gratuita removida; compras preservadas':result.pending?'Liberação salva. Será ativada quando a pessoa criar a conta e confirmar o e-mail.':'Plano liberado até '+new Date(result.expiresAt).toLocaleDateString('pt-BR'));
           await loadAll();
-        } catch (e) {
-          toast("Erro ao liberar acesso", "error");
-          console.error(e);
-        }
+        }catch(error){toast(error.message,'error');}
+        finally{button.disabled=false;}
       };
 
       // ── MODAL: abrir novo / editar ──

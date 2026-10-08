@@ -138,11 +138,12 @@ async function fetchQuestions(topic, difficulty, content = "") {
       Authorization: `Bearer ${idToken}`,
     },
     body: JSON.stringify({
+      tool: "quiz",
       contents: [{ parts: [{ text: prompt }] }],
     }),
   });
-  if (!response.ok) throw new Error("Erro na API");
   const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Não foi possível gerar o quiz.");
   let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!rawText) throw new Error("Resposta vazia.");
   rawText = rawText

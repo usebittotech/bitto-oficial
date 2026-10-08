@@ -1,5 +1,6 @@
 // Arquivo: api/generate.js
 import admin from "firebase-admin";
+import {reserveUsage,releaseUsage} from '../lib/usage.js';
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -16,10 +17,6 @@ const db = admin.firestore();
 
 // Origem permitida para CORS (restrito ao próprio domínio, em vez de "*")
 const ALLOWED_ORIGIN = "https://www.usebitto.com";
-
-// Limite de segurança para o plano gratuito (contador simples de chamadas de IA/mês,
-// além dos limites específicos por ferramenta que o front já aplica).
-const FREE_PLAN_MONTHLY_AI_CALLS = 60;
 
 function setCors(res, origin) {
   const allowOrigin = origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN;
@@ -45,7 +42,7 @@ export default async function handler(req, res) {
   const geminiKey = process.env.GEMINI_API_KEY;
   const openRouterKey = process.env.OPEN_API_KEY;
 
-  if (!geminiKey || !openRouterKey) {
+  if (!geminiKey && !openRouterKey) {
     return res
       .status(500)
       .json({ error: "Chaves de API não configuradas no ambiente da Vercel." });
@@ -68,39 +65,23 @@ export default async function handler(req, res) {
 
   const uid = decodedToken.uid;
 
-  // ========== LIMITE DE USO NO SERVIDOR (defesa contra abuso do proxy de IA) ==========
-  // Isso é uma rede de segurança além do limite por ferramenta já aplicado no front-end
-  // (checkUsageLimit/incrementUsage), que sozinho não protege porque pode ser contornado
-  // chamando este endpoint diretamente.
-  try {
-    const userRef = db.collection("users").doc(uid);
-    const userSnap = await userRef.get();
-    const userData = userSnap.exists ? userSnap.data() : {};
-    const plan = userData.plan || "free";
-
-    if (plan === "free") {
-      const now = new Date();
-      const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
-      const aiUsage = userData.aiUsage || {};
-      const currentCount = aiUsage.month === monthKey ? aiUsage.count || 0 : 0;
-
-      if (currentCount >= FREE_PLAN_MONTHLY_AI_CALLS) {
-        return res.status(403).json({
-          error: "Limite mensal de uso do plano gratuito atingido. Faça upgrade para continuar.",
-        });
-      }
-
-      await userRef.set(
-        { aiUsage: { month: monthKey, count: currentCount + 1 } },
-        { merge: true }
-      );
-    }
-  } catch (e) {
-    // Se a checagem de uso falhar por algum motivo, não travamos a feature —
-    // mas registramos o erro para investigação.
-    console.error("Falha ao checar/atualizar uso de IA:", e.message);
-  }
-
+  const prompt = req.body?.contents?.[0]?.parts?.[0]?.text;
+  const tool = req.body?.tool;
+  const quantity = tool === 'flashcards' ? req.body?.quantity : 1;
+  if(typeof prompt!=='string'||!prompt.trim()||prompt.length>120000) return res.status(400).json({error:'Conteúdo vazio ou muito grande.'});
+  let reservation;
+  try { reservation = await reserveUsage(uid,tool,quantity); }
+  catch(error) { return res.status(error.status || 503).json({error:error.status?error.message:'Não foi possível verificar o limite. Tente novamente.'}); }
+  const adapt = data => {
+    if(tool==='flashcards') {
+      const text=data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const cards=JSON.parse(String(text||'').replace(/```json|```/g,'').trim());
+      if(!Array.isArray(cards)||cards.length<quantity) throw new Error('Flashcards incompletos.');
+      data.candidates[0].content.parts=[{text:JSON.stringify(cards.slice(0,quantity))}];
+    } else if(!data.candidates?.[0]?.content?.parts?.[0]?.text) throw new Error('Resposta vazia.');
+    return data;
+  };
+  // A cota é reservada em transação e devolvida se nenhum modelo responder.
   try {
     const body = req.body;
     const prompt = body?.contents?.[0]?.parts?.[0]?.text;
@@ -122,12 +103,14 @@ export default async function handler(req, res) {
     let lastError = null;
 
     for (const tier of pipeline) {
+      if(tier.provider==='gemini'&&!geminiKey || tier.provider==='openrouter'&&!openRouterKey) continue;
       try {
         if (tier.provider === "gemini") {
           const googleResponse = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/${tier.id}:generateContent?key=${geminiKey}`,
             {
               method: "POST",
+              signal: AbortSignal.timeout(20000),
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
@@ -146,12 +129,13 @@ export default async function handler(req, res) {
           }
 
           const data = await googleResponse.json();
-          return res.status(200).json(data);
+          return res.status(200).json(adapt(data));
         } else if (tier.provider === "openrouter") {
           const openRouterResponse = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
             {
               method: "POST",
+              signal: AbortSignal.timeout(20000),
               headers: {
                 Authorization: `Bearer ${openRouterKey}`,
                 "Content-Type": "application/json",
@@ -178,7 +162,7 @@ export default async function handler(req, res) {
             ],
           };
 
-          return res.status(200).json(adaptedData);
+          return res.status(200).json(adapt(adaptedData));
         }
       } catch (error) {
         console.warn(`[Pipeline Fallback] Falha no modelo ${tier.id}:`, error.message);
@@ -187,11 +171,13 @@ export default async function handler(req, res) {
       }
     }
 
+    await releaseUsage(reservation);
     return res.status(502).json({
       error: "Todos os modelos do pipeline falharam de forma consecutiva.",
       details: lastError?.message,
     });
   } catch (error) {
+    await releaseUsage(reservation);
     console.error("Erro geral no Backend:", error);
     return res.status(500).json({ error: "Erro interno ao processar solicitação." });
   }

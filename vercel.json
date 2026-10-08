@@ -1,6 +1,9 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "redirects": [
+    {"source":"/bitto-oficial/:path*","destination":"/:path*","permanent":true}
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",

@@ -1,100 +1,22 @@
-import {
-  db,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  increment,
-  serverTimestamp,
-} from "./firebase-init.js";
-
-/**
- * Cria ou atualiza o usuário no banco ao fazer login
- */
+import {auth,db,doc,getDoc} from './firebase-init.js';
+import {effectiveAccess,FREE_LIMITS} from './entitlements.js';
 export async function syncUserDatabase(user) {
-  const userRef = doc(db, "users", user.uid);
-  const userSnap = await getDoc(userRef);
-
-  if (!userSnap.exists()) {
-    await setDoc(userRef, {
-      email: user.email,
-      name: user.displayName || "Estudante",
-      plan: "free",
-      subscriptionEnd: null,
-      usage: {
-        flashcards: 0,
-        quiz: 0,
-        review: 0,
-      },
-      lastReset: serverTimestamp(),
-    });
-  }
+ const token=await user.getIdToken(true);
+ const response=await fetch('/api/account/sync',{method:'POST',headers:{Authorization:'Bearer '+token}});
+ const data=await response.json();
+ if(!response.ok) throw new Error(data.error || 'Não foi possível sincronizar sua conta.');
+ sessionStorage.setItem('bitto_pending_verification',data.needsEmailVerification?'1':'0');
+ return data;
 }
-
-/**
- * Verifica se o usuário pode usar a ferramenta
- */
-export async function checkUsageLimit(userId, tool) {
-  if (!userId) return false;
-
-  const userRef = doc(db, "users", userId);
-  const userSnap = await getDoc(userRef);
-
-  if (!userSnap.exists()) return false;
-
-  const userData = userSnap.data();
-  const now = new Date();
-
-  // --- 1. VERIFICAÇÃO DE PLANO PAGO (PRO ou EMBAIXADOR) ---
-  if (userData.plan !== "free" && userData.subscriptionEnd) {
-    const endDate = userData.subscriptionEnd.toDate();
-    if (now < endDate) {
-      return true; // LIBERADO TOTAL
-    }
-  }
-
-  // --- 2. REGRAS DO PLANO FREE ---
-  const lastReset = userData.lastReset
-    ? userData.lastReset.toDate()
-    : new Date(0);
-  const isNewMonth =
-    now.getMonth() !== lastReset.getMonth() ||
-    now.getFullYear() !== lastReset.getFullYear();
-
-  if (isNewMonth) {
-    await updateDoc(userRef, {
-      "usage.flashcards": 0,
-      "usage.quiz": 0,
-      "usage.review": 0,
-      lastReset: serverTimestamp(),
-    });
-    return true;
-  }
-
-  const currentUsage = userData.usage?.[tool] || 0;
-  return currentUsage < 3;
+export async function checkUsageLimit(userId,tool,units=1) {
+ if(!userId||!Object.hasOwn(FREE_LIMITS,tool))return false;
+ const snap=await getDoc(doc(db,'users',userId));
+ if(!snap.exists())return false;
+ const user=snap.data();
+ if(effectiveAccess(user).isActive)return true;
+ const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit'}).formatToParts(new Date());
+ const month=parts.find(p=>p.type==='year').value+'-'+parts.find(p=>p.type==='month').value;
+ return (user.usageMonth===month?Number(user.usage?.[tool]||0):0)+units<=FREE_LIMITS[tool];
 }
-
-/**
- * Incrementa o uso (APENAS se for usuário FREE)
- */
-export async function incrementUsage(userId, tool) {
-  if (!userId) return;
-
-  const userRef = doc(db, "users", userId);
-  const userSnap = await getDoc(userRef);
-  const userData = userSnap.data();
-
-  // REGRA IMPORTANTE: Se o plano for ativo (não free), não gasta o limite de 3 usos
-  if (userData.plan !== "free" && userData.subscriptionEnd) {
-    const endDate = userData.subscriptionEnd.toDate();
-    if (new Date() < endDate) {
-      return; // Sai da função sem incrementar o contador
-    }
-  }
-
-  // Se for Free, incrementa normal
-  await updateDoc(userRef, {
-    [`usage.${tool}`]: increment(1),
-  });
-}
+// O servidor já contabiliza a geração; o cliente não altera cotas.
+export async function incrementUsage() {}
