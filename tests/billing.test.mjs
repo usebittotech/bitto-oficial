@@ -2,6 +2,7 @@ import {test,before,after,beforeEach} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import {PassThrough} from 'node:stream';
 import {createRequire} from 'node:module';
 // Os testes exigem emuladores. Nunca carregam credenciais nem conectam à produção.
 if(!process.env.FIRESTORE_EMULATOR_HOST || !process.env.FIREBASE_AUTH_EMULATOR_HOST) throw new Error('Execute com os emuladores de Firestore e Auth.');
@@ -198,6 +199,15 @@ test('webhook aceita HMAC válido e rejeita replay antigo',async()=>{
 test('webhook V2 processa plano e ignora order bump',async()=>{
  const r=await invoke(webhook,{secret:'local-test-secret',event:'purchase_approved',data:[order('annual'),order('monthly','bump',{product:{id:'other'},offer_type:'orderbump'})]});
  assert.equal(r.code,200);assert.equal(effectiveAccess((await user().get()).data()).plan,'annual');
+});
+test('webhook usa bytes originais quando Vercel fornece corpo já convertido',async()=>{
+ const body=JSON.stringify({secret:'local-test-secret',event:'pix_gerado',data:order()},null,2);
+ const timestamp=String(Math.floor(Date.now()/1000));
+ const req=new PassThrough();req.method='POST';req.body=JSON.parse(body);
+ req.headers={'x-cakto-timestamp':timestamp,'x-cakto-signature':'v1='+crypto.createHmac('sha256','local-test-secret').update(timestamp+'.'+body).digest('hex')};
+ const res={code:200,status(n){this.code=n;return this;},json(b){this.body=b;return this;}};
+ const processing=webhook(req,res);req.end(body);await processing;
+ assert.equal(res.code,200);assert.equal(res.body.results[0].action,'ignored');
 });
 test('fim de mês é ajustado e anual respeita calendário',()=>{
  assert.equal(addMonths(new Date('2026-01-31T12:00:00Z'),1).toISOString(),'2026-02-28T12:00:00.000Z');
