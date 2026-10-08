@@ -73,6 +73,51 @@ for(const plan of ['monthly','quarterly','annual']) {
   await assert.rejects(reserveUsage(uid,'quiz'),e=>e.status===403);
  });
 }
+test('compra para conta existente não confirmada aguarda confirmação',async()=>{
+ await auth.updateUser(uid,{emailVerified:false});
+ try {
+  const result=await processOrder('purchase_approved',order('annual'));
+  assert.equal(result.pending,true);
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'free');
+  assert.equal((await claimPendingAccess({uid,email,email_verified:false})).needsEmailVerification,true);
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'free');
+  await auth.updateUser(uid,{emailVerified:true});
+  await claimPendingAccess({uid,email,email_verified:true});
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'annual');
+  await processOrder('refund',order('annual'));
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'free');
+ } finally {await auth.updateUser(uid,{emailVerified:true});}
+});
+test('concessão para conta existente não confirmada aguarda confirmação',async()=>{
+ await auth.updateUser(uid,{emailVerified:false});
+ try {
+  const r=await invoke(grant,{email,plan:'quarterly',requestId:'unverified-grant'});
+  assert.equal(r.body.pending,true);
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'free');
+  await claimPendingAccess({uid,email,email_verified:false});
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'free');
+  await auth.updateUser(uid,{emailVerified:true});
+  await claimPendingAccess({uid,email,email_verified:true});
+  assert.equal(effectiveAccess((await user().get()).data()).plan,'quarterly');
+ } finally {await auth.updateUser(uid,{emailVerified:true});}
+});
+test('remover concessão não confirmada limpa pendência e concessão antiga preservando compra',async()=>{
+ await user().set({email,plan:'annual',subscriptionEnd:future(),paidAccess:{plan:'monthly',end:future(),status:'active'},manualGrant:{plan:'annual',end:future(),status:'active'}});
+ await auth.updateUser(uid,{emailVerified:false});
+ try {
+  await invoke(grant,{email,plan:'annual',requestId:'pending-old'});
+  await invoke(grant,{email,plan:'free',requestId:'remove-pending-old'});
+  const account=(await user().get()).data();
+  assert.equal(account.manualGrant,null);assert.equal(effectiveAccess(account).plan,'monthly');
+  assert.equal((await db.collection('_pendingAccess').doc(hash(email)).get()).data().manualGrant,null);
+ } finally {await auth.updateUser(uid,{emailVerified:true});}
+});
+test('reembolso atua na conta original mesmo se o e-mail perder confirmação',async()=>{
+ await processOrder('purchase_approved',order());
+ await auth.updateUser(uid,{emailVerified:false});
+ try {await processOrder('refund',order());assert.equal(effectiveAccess((await user().get()).data()).plan,'free');}
+ finally {await auth.updateUser(uid,{emailVerified:true});}
+});
 test('mesmo pedido com aprovação e renovação não duplica prazo',async()=>{
  const data=order();await processOrder('purchase_approved',data);
  const first=(await user().get()).data().subscriptionEnd.toMillis();
