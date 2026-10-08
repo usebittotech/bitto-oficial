@@ -1,3 +1,6 @@
+import {effectiveAccess} from "./entitlements.js";
+import {syncUserDatabase} from "./userManager.js";
+import {sendEmailVerification} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { auth, trackEvent } from "./firebase-init.js";
 
 // Exposta globalmente pois é chamada de um onclick inline no HTML gerado dinamicamente
@@ -72,7 +75,16 @@ let chatHistory = [
 // ==========================================
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    try { await syncUserDatabase(user); }
+    catch(error) { window.showToast(error.message, "error"); }
     await checkMonthlyReset(user);
+    if(sessionStorage.getItem("bitto_pending_verification")==="1") {
+      const banner=document.createElement("div"); banner.style.cssText="padding:16px;background:#fff3cd;color:#222;border-radius:8px;margin:16px";
+      banner.textContent="Seu plano está aguardando confirmação do e-mail. Confirme e entre novamente para ativá-lo. ";
+      const button=document.createElement("button");button.textContent="Enviar verificação";
+      button.onclick=async()=>{try{await sendEmailVerification(user);button.textContent="E-mail enviado";button.disabled=true;}catch{window.showToast("Não foi possível enviar. Tente mais tarde.","error");}};
+      banner.appendChild(button);document.getElementById("subscription-status")?.before(banner);
+    }
     const emailInput = document.getElementById("settingsEmailInput");
     if (emailInput) emailInput.value = user.email;
 
@@ -88,7 +100,14 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+let lastSubscriptionKey;
 function updateInterface(user, dbData) {
+  const access = effectiveAccess(dbData);
+  const subscriptionKey = JSON.stringify([access.plan, access.end, dbData.renewalStatus]);
+  if (subscriptionKey !== lastSubscriptionKey) {
+    lastSubscriptionKey = subscriptionKey;
+    loadSubscriptionStatus(user.uid);
+  }
   const currentXP = dbData.xp || 0;
   const levelData = calculateLevel(currentXP);
   const displayName = dbData.displayName || user.displayName || "Estudante";
@@ -96,7 +115,7 @@ function updateInterface(user, dbData) {
 
   const planNav = document.getElementById("userPlanNav");
   const planMobile = document.getElementById("userPlanMobile");
-  const userPlan = dbData.plan || "free";
+  const userPlan = effectiveAccess(dbData).plan;
 
   if (planNav) {
     planNav.innerText = userPlan.toUpperCase();
@@ -547,6 +566,7 @@ async function loadSubscriptionStatus(userId) {
       headers: { Authorization: `Bearer ${idToken}` },
     });
     const data = await response.json();
+    if(!response.ok) throw new Error(data.error || "Status indisponível");
 
     const statusEl = document.getElementById("subscription-status");
 
@@ -578,7 +598,7 @@ async function loadSubscriptionStatus(userId) {
                     box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
                 ">
                     <strong style="color: #e65100; font-size: 16px;">⏳ Plano GRATUITO</strong><br/>
-                    <small style="color: #bf360c; font-size: 13px;">📊 Limite: <strong>10 Flashcards/mês</strong> • <strong>3 Quizzes/mês</strong> • <strong>5 Reviews/mês</strong></small><br/>
+                    <small style="color: #bf360c; font-size: 13px;">📊 Limite: <strong>10 Flashcards/mês</strong> • <strong>3 Quizzes/mês</strong> • <strong>3 Reviews/mês</strong></small><br/>
                     <button onclick="window.__trackUpgradeClick && window.__trackUpgradeClick(); window.location.href='https://pay.cakto.com.br/ar6yxop_697009'" style="
                         margin-top: 10px; 
                         padding: 10px 20px; 
@@ -601,10 +621,3 @@ async function loadSubscriptionStatus(userId) {
     console.error("Erro ao carregar status de assinatura:", error);
   }
 }
-
-// Chamar quando usuário faz login
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    loadSubscriptionStatus(user.uid);
-  }
-});

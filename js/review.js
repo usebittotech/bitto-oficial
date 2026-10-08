@@ -74,13 +74,13 @@ if (generateBtn) {
           Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify({
+          tool: "review",
           contents: [{ parts: [{ text: prompt }] }],
         }),
       });
 
-      if (!response.ok) throw new Error("Erro no Servidor");
-
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível gerar a revisão.");
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!aiResponse) throw new Error("A IA não gerou resposta.");
 

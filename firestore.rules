@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function admin() { return signedIn() && request.auth.token.email == 'usebitto.tech@gmail.com' && request.auth.token.email_verified == true; }
+    function profileFields() { return ['email','name','displayName','photoURL','xp','level','stats','studyPlanner','lastResetMonth','lastReset','usage','createdAt','updatedAt','plan','subscriptionEnd']; }
+    match /users/{uid} {
+      allow get: if owner(uid) || admin();
+      allow list: if admin();
+      allow create: if owner(uid)
+        && request.resource.data.keys().hasOnly(profileFields())
+        && (!('plan' in request.resource.data) || request.resource.data.plan == 'free')
+        && (!('subscriptionEnd' in request.resource.data) || request.resource.data.subscriptionEnd == null)
+        && (!('email' in request.resource.data) || request.resource.data.email == request.auth.token.email);
+      allow update: if owner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','displayName','photoURL','xp','level','stats','studyPlanner','lastResetMonth','updatedAt']);
+      match /{collection}/{document=**} {
+        allow read, write: if owner(uid);
+        allow read: if admin();
+      }
+    }
+    match /embaixadores/{id} { allow read, write: if admin(); }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
