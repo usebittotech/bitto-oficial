@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAnalytics, logEvent, setUserId, isSupported } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { campaignEventParams } from './campaign.js';
 
 // COLE SUA CONFIGURAÇÃO AQUI (Do passo 1)
 const firebaseConfig = {
@@ -25,11 +26,20 @@ const googleProvider = new GoogleAuthProvider();
 // isSupported() evita erro em navegadores/contextos que bloqueiam IndexedDB
 // (ex: modo anônimo com cookies bloqueados, alguns bloqueadores de anúncio).
 let analytics = null;
+let analyticsReady = false;
+let pendingUserId = null;
+const pendingEvents = [];
 isSupported()
   .then((ok) => {
-    if (ok) analytics = getAnalytics(app);
+    if (ok && ['www.usebitto.com','usebitto.com'].includes(location.hostname)) analytics = getAnalytics(app);
+    analyticsReady = true;
+    if(analytics && pendingUserId) setUserId(analytics,pendingUserId);
+    if(analytics) for(const [name,params] of pendingEvents.splice(0)) logEvent(analytics,name,params);
+    else pendingEvents.length=0;
   })
   .catch(() => {
+    analyticsReady = true;
+    pendingEvents.length=0;
     /* Analytics indisponível neste navegador — segue normalmente sem quebrar o app */
   });
 
@@ -37,7 +47,9 @@ isSupported()
 // sem precisar checar se o Analytics já carregou.
 function trackEvent(eventName, params = {}) {
   try {
-    if (analytics) logEvent(analytics, eventName, params);
+    const values={...campaignEventParams(),...params};
+    if (analytics) logEvent(analytics, eventName, values);
+    else if(!analyticsReady && pendingEvents.length<25) pendingEvents.push([eventName,values]);
   } catch (e) {
     console.warn("Analytics: falha ao registrar evento", eventName, e);
   }
@@ -45,7 +57,8 @@ function trackEvent(eventName, params = {}) {
 
 function trackUserId(uid) {
   try {
-    if (analytics && uid) setUserId(analytics, uid);
+    pendingUserId=uid || null;
+    if (analytics) setUserId(analytics, pendingUserId);
   } catch (e) {
     /* silencioso */
   }

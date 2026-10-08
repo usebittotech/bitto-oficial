@@ -3,11 +3,14 @@
 // (via Firebase Analytics). Não bloqueia navegação nem altera nenhum
 // comportamento visual/funcional existente.
 import { trackEvent } from "./firebase-init.js";
+import { decorateCampaignLinks, campaignContext } from './campaign.js';
 
-document.addEventListener("DOMContentLoaded", () => {
+function setupLandingAnalytics() {
+  campaignContext();
+  decorateCampaignLinks();
   // CTAs principais de cadastro ("Quero Começar Agora" / topo, meio e fim da página)
   document
-    .querySelectorAll('a[href*="login.html?mode=register"], .btn-cta-large')
+    .querySelectorAll('a[href*="login.html?mode=register"]')
     .forEach((el) => {
       el.addEventListener("click", () => {
         trackEvent("landing_cta_click", {
@@ -31,9 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cliques nos planos (evento recomendado do GA4: select_item)
   document.querySelectorAll(".plan-cta[data-plan-link]").forEach((el) => {
     el.addEventListener("click", () => {
+      const itemId={mensal:'monthly',trimestral:'quarterly',anual:'annual'}[el.dataset.planLink];
+      const price={mensal:24.90,trimestral:59.70,anual:178.80}[el.dataset.planLink];
       trackEvent("select_item", {
         item_list_name: "planos_bitto",
-        items: [{ item_id: el.dataset.planLink, item_name: el.dataset.planLabel || el.textContent.trim() }],
+        items: [{ item_id: itemId, item_name: el.dataset.planLabel || el.textContent.trim() }],
+      });
+      trackEvent('begin_checkout',{
+        currency:'BRL',
+        value:price,
+        items:[{item_id:itemId,item_name:'Plano '+el.dataset.planLink,price,quantity:1}]
       });
     });
   });
@@ -56,4 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     observer.observe(pricingSection);
   }
-});
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupLandingAnalytics,{once:true});
+else setupLandingAnalytics();
