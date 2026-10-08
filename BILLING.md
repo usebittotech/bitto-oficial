@@ -6,7 +6,7 @@ O webhook `/api/webhooks/cakto` exige o segredo configurado no ambiente. Também
 
 No backstage, informe e-mail, plano e, opcionalmente, uma data final. Sem data, a validade é de 1, 3 ou 12 meses a partir da concessão. A opção de remover concessão gratuita preserva períodos pagos. Somente o administrador com e-mail verificado pode conceder acesso, pela API autenticada; cada alteração fica em `_adminPlanAudit`.
 
-Compra ou concessão antes do cadastro fica em `_pendingAccess`. O usuário pode criar uma conta normalmente; ao confirmar seu e-mail e entrar novamente, o acesso é vinculado à conta. A concessão não cria contas sem senha.
+Compra ou concessão antes do cadastro, ou para uma conta com e-mail ainda não confirmado, fica em `_pendingAccess`. O usuário pode criar uma conta normalmente; ao confirmar seu e-mail e entrar novamente, o acesso é vinculado à conta. A concessão não cria contas sem senha. Remover uma concessão também limpa concessões antigas de contas ainda não confirmadas, preservando períodos pagos.
 
 O servidor verifica vencimento em todas as gerações. O plano gratuito permite 10 flashcards, 3 quizzes e 3 revisões por mês (fuso America/Sao_Paulo). A cota é reservada em transação; falhas de geração devolvem a reserva. As regras do Firestore impedem alteração de plano, pagamento ou cota pelo cliente, mantendo perfil, planner e materiais pessoais editáveis.
 
