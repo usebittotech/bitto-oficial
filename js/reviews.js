@@ -98,6 +98,15 @@ function renderSummary(reviews) {
     .join("");
   countEl.textContent = `com base em ${reviews.length} avaliaç${reviews.length === 1 ? "ão" : "ões"}`;
   wrap.style.display = "flex";
+
+  const heroProof = document.getElementById("hero-review-proof");
+  const heroScore = document.getElementById("hero-review-score");
+  const heroCount = document.getElementById("hero-review-count");
+  if (heroProof && heroScore && heroCount) {
+    heroScore.textContent = `${rounded.toFixed(1).replace(".", ",")}/5`;
+    heroCount.textContent = `${reviews.length} avaliações de estudantes`;
+    heroProof.hidden = false;
+  }
 }
 
 // ---------------------------------------------------------------
@@ -175,7 +184,7 @@ function renderFeaturedShowcase(featuredReviews) {
   const MIN_FOR_REAL_SHOWCASE = 4; // abaixo disso, mantém o fallback
 
   if (featuredReviews.length < MIN_FOR_REAL_SHOWCASE) {
-    // Não mexe no fallback estático que já está no HTML.
+    container.closest(".social-proof-section")?.setAttribute("hidden", "");
     return;
   }
 
@@ -186,6 +195,7 @@ function renderFeaturedShowcase(featuredReviews) {
   }
 
   container.removeAttribute("data-fallback");
+  container.closest(".social-proof-section")?.removeAttribute("hidden");
   container.innerHTML = pairs
     .map((pair, pairIndex) =>
       pair

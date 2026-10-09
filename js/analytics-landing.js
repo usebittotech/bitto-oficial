@@ -66,6 +66,21 @@ function setupLandingAnalytics() {
     );
     observer.observe(pricingSection);
   }
+
+  const demoSection = document.getElementById("demonstracao");
+  if (demoSection && "IntersectionObserver" in window) {
+    const demoObserver = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        trackEvent("view_product_demo");
+        demoObserver.disconnect();
+      }
+    }, { threshold: 0.25 });
+    demoObserver.observe(demoSection);
+  }
+
+  window.setTimeout(() => {
+    if (document.visibilityState === "visible") trackEvent("engaged_30s");
+  }, 30000);
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupLandingAnalytics,{once:true});
 else setupLandingAnalytics();
