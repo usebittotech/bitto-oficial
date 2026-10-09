@@ -165,7 +165,10 @@
           <li><a href="#faq">FAQ</a></li>
         </ul>
 
-        <a href="pages/login.html" class="btn-login">Entrar</a>
+        <div class="nav-actions">
+          <a href="pages/login.html" class="nav-signin">Entrar</a>
+          <a href="pages/login.html?mode=register" class="btn-login">Começar grátis</a>
+        </div>
 
         <button
           type="button"
@@ -183,12 +186,13 @@
       <div class="mobile-menu" id="mobile-menu">
         <ul class="mobile-menu-links">
           <li><a href="#ferramentas">Ferramentas</a></li>
+          <li><a href="/enem">ENEM</a></li>
           <li><a href="#demonstracao">Demonstração</a></li>
           <li><a href="#planos">Planos</a></li>
           <li><a href="#faq">FAQ</a></li>
           <li><a href="#avaliacoes">Avaliações</a></li>
         </ul>
-        <a href="pages/login.html" class="btn-main mobile-menu-cta">Entrar</a>
+        <a href="pages/login.html?mode=register" class="btn-main mobile-menu-cta">Criar conta grátis</a>
       </div>
     </nav>
 
@@ -198,35 +202,42 @@
       ================================================ -->
       <section class="hero">
         <div class="hero-text">
-          <span class="badge">PDF, texto e anotações viram estudo ativo</span>
+          <span class="badge">Seu material vira prática de estudo</span>
           <h1>
-            Transforme seus PDFs e anotações em <span class="highlight">flashcards, quiz e revisão</span>
+            Pare de apenas reler. <span class="highlight">Pratique o que você precisa aprender.</span>
           </h1>
           <p>
-            Cole seu texto ou importe um PDF. A BITTO organiza seu material em
-            perguntas, resumos e um caminho claro para você saber o que estudar
-            agora.
+            Envie um PDF ou cole suas anotações. A Bitto transforma o conteúdo
+            em flashcards, quizzes e revisões para você começar a estudar agora.
           </p>
 
           <div class="cta-group">
             <a href="pages/login.html?mode=register" class="btn-main"
-              >Começar Grátis</a
+              >Criar conta grátis</a
             >
-            <a href="#ferramentas" class="btn-secondary">Ver como funciona</a>
+            <a href="#demonstracao" class="btn-secondary">Ver a Bitto em ação</a>
           </div>
+
+          <p class="hero-microcopy">Sem cartão • 10 flashcards, 3 quizzes e 3 revisões por mês</p>
+
+          <a href="#avaliacoes" class="hero-review-proof" id="hero-review-proof" hidden>
+            <span class="hero-review-stars" aria-hidden="true">★★★★★</span>
+            <strong id="hero-review-score"></strong>
+            <span id="hero-review-count"></span>
+          </a>
 
           <div class="hero-stats">
             <div class="stat-item">
-              <h3>PDF → Quiz</h3>
-              <p>Seu material vira prática ativa</p>
+              <h3>PDF → prática</h3>
+              <p>Comece pelo seu próprio conteúdo</p>
             </div>
             <div class="stat-item">
               <h3>4</h3>
-              <p>Ferramentas de estudo</p>
+              <p>Flashcards, quiz, revisão e planner</p>
             </div>
             <div class="stat-item">
               <h3>Grátis</h3>
-              <p>Para testar sem cartão</p>
+              <p>Para começar sem cartão</p>
             </div>
           </div>
         </div>
