@@ -2289,6 +2289,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   display: none;
 }
 
+/* Mantem a jornada principal curta: valor, prova real e produto. */
+.audience-section,
+.partner-banner-clean {
+    display: none;
+}
+
 .social-proof-section[data-empty="true"] {
   display: none;
 }
@@ -2555,6 +2561,27 @@ input[type="range"]::-webkit-slider-thumb:hover {
   line-height: 1.6;
   position: relative;
   z-index: 1;
+}
+
+.flow-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 30px;
+}
+
+.flow-cta span {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+    .flow-cta {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
 }
 
 /* ==============================================
