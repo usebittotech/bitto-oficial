@@ -263,11 +263,26 @@ main { padding-top: 78px; }
   transform: none;
 }
 .plan-card.featured { border: 2px solid #91b800; background: #f9ffe6; }
+.badge-popular,
 .popular-badge { background: var(--home-lime); color: #2b3900; }
 .plan-card h3, .plan-price, .plan-features li { color: var(--home-ink); }
 .plan-card p, .plan-period, .plan-billing { color: var(--home-muted); }
 .plan-toggle { background: #eef0e7; border: 1px solid var(--home-line); }
 .plan-toggle-btn.active { background: white; color: var(--home-ink); }
+.plan-card.featured .plan-toggle-btn { color: var(--home-muted); }
+.plan-card.featured .plan-toggle-btn.active { color: var(--home-ink); }
+.plan-card.featured .plan-name,
+.plan-card.featured .plan-price,
+.plan-card.featured .plan-price span,
+.plan-card.featured .plan-features li,
+.plan-card.featured .plan-features b { color: var(--home-ink); }
+.plan-card.featured .plan-desc,
+.plan-card.featured .plan-price-old { color: var(--home-muted); }
+.plan-card.featured .plan-savings {
+  color: #536e00;
+  background: #eaf4ca;
+}
+.plan-card.featured .icon-check { color: #536e00; background: #eaf4ca; }
 .pricing-guarantee { border: 1px solid var(--home-line); background: white; border-radius: 14px; }
 
 #faq.section-padding { border-top: 1px solid var(--home-line); }
