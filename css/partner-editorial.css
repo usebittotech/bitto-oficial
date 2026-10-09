@@ -2,3 +2,5 @@
 
 .partner-nav nav{position:static!important;inset:auto!important;width:auto!important;height:auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;z-index:auto!important}
 
+.partner-footer{max-width:none!important;width:100%!important;margin:0!important;padding:36px max(28px,calc((100vw - 1124px)/2))!important;background:var(--dark)!important;color:#bdc6b7!important}.partner-footer a{color:#fff!important}@media(max-width:800px){.partner-footer{padding:28px 20px!important}}
+
