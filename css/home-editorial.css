@@ -322,7 +322,14 @@ main { padding-top: 78px; }
 footer { background: var(--home-paper); color: var(--home-ink); border-top: 1px solid var(--home-line); }
 .footer-container { max-width: 1180px; padding: 54px 32px 28px; }
 .footer-col h4, .logo-footer, .logo-footer span { color: var(--home-ink); }
-.footer-col p, .footer-col a, .footer-bottom { color: var(--home-muted); }
+.footer-col p,
+.footer-col a,
+.footer-col ul li a,
+.social-links a,
+.footer-bottom,
+.footer-bottom p { color: var(--home-muted); }
+.footer-col ul li a:hover,
+.social-links a:hover { color: var(--home-ink); }
 .footer-bottom { border-top-color: var(--home-line); }
 
 @media (max-width: 900px) {

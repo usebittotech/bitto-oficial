@@ -48,6 +48,20 @@ function setupLandingAnalytics() {
     });
   });
 
+  document.querySelectorAll("[data-product-link], [data-product]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const itemId = el.dataset.productLink || el.dataset.product;
+      trackEvent("select_item", {
+        item_list_name: "materiais_complementares",
+        items: [{ item_id: itemId, item_name: el.textContent.trim().slice(0, 80) }],
+      });
+      trackEvent("digital_product_click", {
+        product_id: itemId,
+        page_path: window.location.pathname,
+      });
+    });
+  });
+
   // Scroll até a seção de preços (indica intenção de compra)
   const pricingSection = document.getElementById("planos");
   if (pricingSection && "IntersectionObserver" in window) {
