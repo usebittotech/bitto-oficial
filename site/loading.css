@@ -226,6 +226,9 @@ h1 {
   font-weight: 900;
   margin-bottom: 1.5rem;
 }
+.hero h1 {
+  font-size: clamp(2.7rem, 4.2vw, 3.7rem);
+}
 .highlight {
   background: var(--accent);
   padding: 0 8px;
